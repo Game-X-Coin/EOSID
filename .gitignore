@@ -1,3 +1,22 @@
+# NodeJS modules folder
 node_modules/**/*
+
+#expo
 .expo/*
+
+# npm debug log
 npm-debug.*
+
+#npm
+package-lock.json
+
+# yarn
+yarn.lock
+yarn-debug.log*
+yarn-error.log*
+
+# mac
+.DS_Store
+
+# misc
+.env
