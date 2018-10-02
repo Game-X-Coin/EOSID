@@ -12,5 +12,12 @@
     "expo": "^30.0.1",
     "react": "16.3.1",
     "react-native": "https://github.com/expo/react-native/archive/sdk-30.0.0.tar.gz"
+  },
+  "devDependencies": {
+    "babel-eslint": "^10.0.1",
+    "eslint": "^5.6.1",
+    "eslint-plugin-prettier": "^3.0.0",
+    "eslint-plugin-react-app": "^3.0.0",
+    "eslint-plugin-react-native": "^3.3.0"
   }
 }
