@@ -1,12 +1,29 @@
 {
   "name": "EOSID",
+  "version": "0.1.0",
   "main": "node_modules/expo/AppEntry.js",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://gitlab.com/Game-X-Coin/eosidmobile"
+  },
+  "keywords": [
+    "EOS",
+    "EOSID",
+    "react-native"
+  ],
+  "author": "GXC",
+  "bugs": {
+    "url": "https://gitlab.com/Game-X-Coin/eosidmobile/issues",
+    "email": "dev@bcventures.io"
+  },
+  "homepage": "https://gitlab.com/Game-X-Coin/eosidmobile",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "eject": "expo eject"
+    "eject": "expo eject",
+    "lint-js": "eslint --ignore-path .gitignore --ignore-pattern \"!**/.*\" ."
   },
   "dependencies": {
     "expo": "^30.0.1",
