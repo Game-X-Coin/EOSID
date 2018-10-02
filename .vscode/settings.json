@@ -1,0 +1,10 @@
+{
+  "editor.formatOnSave": true,
+  "javascript.format.enable": true,
+  "prettier.eslintIntegration": true,
+  "prettier.stylelintIntegration": true,
+  "files.associations": {
+    "*.js": "javascriptreact",
+    "*.json": "json"
+  }
+}
