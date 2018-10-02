@@ -22,13 +22,16 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
+    "test": "jest",
     "eject": "expo eject",
     "lint-js": "eslint --ignore-path .gitignore --ignore-pattern \"!**/.*\" ."
   },
   "dependencies": {
     "expo": "^30.0.1",
+    "jest-expo": "^30.0.0",
     "react": "16.3.1",
-    "react-native": "https://github.com/expo/react-native/archive/sdk-30.0.0.tar.gz"
+    "react-native": "https://github.com/expo/react-native/archive/sdk-30.0.0.tar.gz",
+    "react-test-renderer": "^16.5.2"
   },
   "devDependencies": {
     "babel-eslint": "^10.0.1",
