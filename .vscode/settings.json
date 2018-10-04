@@ -6,5 +6,6 @@
   "files.associations": {
     "*.js": "javascriptreact",
     "*.json": "json"
-  }
+  },
+  "editor.tabSize": 2
 }
