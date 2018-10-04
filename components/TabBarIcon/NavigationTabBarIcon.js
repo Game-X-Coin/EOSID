@@ -5,14 +5,15 @@ import TabBarIcon from './TabBarIcon';
 
 export default class NavigationTabBarIcon extends Component {
   render() {
+    const { name, ...props } = this.props;
     return (
       <TabBarIcon
         name={
           Platform.OS === 'ios'
-            ? `ios-information-circle${this.props.focused ? '' : '-outline'}`
-            : 'md-information-circle'
+            ? `ios-${name}${this.props.focused ? '' : '-outline'}`
+            : `md-${name}`
         }
-        {...this.props}
+        {...props}
       />
     );
   }
