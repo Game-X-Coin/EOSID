@@ -1,14 +1,11 @@
-import { createSwitchNavigator, createStackNavigator } from 'react-navigation';
+import { createSwitchNavigator } from 'react-navigation';
 
-import MainTabNavigator from './MainTabNavigator';
-import AccountNavigator from './AccountNavigator';
+import { AuthStackNavigator, MainStackNavigator } from './navigators';
 
 export default createSwitchNavigator(
   {
-    // You could add another route here for authentication.
-    // Read more at https://reactnavigation.org/docs/en/auth-flow.html
-    Main: MainTabNavigator,
-    Account: AccountNavigator
+    Auth: AuthStackNavigator,
+    Main: MainStackNavigator
   },
   {
     initialRouteName: 'Main'
