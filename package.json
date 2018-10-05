@@ -22,7 +22,7 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "test": "jest",
+    "test": "jest --watchAll",
     "eject": "expo eject",
     "lint-js": "eslint --ignore-path .gitignore --ignore-pattern \"!**/.*\" ."
   },
@@ -31,6 +31,9 @@
     "jest-expo": "^30.0.0",
     "react": "16.3.1",
     "react-native": "https://github.com/expo/react-native/archive/sdk-30.0.0.tar.gz",
+    "react-native-material-textfield": "^0.12.0",
+    "react-native-paper": "^2.0.1",
+    "react-navigation": "^2.17.0",
     "react-test-renderer": "^16.5.2"
   },
   "devDependencies": {

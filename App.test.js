@@ -1,9 +1,21 @@
 import React from 'react';
+import renderer from 'react-test-renderer';
+import NavigationTestUtils from 'react-navigation/NavigationTestUtils';
 import App from './App';
 
-import renderer from 'react-test-renderer';
+describe('App snapshot', () => {
+  jest.useFakeTimers();
+  beforeEach(() => {
+    NavigationTestUtils.resetInternalState();
+  });
 
-it('renders without crashing', () => {
-  const rendered = renderer.create(<App />).toJSON();
-  expect(rendered).toBeTruthy();
+  it('renders the loading screen', async () => {
+    const tree = renderer.create(<App />).toJSON();
+    expect(tree).toMatchSnapshot();
+  });
+
+  it('renders the root without loading screen', async () => {
+    const tree = renderer.create(<App skipLoadingScreen />).toJSON();
+    expect(tree).toMatchSnapshot();
+  });
 });
