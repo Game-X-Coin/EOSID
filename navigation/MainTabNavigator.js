@@ -4,7 +4,12 @@ import {
   createBottomTabNavigator
 } from 'react-navigation';
 
-import { AccountScreen, SettingScreen } from '../screens';
+import {
+  AccountScreen,
+  TransactionScreen,
+  NetworkScreen,
+  SettingScreen
+} from '../screens';
 import { NavigationTabBarIcon } from '../components/TabBarIcon';
 
 const HomeStack = createStackNavigator({ Account: AccountScreen });
@@ -12,6 +17,24 @@ HomeStack.navigationOptions = {
   tabBarLabel: 'Account',
   tabBarIcon: ({ focused }) => (
     <NavigationTabBarIcon focused={focused} name="information-circle" />
+  )
+};
+
+const TransactionStack = createStackNavigator({
+  Transaction: TransactionScreen
+});
+TransactionStack.navigationOptions = {
+  tabBarLabel: 'Transaction',
+  tabBarIcon: ({ focused }) => (
+    <NavigationTabBarIcon focused={focused} name="link" />
+  )
+};
+
+const NetworkStack = createStackNavigator({ Network: NetworkScreen });
+NetworkStack.navigationOptions = {
+  tabBarLabel: 'Network',
+  tabBarIcon: ({ focused }) => (
+    <NavigationTabBarIcon focused={focused} name="desktop" />
   )
 };
 
@@ -23,4 +46,9 @@ SettingStack.navigationOptions = {
   )
 };
 
-export default createBottomTabNavigator({ HomeStack, SettingStack });
+export default createBottomTabNavigator({
+  HomeStack,
+  TransactionStack,
+  NetworkStack,
+  SettingStack
+});
