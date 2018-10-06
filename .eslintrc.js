@@ -12,5 +12,10 @@ module.exports = {
     quotes: ['error', 'single', { avoidEscape: true }],
     // 'prettier/prettier': ['error']
     code: 80
+  },
+  parserOptions: {
+    ecmaFeatures: {
+      legacyDecorators: true
+    }
   }
 };
