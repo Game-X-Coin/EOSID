@@ -4,6 +4,8 @@ import { AppLoading, Font, Icon } from 'expo';
 
 import AppNavigator from './navigation/AppNavigator';
 
+import { initializeDB } from './db';
+
 export default class RenderApp extends Component {
   constructor() {
     super();
@@ -15,6 +17,7 @@ export default class RenderApp extends Component {
 
   async startAsyncLoading() {
     return Promise.all([
+      initializeDB(),
       // Asset.loadAsync(),
       Font.loadAsync({
         ...Icon.Ionicons.font
