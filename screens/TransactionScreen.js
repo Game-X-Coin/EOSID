@@ -43,7 +43,7 @@ export default class TransactionScreen extends Component {
                     {actions.map((action, i) => (
                       <List.Item
                         key={i}
-                        title={`${action.action_trace.act.name}::${
+                        title={`${action.action_trace.act.account}::${
                           action.action_trace.act.name
                         }`}
                         description={action.action_trace.trx_id}
