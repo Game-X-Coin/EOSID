@@ -16,6 +16,7 @@ class Store {
 
   @action
   setUser(user) {
+    console.log(user);
     this.currentUser = user;
   }
 
@@ -32,7 +33,6 @@ class Store {
       ...userInfo,
       id: this.currentUser.id
     }).then(user => {
-      console.log(user);
       this.setUser(user);
     });
   }
@@ -48,6 +48,7 @@ class Store {
   async signUp(formData) {
     return UserService.signUp(formData).then(user => {
       this.setUser(user);
+      this.getUsers();
     });
   }
 

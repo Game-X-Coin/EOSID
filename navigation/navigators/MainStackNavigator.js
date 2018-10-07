@@ -6,23 +6,23 @@ import {
 
 import { NavigationTabBarIcon } from '../../components/TabBarIcon';
 
+import { AccountScreen, TransactionScreen, NetworkScreen } from '../../screens';
+
 import {
-  AccountScreen,
-  TransactionScreen,
-  NetworkScreen,
-  SettingsScreen
-} from '../../screens';
+  SettingsScreen,
+  AddNetworkScreen,
+  NetworkScreen as SettingsNetworkScreen
+} from '../../screens/Main';
 
 import AddAccountScreen from '../../screens/Account/AddAccountScreen';
 
 // detail screens
 const DetailScreens = {
   // accounts
-  AddAccount: AddAccountScreen
-  /* settings
-  language: { screen: LanguageScreen },
-  network: { screen: NetworkScreen },
-  */
+  AddAccount: AddAccountScreen,
+  // settings
+  SettingsNetwork: SettingsNetworkScreen,
+  AddNetwork: AddNetworkScreen
 };
 
 // for tab icons

@@ -29,6 +29,7 @@
   "dependencies": {
     "@haskkor/react-native-pincode": "^1.6.6",
     "expo": "^30.0.1",
+    "formik": "^1.3.1",
     "jest-expo": "^30.0.0",
     "mobx": "4.2.1",
     "mobx-react": "5.1.2",
@@ -39,7 +40,8 @@
     "react-native-sqlite-storage": "^3.3.5",
     "react-navigation": "^2.17.0",
     "react-test-renderer": "^16.5.2",
-    "typeorm": "github:cuibonobo/typeorm-package"
+    "typeorm": "github:cuibonobo/typeorm-package",
+    "yup": "^0.26.6"
   },
   "devDependencies": {
     "babel-eslint": "^10.0.1",
