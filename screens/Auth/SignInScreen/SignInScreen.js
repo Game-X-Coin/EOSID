@@ -1,66 +1,45 @@
 import React, { Component } from 'react';
-import { View, SafeAreaView } from 'react-native';
-// import { observer, inject } from 'mobx-react';
+import { SafeAreaView } from 'react-native';
+import { observable } from 'mobx';
+import { observer, inject } from 'mobx-react';
+import { Appbar } from 'react-native-paper';
+import Pincode from '@haskkor/react-native-pincode';
 
-// import { UserError } from "../../../db"
-/* 
-import { Text } from "../../shared/text"
-import { Screen } from "../../shared/screen"
-import { Header } from "../../shared/header"
-import { Button } from "../../shared/button"
-import { TextField } from "../../shared/text-field"
-import { Wallpaper } from "../../shared/wallpaper" */
-
-// import { color, spacing } from "../../../theme"
-
+@inject('userStore')
+@observer
 export class SignInScreen extends Component {
-  goBack = () => this.props.navigation.goBack();
+  @observable
+  pinStatus = 'initial';
+
+  signIn = async pincode => {
+    const { userStore, navigation } = this.props;
+
+    try {
+      await userStore.signIn({ pincode });
+      navigation.navigate('Account');
+    } catch (error) {
+      this.pinStatus = 'failure';
+    }
+  };
 
   render() {
-    const {
-      values,
-      errors,
-      touched,
-      setFieldValue,
-      setFieldTouched,
-      handleSubmit,
-      isSubmitting
-    } = this.props;
-
     return (
-      <View>
-        <SafeAreaView>
-          {/* <Text style={TITLE_WRAPPER}>
-              <Text style={TITLE} tx="signUpScreen.title" />
-            </Text>
+      <SafeAreaView style={{ flex: 1 }}>
+        <Appbar.Header>
+          <Appbar.BackAction
+            onPress={() => this.props.navigation.goBack(null)}
+          />
+          <Appbar.Content title="Sign in" />
+        </Appbar.Header>
 
-            <TextField
-              labelTx="signUpScreen.username"
-              value={values.username}
-              error={touched.username && errors.username}
-              onChangeText={_ => {
-                setFieldTouched("username", true)
-                setFieldValue("username", _)
-              }}
-            />
-            <TextField
-              secureTextEntry
-              labelTx="signUpScreen.password"
-              value={values.password}
-              error={touched.password && errors.password}
-              onChangeText={_ => {
-                setFieldTouched("password", true)
-                setFieldValue("password", _)
-              }}
-            />
-
-              <Button
-                tx="signUpScreen.submit"
-                disabled={Boolean(isSubmitting)}
-                onPress={() => handleSubmit()}
-              /> */}
-        </SafeAreaView>
-      </View>
+        <Pincode
+          touchIDDisabled
+          status="enter"
+          storedPin="____"
+          pinStatus={this.pinStatus}
+          handleResultEnterPin={this.signIn}
+        />
+      </SafeAreaView>
     );
   }
 }

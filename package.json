@@ -27,8 +27,11 @@
     "lint-js": "eslint --ignore-path .gitignore --ignore-pattern \"!**/.*\" ."
   },
   "dependencies": {
+    "@haskkor/react-native-pincode": "^1.6.6",
     "expo": "^30.0.1",
     "jest-expo": "^30.0.0",
+    "mobx": "4.2.1",
+    "mobx-react": "5.1.2",
     "react": "16.3.1",
     "react-native": "https://github.com/expo/react-native/archive/sdk-30.0.0.tar.gz",
     "react-native-material-textfield": "^0.12.0",
@@ -36,8 +39,6 @@
     "react-native-sqlite-storage": "^3.3.5",
     "react-navigation": "^2.17.0",
     "react-test-renderer": "^16.5.2",
-    "mobx": "4.2.1",
-    "mobx-react": "5.1.2",
     "typeorm": "github:cuibonobo/typeorm-package"
   },
   "devDependencies": {
