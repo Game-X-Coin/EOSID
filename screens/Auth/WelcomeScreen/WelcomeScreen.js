@@ -1,39 +1,48 @@
 import React, { Component } from 'react';
-import { View, SafeAreaView, Button, Text } from 'react-native';
+import { View, SafeAreaView } from 'react-native';
+import { observer, inject } from 'mobx-react';
+import { Button, Text } from 'react-native-paper';
 
-/* import { Button } from '../../shared/button';
-import { Text } from '../../shared/text';
- */
+@inject('userStore')
+@observer
 export class WelcomeScreen extends Component {
   moveScreen = routeName => this.props.navigation.navigate(routeName);
 
   render() {
-    return (
+    const { users } = this.props.userStore;
+
+    const BeforeSignUp = () => (
       <View>
-        <SafeAreaView>
-          <View>
-            <Text text="EOSID" />
-          </View>
-
-          <View>
-            <View>
-              <Text text={'welcomeScreen.title'} />
-              <Text text={'welcomeScreen.subTitle'} />
-            </View>
-
-            <View>
-              <Button
-                title="welcomeScreen.signIn"
-                onPress={() => this.moveScreen('SignIn')}
-              />
-              <Button
-                title="welcomeScreen.signUp"
-                onPress={() => this.moveScreen('SignUp')}
-              />
-            </View>
-          </View>
-        </SafeAreaView>
+        <Text>EOSID, identification for EOS</Text>
+        <Button mode="contained" onPress={() => this.moveScreen('SignUp')}>
+          Start EOSID
+        </Button>
       </View>
+    );
+
+    const SelectUser = () => (
+      <View>
+        <Text>Sign in as</Text>
+        {users.map(({ id, username }) => (
+          <Button
+            key={id}
+            mode="contained"
+            onPress={() => this.moveScreen('SignIn')}
+          >
+            {username}
+          </Button>
+        ))}
+      </View>
+    );
+
+    return (
+      <SafeAreaView style={{ flex: 1 }}>
+        <View style={{ flex: 1 }}>
+          <Text>Welcome to EOSID</Text>
+        </View>
+
+        <View>{users.length ? <SelectUser /> : <BeforeSignUp />}</View>
+      </SafeAreaView>
     );
   }
 }

@@ -4,11 +4,12 @@ import { WelcomeScreen, SignInScreen, SignUpScreen } from '../../screens/Auth';
 
 export const AuthStackNavigator = createStackNavigator(
   {
-    Welcome: { screen: WelcomeScreen },
-    SignIn: { screen: SignInScreen },
-    SignUp: { screen: SignUpScreen }
+    Welcome: WelcomeScreen,
+    SignIn: SignInScreen,
+    SignUp: SignUpScreen
   },
   {
-    headerMode: 'none'
+    headerMode: 'none',
+    cardStyle: { backgroundColor: '#fff' }
   }
 );
