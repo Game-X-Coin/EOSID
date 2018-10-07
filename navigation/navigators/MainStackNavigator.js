@@ -6,15 +6,15 @@ import {
 
 import { NavigationTabBarIcon } from '../../components/TabBarIcon';
 
-import { AccountScreen, TransactionScreen, NetworkScreen } from '../../screens';
+import { TransactionScreen, NetworkScreen } from '../../screens';
 
 import {
+  AccountScreen,
+  AddAccountScreen,
   SettingsScreen,
   AddNetworkScreen,
   NetworkScreen as SettingsNetworkScreen
 } from '../../screens/Main';
-
-import AddAccountScreen from '../../screens/Account/AddAccountScreen';
 
 // detail screens
 const DetailScreens = {
