@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { observable } from 'mobx';
-import { observer, inject } from 'mobx-react';
+import { observer, inject } from 'mobx-react/native';
 import { Platform, StatusBar, StyleSheet, View } from 'react-native';
 import { AppLoading, Font, Icon } from 'expo';
 

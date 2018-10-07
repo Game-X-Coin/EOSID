@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { observer, inject } from 'mobx-react';
+import { observer, inject } from 'mobx-react/native';
 import { SafeAreaView } from 'react-native';
 import { Appbar } from 'react-native-paper';
 import Pincode from '@haskkor/react-native-pincode';

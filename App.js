@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Provider } from 'mobx-react';
+import { Provider } from 'mobx-react/native';
 
 import RenderApp from './RenderApp';
 

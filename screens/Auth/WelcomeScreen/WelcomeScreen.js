@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { View, SafeAreaView } from 'react-native';
-import { observer, inject } from 'mobx-react';
+import { observer, inject } from 'mobx-react/native';
 import { Button, Text } from 'react-native-paper';
 
 @inject('userStore')
