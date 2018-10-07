@@ -7,10 +7,6 @@ import { TextField } from 'react-native-material-textfield';
 import HomeStyle from '../../styles/HomeStyle';
 
 class AddAccountScreen extends Component {
-  static navigationOptions = {
-    header: null
-  };
-
   render() {
     const { navigation } = this.props;
 
@@ -18,8 +14,8 @@ class AddAccountScreen extends Component {
       <View style={HomeStyle.container}>
         <SafeAreaView>
           <Appbar.Header>
-            <Appbar.Content title={'Account'} subtitle={'add account'} />
             <Appbar.BackAction onPress={() => navigation.goBack(null)} />
+            <Appbar.Content title={'Account'} subtitle={'add account'} />
           </Appbar.Header>
           <TextField
             multiline

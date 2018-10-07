@@ -5,10 +5,6 @@ import { Appbar, List } from 'react-native-paper';
 import HomeStyle from '../styles/HomeStyle';
 
 export default class AccountScreen extends Component {
-  static navigationOptions = {
-    header: null
-  };
-
   render() {
     return (
       <View style={HomeStyle.container}>

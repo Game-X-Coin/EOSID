@@ -4,11 +4,7 @@ import { Appbar, List } from 'react-native-paper';
 
 import HomeStyle from '../styles/HomeStyle';
 
-export default class SettingScreen extends Component {
-  static navigationOptions = {
-    header: null
-  };
-
+export default class SettingsScreen extends Component {
   render() {
     return (
       <View style={HomeStyle.container}>
