@@ -8,7 +8,7 @@ import AppNavigator from './navigation/AppNavigator';
 
 import { initializeDB } from './db';
 
-@inject('userStore')
+@inject('userStore', 'networkStore')
 @observer
 export default class RenderApp extends Component {
   @observable
@@ -31,7 +31,11 @@ export default class RenderApp extends Component {
   }
 
   async onFinishLoading() {
-    await this.props.userStore.getUsers();
+    const { userStore, networkStore } = this.props;
+
+    await userStore.getUsers();
+    await networkStore.getNetworks();
+
     this.isLoadingComplete = true;
   }
 

@@ -3,12 +3,13 @@ import { Provider } from 'mobx-react/native';
 
 import RenderApp from './RenderApp';
 
-import { UserStore } from './stores';
+import { UserStore, NetworkStore } from './stores';
 
 export default class App extends Component {
   render() {
     const stores = {
-      userStore: UserStore
+      userStore: UserStore,
+      networkStore: NetworkStore
     };
 
     return (

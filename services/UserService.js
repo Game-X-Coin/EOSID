@@ -22,14 +22,7 @@ export class UserService {
     Object.keys(userInfo).forEach(key => {
       const info = userInfo[key];
 
-      if (info.constructor === Object) {
-        user[key] = {
-          ...user[key],
-          ...info
-        };
-      } else {
-        user[key] = info;
-      }
+      user[key] = info;
     });
 
     // save updated user
