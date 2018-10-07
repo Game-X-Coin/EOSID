@@ -19,7 +19,7 @@ const eosApi = {
         .then(res => res.data)
   },
   currency: {
-    balance: ({ code = 'eosio.token', account, symbol = 'EOS' }) =>
+    balance: ({ code = 'eosio.token', account, symbol }) =>
       api
         .post('/v1/chain/get_currency_balance', { code, account, symbol })
         .then(res => res.data),
