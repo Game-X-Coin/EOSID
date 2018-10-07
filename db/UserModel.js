@@ -1,5 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm/browser';
 
+export const USER_KEY = 'user';
+
 export class UserError {
   constructor({ message = '', errors = {} }) {
     this.message = message;
@@ -19,7 +21,7 @@ export class UserError {
   }
 }
 
-@Entity('user')
+@Entity(USER_KEY)
 export class UserModel {
   @PrimaryGeneratedColumn('uuid')
   id = undefined;
@@ -29,8 +31,9 @@ export class UserModel {
 
   constructor(data) {
     if (data) {
-      const { username } = data;
+      const { id, username } = data;
 
+      this.id = id;
       this.username = username;
     }
   }
