@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { observable } from 'mobx';
+import { observer, inject } from 'mobx-react';
 import { Platform, StatusBar, StyleSheet, View } from 'react-native';
 import { AppLoading, Font, Icon } from 'expo';
 
@@ -6,14 +8,11 @@ import AppNavigator from './navigation/AppNavigator';
 
 import { initializeDB } from './db';
 
+@inject('userStore')
+@observer
 export default class RenderApp extends Component {
-  constructor() {
-    super();
-
-    this.state = {
-      isLoadingComplete: false
-    };
-  }
+  @observable
+  isLoadingComplete = false;
 
   async startAsyncLoading() {
     return Promise.all([
@@ -31,12 +30,13 @@ export default class RenderApp extends Component {
     console.warn(error);
   }
 
-  onFinishLoading() {
-    this.setState({ isLoadingComplete: true });
+  async onFinishLoading() {
+    await this.props.userStore.getUsers();
+    this.isLoadingComplete = true;
   }
 
   render() {
-    if (!this.state.isLoadingComplete) {
+    if (!this.isLoadingComplete) {
       return (
         <AppLoading
           startAsync={() => this.startAsyncLoading()}
