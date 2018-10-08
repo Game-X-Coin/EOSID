@@ -64,6 +64,15 @@ export class TransactionDetailScreen extends Component {
               </Text>
             </View>
             <View style={{ marginTop: 5, marginBottom: 5 }}>
+              <Text style={{ fontWeight: 'bold' }}>Status</Text>
+              <Text>
+                {info && `${info.trx.receipt.status}`}
+                {info && info.last_irreversible_block
+                  ? ' irreversible'
+                  : ' reversible'}
+              </Text>
+            </View>
+            <View style={{ marginTop: 5, marginBottom: 5 }}>
               <Text style={{ fontWeight: 'bold' }}>CPU Usage</Text>
               <Text>{info && info.trx.receipt.cpu_usage_us} us</Text>
             </View>
