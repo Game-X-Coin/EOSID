@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { SafeAreaView, ScrollView, Text, View } from 'react-native';
-import { Appbar, List } from 'react-native-paper';
+import { Appbar } from 'react-native-paper';
+import moment from 'moment';
 
 import HomeStyle from '../styles/HomeStyle';
 import eosApi from '../utils/eosApi';
@@ -38,19 +39,28 @@ export default class TransactionScreen extends Component {
           <ScrollView style={{}} contentContainerStyle={{}}>
             <View style={HomeStyle.welcomeContainer}>
               {fetched &&
-                actions && (
-                  <List.Section>
-                    {actions.map((action, i) => (
-                      <List.Item
-                        key={i}
-                        title={`${action.action_trace.act.account}::${
-                          action.action_trace.act.name
-                        }`}
-                        description={action.action_trace.trx_id}
-                      />
-                    ))}
-                  </List.Section>
-                )}
+                actions &&
+                actions.map((action, i) => (
+                  <View key={i} style={{ padding: 10 }}>
+                    <View>
+                      <Text style={{ fontWeight: 'bold', fontSize: 17 }}>{`${
+                        action.action_trace.act.account
+                      }::${action.action_trace.act.name}`}</Text>
+                      <Text>{moment(action.block_time).fromNow()}</Text>
+                    </View>
+                    <View>
+                      <Text
+                        onPress={() =>
+                          this.props.navigation.navigate('TransactionDetail', {
+                            txId: action.action_trace.trx_id
+                          })
+                        }
+                      >
+                        {action.action_trace.trx_id}
+                      </Text>
+                    </View>
+                  </View>
+                ))}
             </View>
           </ScrollView>
         </SafeAreaView>

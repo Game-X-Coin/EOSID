@@ -13,7 +13,8 @@ import {
   AddAccountScreen,
   SettingsScreen,
   AddNetworkScreen,
-  NetworkScreen as SettingsNetworkScreen
+  NetworkScreen as SettingsNetworkScreen,
+  TransactionDetailScreen
 } from '../../screens/Main';
 
 // detail screens
@@ -22,7 +23,10 @@ const DetailScreens = {
   AddAccount: AddAccountScreen,
   // settings
   SettingsNetwork: SettingsNetworkScreen,
-  AddNetwork: AddNetworkScreen
+  AddNetwork: AddNetworkScreen,
+  TransactionDetail: {
+    screen: TransactionDetailScreen
+  }
 };
 
 // for tab icons

@@ -29,8 +29,11 @@ const eosApi = {
         .then(res => res.data)
   },
   transactions: {
-    get: id =>
-      api.post('/v1/history/get_transaction', { id }).then(res => res.data),
+    get: ({ id }) =>
+      (isJungleNet
+        ? axios.post(`${historyURL}/v1/history/get_transaction`, { id })
+        : api.post('/v1/history/get_transaction', { id })
+      ).then(res => res.data),
     getRequiredKeys: ({ transaction, available_keys }) =>
       api
         .post('/v1/chain/get_required_keys', { transaction, available_keys })
