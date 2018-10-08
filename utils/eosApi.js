@@ -1,6 +1,8 @@
 import axios from 'axios';
 
 const baseURL = 'http://jungle.cryptolions.io:18888';
+const historyURL = 'http://junglehistory.cryptolions.io:18888';
+const isJungleNet = true;
 const api = axios.create({ baseURL });
 
 const eosApi = {
@@ -17,7 +19,7 @@ const eosApi = {
         .then(res => res.data)
   },
   currency: {
-    balance: ({ code = 'eosio.token', account, symbol = 'EOS' }) =>
+    balance: ({ code = 'eosio.token', account, symbol }) =>
       api
         .post('/v1/chain/get_currency_balance', { code, account, symbol })
         .then(res => res.data),
@@ -32,13 +34,34 @@ const eosApi = {
     getRequiredKeys: ({ transaction, available_keys }) =>
       api
         .post('/v1/chain/get_required_keys', { transaction, available_keys })
+        .then(res => res.data),
+    gets: ({ scope, code, table, json, lower_bound, upper_bound, limit }) =>
+      api
+        .post('/v1/chain/get_table_rows', {
+          scope,
+          code,
+          table,
+          json,
+          lower_bound,
+          upper_bound,
+          limit
+        })
         .then(res => res.data)
   },
   actions: {
     get: ({ pos, offset, account_name }) =>
       api
         .post('/v1/history/get_actions', { pos, offset, account_name })
-        .then(res => res.data)
+        .then(res => res.data),
+    gets: ({ pos = 0, offset = 10, account_name }) =>
+      (isJungleNet
+        ? axios.post(`${historyURL}/v1/history/get_actions`, {
+            pos,
+            offset,
+            account_name
+          })
+        : api.post('/v1/history/get_actions', { pos, offset, account_name })
+      ).then(res => res.data)
   },
   producers: {
     get: ({ id }) =>
