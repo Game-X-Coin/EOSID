@@ -30,15 +30,11 @@ export class AccountError {
     });
   }
 
-  static get AccountAlreadyExist() {
-    return new AccountError({
-      message: 'Account already exist'
-    });
-  }
-
   static get AccountNotAvailable() {
     return new AccountError({
-      message: 'Account is not available'
+      errors: {
+        privateKey: 'Account is not available'
+      }
     });
   }
 }

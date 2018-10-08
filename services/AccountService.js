@@ -3,6 +3,8 @@ import { Eos } from 'react-native-eosjs';
 
 import { AccountModel, AccountError } from '../db';
 
+import eosApi from '../utils/eosApi';
+
 const eosjs = {
   privateToPublic(privateKey) {
     return new Promise(resolve => {
@@ -10,10 +12,6 @@ const eosjs = {
         resolve(e);
       });
     });
-  },
-
-  async getKeyAccounts(publicKey) {
-    return { account_names: ['iamqwdwqd'] };
   }
 };
 
@@ -39,7 +37,7 @@ export class AccountService {
 
   static async findKeyAccount(publicKey) {
     // find account
-    const { account_names } = await eosjs.getKeyAccounts(publicKey);
+    const { account_names } = await eosApi.accounts.getsByPublicKey(publicKey);
 
     // invalid account
     if (!account_names.length) {

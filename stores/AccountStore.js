@@ -15,17 +15,17 @@ class Store {
     );
   }
 
-  /* @computed
+  @computed
   get currentUserAccount() {
-    const { accountId } = UserStore.currentUser.settings
+    const { accountId } = UserStore.currentUser;
 
-    return this.userAccounts.find(account => account.id === accountId)
-  } */
+    return this.userAccounts.find(account => account.id === accountId);
+  }
 
   @action
   async changeUserAccount(accountId) {
     // update user info
-    // await UserStore.updateUser({ settings: { accountId } });
+    await UserStore.updateUser({ accountId });
   }
 
   @action

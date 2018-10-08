@@ -29,12 +29,16 @@ export class UserModel {
   @Column('varchar')
   username = '';
 
+  @Column('varchar')
+  accountId = ''; // using eos account
+
   constructor(data) {
     if (data) {
-      const { id, username } = data;
+      const { id, username = '', accountId = '' } = data;
 
       this.id = id;
       this.username = username;
+      this.accountId = accountId;
     }
   }
 
