@@ -1,14 +1,7 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { SafeAreaView, ScrollView, Text, View } from 'react-native';
-import {
-  Appbar,
-  Colors,
-  Divider,
-  List,
-  ProgressBar,
-  Title
-} from 'react-native-paper';
+import { Colors, Divider, List, ProgressBar, Title } from 'react-native-paper';
 import bytes from 'bytes';
 import prettyMs from 'pretty-ms';
 
