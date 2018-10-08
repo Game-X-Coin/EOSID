@@ -25,7 +25,6 @@ export class TransactionDetailScreen extends Component {
     const { navigation } = this.props;
     const txId = navigation.state.params.txId;
     const transaction = await eosApi.transactions.get({ id: txId });
-    console.log(transaction);
     this.setState({ fetched: true, info: transaction });
   }
 
@@ -47,28 +46,42 @@ export class TransactionDetailScreen extends Component {
             />
           </Appbar.Header>
           <ScrollView style={{ padding: 15 }}>
-            <View>
+            <View style={{ marginTop: 5, marginBottom: 5 }}>
               <Text style={{ fontWeight: 'bold' }}>Transaction ID</Text>
               <Text>{navigation.state.params.txId}</Text>
             </View>
-            <View>
+            <View style={{ marginTop: 5, marginBottom: 5 }}>
               <Text style={{ fontWeight: 'bold' }}>Block Num</Text>
               <Text>{info && info.block_num}</Text>
             </View>
-            <View>
+            <View style={{ marginTop: 5, marginBottom: 5 }}>
               <Text style={{ fontWeight: 'bold' }}>Block Time</Text>
-              <Text>{info && moment(info.block_time).fromNow()}</Text>
+              <Text>
+                {info &&
+                  `${moment(info.block_time).format('lll')} (${moment(
+                    info.block_time
+                  ).fromNow()})`}
+              </Text>
             </View>
-            <View>
+            <View style={{ marginTop: 5, marginBottom: 5 }}>
+              <Text style={{ fontWeight: 'bold' }}>Status</Text>
+              <Text>
+                {info && `${info.trx.receipt.status}`}
+                {info && info.last_irreversible_block
+                  ? ' irreversible'
+                  : ' reversible'}
+              </Text>
+            </View>
+            <View style={{ marginTop: 5, marginBottom: 5 }}>
               <Text style={{ fontWeight: 'bold' }}>CPU Usage</Text>
               <Text>{info && info.trx.receipt.cpu_usage_us} us</Text>
             </View>
-            <View>
+            <View style={{ marginTop: 5, marginBottom: 5 }}>
               <Text style={{ fontWeight: 'bold' }}>Net Usage</Text>
               <Text>{info && info.trx.receipt.net_usage_words} words</Text>
             </View>
             <Divider />
-            <View>
+            <View style={{ marginTop: 5, marginBottom: 5 }}>
               <Text style={{ fontSize: 16, fontWeight: 'bold' }}>Actions</Text>
               {fetched &&
                 info &&
@@ -89,6 +102,33 @@ export class TransactionDetailScreen extends Component {
                     <View>
                       <Text style={{ color: 'gray' }}>
                         {JSON.stringify(action.data)}
+                      </Text>
+                    </View>
+                  </View>
+                ))}
+            </View>
+            <Divider />
+            <View style={{ marginTop: 5, marginBottom: 5 }}>
+              <Text style={{ fontSize: 16, fontWeight: 'bold' }}>Traces</Text>
+              {fetched &&
+                info &&
+                info.traces.map((trace, i) => (
+                  <View key={i}>
+                    <View>
+                      <Text style={{ fontWeight: 'bold' }}>{`${
+                        trace.act.account
+                      }::${trace.act.name}`}</Text>
+                    </View>
+                    <View>
+                      {trace.act.authorization.map((auth, i) => (
+                        <Text key={i}>{`${auth.actor}@${
+                          auth.permission
+                        }`}</Text>
+                      ))}
+                    </View>
+                    <View>
+                      <Text style={{ color: 'gray' }}>
+                        {JSON.stringify(trace.act.data)}
                       </Text>
                     </View>
                   </View>
