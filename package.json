@@ -44,7 +44,7 @@
     "react-native-paper": "^2.0.1",
     "react-native-sqlite-storage": "^3.3.5",
     "react-navigation": "^2.17.0",
-    "typeorm": "github:cuibonobo/typeorm-package",
+    "typeorm": "github:gomonk3037/typeorm-package",
     "yup": "^0.26.6"
   },
   "devDependencies": {

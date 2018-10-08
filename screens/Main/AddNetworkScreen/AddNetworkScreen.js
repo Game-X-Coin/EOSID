@@ -18,11 +18,13 @@ import HomeStyle from '../../../styles/HomeStyle';
     url: ''
   }),
   validationSchema: props => {
-    const { errors } = NetworkError.RequiredFields;
+    const { InvalidUrl, RequiredFields } = NetworkError;
 
     return Yup.object().shape({
-      name: Yup.string().required(errors.name),
-      url: Yup.string().required(errors.url)
+      name: Yup.string().required(RequiredFields.errors.name),
+      url: Yup.string()
+        .required(RequiredFields.errors.url)
+        .url(InvalidUrl.errors.url)
     });
   },
   handleSubmit: async (values, { props, setSubmitting, setErrors }) => {
