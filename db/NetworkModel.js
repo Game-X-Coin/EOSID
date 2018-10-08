@@ -16,6 +16,22 @@ export class NetworkError {
       }
     });
   }
+
+  static get InvalidUrl() {
+    return new NetworkError({
+      errors: {
+        url: 'Invalid url'
+      }
+    });
+  }
+
+  static get NoResponseUrl() {
+    return new NetworkError({
+      errors: {
+        url: 'No response from url you entered'
+      }
+    });
+  }
 }
 
 @Entity(NETWORK_KEY)
@@ -30,15 +46,19 @@ export class NetworkModel {
   url = '';
 
   @Column('varchar')
+  chainId = '';
+
+  @Column('varchar')
   userId = '';
 
   constructor(data) {
     if (data) {
-      const { id, name, url, userId } = data;
+      const { id, name, url, chainId, userId } = data;
 
       this.id = id;
       this.name = name;
       this.url = url;
+      this.chainId = chainId;
       this.userId = userId;
     }
   }

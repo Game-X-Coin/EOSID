@@ -15,20 +15,14 @@ export class UserService {
     return users;
   }
 
-  static async updateUser(userInfo) {
+  static async updateUser({ id, ...userInfo }) {
     const UserRepo = getRepository(UserModel);
-    const user = await UserRepo.findOne(userInfo.id);
+    // save
+    await UserRepo.update(id, userInfo);
 
-    Object.keys(userInfo).forEach(key => {
-      const info = userInfo[key];
+    const updatedUser = await UserRepo.findOne(id);
 
-      user[key] = info;
-    });
-
-    // save updated user
-    await UserRepo.save(user);
-
-    return user;
+    return updatedUser;
   }
 
   static async signIn({ username = DEFAULT_USERNAME, pincode }) {

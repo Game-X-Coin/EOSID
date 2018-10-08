@@ -1,6 +1,8 @@
 import { getRepository } from 'typeorm/browser';
 
-import { NetworkModel } from '../db';
+import { NetworkModel, NetworkError } from '../db';
+
+import eosApi from '../utils/eosApi';
 
 export class NetworkService {
   static async getNetworks() {
@@ -13,8 +15,19 @@ export class NetworkService {
   static async addNetwork(networkInfo) {
     const NetworkRepo = getRepository(NetworkModel);
 
+    let info;
+
+    try {
+      info = await eosApi.info.get();
+    } catch (error) {
+      return Promise.reject(NetworkError.NoResponseUrl);
+    }
+
     // create new network instance
-    const newNetwork = new NetworkModel(networkInfo);
+    const newNetwork = new NetworkModel({
+      ...networkInfo,
+      chainId: info.chain_id
+    });
 
     // save
     await NetworkRepo.save(newNetwork);
@@ -29,6 +42,6 @@ export class NetworkService {
     const findNetwork = await NetworkRepo.findOne(networkId);
 
     // remove
-    NetworkRepo.remove(findNetwork);
+    await NetworkRepo.remove(findNetwork);
   }
 }

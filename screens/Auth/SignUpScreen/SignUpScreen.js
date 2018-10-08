@@ -12,7 +12,7 @@ export class SignUpScreen extends Component {
 
     try {
       await userStore.signUp({ pincode });
-      navigation.navigate('Welcome');
+      navigation.navigate('Account');
     } catch (error) {
       console.log(error);
     }
