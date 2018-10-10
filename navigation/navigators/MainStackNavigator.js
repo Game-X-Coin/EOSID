@@ -6,7 +6,7 @@ import {
 
 import { NavigationTabBarIcon } from '../../components/TabBarIcon';
 
-import { TransactionScreen, NetworkScreen } from '../../screens';
+import { TransactionScreen } from '../../screens';
 
 import {
   AccountScreen,
@@ -31,10 +31,9 @@ const DetailScreens = {
 
 // for tab icons
 const iconMap = {
-  Account: 'information-circle',
-  Transaction: 'link',
-  Network: 'desktop',
-  Settings: 'options'
+  Account: 'contact',
+  Transaction: 'albums',
+  Settings: 'settings'
 };
 
 // tab navigator
@@ -42,7 +41,6 @@ const AppTabNavigator = createBottomTabNavigator(
   {
     Account: AccountScreen,
     Transaction: TransactionScreen,
-    Network: NetworkScreen,
     Settings: SettingsScreen
   },
   {
