@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { View, SafeAreaView } from 'react-native';
 import { observer, inject } from 'mobx-react/native';
-import { Button, Text } from 'react-native-paper';
+import { Button, Text, Title } from 'react-native-paper';
 import { Logo } from '../../../components/SVG';
 
 @inject('userStore')
@@ -14,8 +14,14 @@ export class WelcomeScreen extends Component {
 
     const BeforeSignUp = () => (
       <View>
-        <Text>EOSID, identification for EOS</Text>
-        <Button mode="contained" onPress={() => this.moveScreen('SignUp')}>
+        <Text style={{ textAlign: 'center', marginBottom: 8 }}>
+          EOSID, identification for EOS
+        </Text>
+        <Button
+          style={{ padding: 5 }}
+          mode="contained"
+          onPress={() => this.moveScreen('SignUp')}
+        >
           Start EOSID
         </Button>
       </View>
@@ -23,10 +29,11 @@ export class WelcomeScreen extends Component {
 
     const SelectUser = () => (
       <View>
-        <Text>Sign in as</Text>
+        <Text style={{ textAlign: 'center' }}>Welcome back!</Text>
         {users.map(({ id, username }) => (
           <Button
             key={id}
+            style={{ padding: 5, marginTop: 8 }}
             mode="contained"
             onPress={() => this.moveScreen('SignIn')}
           >
@@ -46,12 +53,18 @@ export class WelcomeScreen extends Component {
           }}
         >
           <Logo width={3.5} height={3.5} />
-          <Text style={{ marginTop: 10, fontSize: 35, fontWeight: 'bold' }}>
-            EOSID
-          </Text>
+          <Title style={{ marginTop: 20, fontSize: 30 }}>
+            Welcome to EOSID
+          </Title>
         </View>
 
-        <View>{users.length ? <SelectUser /> : <BeforeSignUp />}</View>
+        <View
+          style={{
+            margin: 20
+          }}
+        >
+          {users.length ? <SelectUser /> : <BeforeSignUp />}
+        </View>
       </SafeAreaView>
     );
   }
