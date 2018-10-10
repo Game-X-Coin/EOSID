@@ -30,13 +30,9 @@ export default class TransactionScreen extends Component {
       <View style={HomeStyle.container}>
         <SafeAreaView>
           <Appbar.Header>
-            <Appbar.Content title={'Transaction'} subtitle={'transcation'} />
-            <Appbar.Action
-              icon="link"
-              onPress={() => this.props.navigation.navigate('')}
-            />
+            <Appbar.Content title="Transaction" />
           </Appbar.Header>
-          <ScrollView style={{}} contentContainerStyle={{}}>
+          <ScrollView>
             <View style={HomeStyle.welcomeContainer}>
               {fetched &&
                 actions &&

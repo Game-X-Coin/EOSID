@@ -66,29 +66,36 @@ export class AddNetworkScreen extends Component {
           </Appbar.Header>
 
           <ScrollView style={HomeStyle.container}>
-            <TextField
-              label="Name"
-              value={values.name}
-              error={touched.name && errors.name}
-              onChangeText={_ => {
-                setFieldTouched('name', true);
-                setFieldValue('name', _);
-              }}
-            />
+            <View style={{ paddingHorizontal: 15 }}>
+              <TextField
+                label="Name"
+                value={values.name}
+                error={touched.name && errors.name}
+                onChangeText={_ => {
+                  setFieldTouched('name', true);
+                  setFieldValue('name', _);
+                }}
+              />
 
-            <TextField
-              label="Url"
-              value={values.url}
-              error={touched.url && errors.url}
-              onChangeText={_ => {
-                setFieldTouched('url', true);
-                setFieldValue('url', _);
-              }}
-            />
+              <TextField
+                label="Url"
+                value={values.url}
+                error={touched.url && errors.url}
+                onChangeText={_ => {
+                  setFieldTouched('url', true);
+                  setFieldValue('url', _);
+                }}
+              />
 
-            <Button loading={isSubmitting} onPress={() => handleSubmit()}>
-              Add network
-            </Button>
+              <Button
+                mode="contained"
+                style={{ padding: 5, marginTop: 15 }}
+                loading={isSubmitting}
+                onPress={() => handleSubmit()}
+              >
+                Add network
+              </Button>
+            </View>
           </ScrollView>
         </SafeAreaView>
       </View>

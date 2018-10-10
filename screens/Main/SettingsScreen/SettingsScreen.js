@@ -21,7 +21,7 @@ export class SettingsScreen extends Component {
         <SafeAreaView style={HomeStyle.container}>
           <Appbar.Header>
             <Appbar.Content title={'Settings'} />
-            <Appbar.Action icon="lock" onPress={this.signOut} />
+            <Appbar.Action icon="exit-to-app" onPress={this.signOut} />
           </Appbar.Header>
           <ScrollView style={HomeStyle.container}>
             <List.Section>
@@ -33,7 +33,7 @@ export class SettingsScreen extends Component {
               <List.Item
                 title="Language"
                 left={() => <List.Icon icon="translate" />}
-                onPress={() => this.moveScreen('language')}
+                // onPress={() => this.moveScreen('language')}
               />
             </List.Section>
           </ScrollView>

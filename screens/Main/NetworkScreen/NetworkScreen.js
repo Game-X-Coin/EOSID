@@ -8,6 +8,8 @@ import HomeStyle from '../../../styles/HomeStyle';
 @inject('networkStore')
 @observer
 export class NetworkScreen extends Component {
+  moveScreen = routeName => this.props.navigation.navigate(routeName);
+
   render() {
     const { networkStore, navigation } = this.props;
     const { defaultNetworks, userNetworks } = networkStore;
@@ -18,6 +20,10 @@ export class NetworkScreen extends Component {
           <Appbar.Header>
             <Appbar.BackAction onPress={() => navigation.goBack(null)} />
             <Appbar.Content title={'Network'} />
+            <Appbar.Action
+              icon="add"
+              onPress={() => this.moveScreen('AddNetwork')}
+            />
           </Appbar.Header>
 
           <ScrollView style={HomeStyle.container}>
@@ -33,7 +39,7 @@ export class NetworkScreen extends Component {
               ))}
             </List.Section>
 
-            <Button onPress={() => navigation.push('AddNetwork')}>
+            <Button onPress={() => this.moveScreen('AddNetwork')}>
               Add custom network
             </Button>
           </ScrollView>
