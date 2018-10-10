@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { observable } from 'mobx';
 import { observer, inject } from 'mobx-react';
 import { SafeAreaView, ScrollView, View } from 'react-native';
 import {
@@ -83,6 +82,11 @@ export class AddAccountScreen extends Component {
     this.props.setFieldValue('selectedAccount', account);
   }
 
+  cancelSelectAccount() {
+    this.props.setFieldValue('showDialog', false)
+    this.props.setSubmitting(false)
+  }
+
   render() {
     const {
       navigation,
@@ -102,6 +106,41 @@ export class AddAccountScreen extends Component {
       value: network.id
     }));
 
+    const EosAccountDialog = () => (
+      <Portal>
+        <Dialog
+          visible={values.showDialog}
+          onDismiss={() => this.cancelSelectAccount()}
+        >
+          <Dialog.Title>Select eos account</Dialog.Title>
+          <Dialog.Content>
+            <List.Section>
+              {values.accounts.map(account => (
+                <List.Item
+                  key={account}
+                  title={account}
+                  right={() => (
+                    <RadioButton
+                      status={
+                        values.selectedAccount === account
+                          ? 'checked'
+                          : 'unchecked'
+                      }
+                      onPress={() => this.selectAccount(account)}
+                    />
+                  )}
+                  onPress={() => this.selectAccount(account)}
+                />
+              ))}
+            </List.Section>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={() => this.addAccount()}>Done</Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
+    );
+
     return (
       <View style={HomeStyle.container}>
         <SafeAreaView style={HomeStyle.container}>
@@ -110,62 +149,41 @@ export class AddAccountScreen extends Component {
             <Appbar.Content title={'Add eos account'} />
           </Appbar.Header>
           <ScrollView style={HomeStyle.container}>
-            <TextField
-              multiline
-              label="Private key"
-              style={{ fontFamily: 'monospace' }}
-              value={values.privateKey}
-              error={touched.privateKey && errors.privateKey}
-              onChangeText={_ => {
-                setFieldTouched('privateKey', true);
-                setFieldValue('privateKey', _);
-              }}
-            />
+            <View style={{ paddingHorizontal: 15 }}>
+              <TextField
+                multiline
+                label="Private key"
+                style={{ fontFamily: 'monospace' }}
+                value={values.privateKey}
+                error={touched.privateKey && errors.privateKey}
+                onChangeText={_ => {
+                  setFieldTouched('privateKey', true);
+                  setFieldValue('privateKey', _);
+                }}
+              />
 
-            <Dropdown
-              label="Network"
-              data={networks}
-              value={values.networkId}
-              error={touched.networkId && errors.networkId}
-              onChangeText={_ => {
-                setFieldTouched('networkId', true);
-                setFieldValue('networkId', _);
-              }}
-            />
+              <Dropdown
+                label="Network"
+                data={networks}
+                value={values.networkId}
+                error={touched.networkId && errors.networkId}
+                onChangeText={_ => {
+                  setFieldTouched('networkId', true);
+                  setFieldValue('networkId', _);
+                }}
+              />
 
-            <Button loading={isSubmitting} onPress={() => handleSubmit()}>
-              Add account
-            </Button>
+              <Button
+                mode="contained"
+                style={{ padding: 5, marginTop: 15 }}
+                loading={isSubmitting}
+                onPress={() => handleSubmit()}
+              >
+                Add eos account
+              </Button>
+            </View>
 
-            <Portal>
-              <Dialog visible={values.showDialog}>
-                <Dialog.Title>Select eos account</Dialog.Title>
-                <Dialog.Content>
-                  <List.Section>
-                    {values.accounts.map(account => (
-                      <List.Item
-                        key={account}
-                        title={account}
-                        right={() => (
-                          <RadioButton
-                            status={
-                              values.selectedAccount === account
-                                ? 'checked'
-                                : 'unchecked'
-                            }
-                            onPress={() => this.selectAccount(account)}
-                          />
-                        )}
-                        onPress={() => this.selectAccount(account)}
-                      />
-                    ))}
-                  </List.Section>
-                </Dialog.Content>
-                <Dialog.Actions>
-                  <Button onPress={() => this.addAccount()}>Done</Button>
-                </Dialog.Actions>
-              </Dialog>
-            </Portal>
+            <EosAccountDialog />
           </ScrollView>
         </SafeAreaView>
       </View>
