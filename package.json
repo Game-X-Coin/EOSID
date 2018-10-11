@@ -45,7 +45,7 @@
     "react-native-paper": "^2.0.1",
     "react-native-sqlite-storage": "^3.3.5",
     "react-navigation": "^2.17.0",
-    "typeorm": "gomonk3037/typeorm-package",
+    "typeorm": "gomonk3037/typeorm-package#cd7eb0190816707c7c0df2df21f0bfb9d277c25a",
     "yup": "^0.26.6"
   },
   "devDependencies": {
