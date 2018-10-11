@@ -93,8 +93,10 @@ export class AccountScreen extends Component {
 
   showSelectAccount = () => (this.selectAccount = true);
   hideSelectAccount = () => (this.selectAccount = false);
-  changeAccount = accountId =>
+  changeAccount = accountId => {
+    this.selectAccount = false;
     this.props.accountStore.changeUserAccount(accountId);
+  };
 
   render() {
     const { userAccounts, currentUserAccount } = this.props.accountStore;
