@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
+import { observer, inject } from 'mobx-react';
 import { SafeAreaView, ScrollView, Text, View } from 'react-native';
 import { Appbar } from 'react-native-paper';
 import moment from 'moment';
 
 import HomeStyle from '../styles/HomeStyle';
-import eosApi from '../utils/eosApi';
 
+@inject('networkStore')
+@observer
 export default class TransactionScreen extends Component {
   constructor() {
     super();
@@ -16,8 +18,10 @@ export default class TransactionScreen extends Component {
     };
   }
   async componentDidMount() {
+    const { eos } = this.props.networkStore;
+
     const actions =
-      ((await eosApi.actions.gets({ account_name: 'indieveloper' })) || {})
+      ((await eos.actions.gets({ account_name: 'indieveloper' })) || {})
         .actions || [];
     this.setState({
       fetched: true,
