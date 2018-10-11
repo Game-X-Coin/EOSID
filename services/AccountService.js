@@ -1,14 +1,12 @@
 import { getRepository } from 'typeorm/browser';
-import { Eos } from 'react-native-eosjs';
+import { Eos as Ecc } from 'react-native-eosjs';
 
 import { AccountModel, AccountError } from '../db';
 
-import eosApi from '../utils/eosApi';
-
-const eosjs = {
+const eosjsEcc = {
   privateToPublic(privateKey) {
     return new Promise(resolve => {
-      Eos.privateToPublic(privateKey, e => {
+      Ecc.privateToPublic(privateKey, e => {
         resolve(e);
       });
     });
@@ -25,7 +23,7 @@ export class AccountService {
 
   static async privateToPublic(privateKey) {
     // generate publickey
-    const { isSuccess, data } = await eosjs.privateToPublic(privateKey);
+    const { isSuccess, data } = await eosjsEcc.privateToPublic(privateKey);
 
     // invalid privateKey
     if (!isSuccess) {
@@ -35,9 +33,9 @@ export class AccountService {
     return data.publicKey;
   }
 
-  static async findKeyAccount(publicKey) {
+  static async findKeyAccount(publicKey, userEos) {
     // find account
-    const { account_names } = await eosApi.accounts.getsByPublicKey(publicKey);
+    const { account_names } = await userEos.accounts.getsByPublicKey(publicKey);
 
     // invalid account
     if (!account_names.length) {
