@@ -1,4 +1,5 @@
 import React from 'react';
+import { View } from 'react-native';
 import {
   createStackNavigator,
   createBottomTabNavigator
@@ -14,7 +15,8 @@ import {
   SettingsScreen,
   AddNetworkScreen,
   NetworkScreen as SettingsNetworkScreen,
-  TransactionDetailScreen
+  TransactionDetailScreen,
+  AccountsScreen
 } from '../../screens/Main';
 
 // detail screens
@@ -24,6 +26,8 @@ const DetailScreens = {
   // settings
   SettingsNetwork: SettingsNetworkScreen,
   AddNetwork: AddNetworkScreen,
+  Accounts: AccountsScreen,
+  // tx
   TransactionDetail: {
     screen: TransactionDetailScreen
   }
@@ -37,7 +41,7 @@ const iconMap = {
 };
 
 // tab navigator
-const AppTabNavigator = createBottomTabNavigator(
+const MainTabNavigator = createBottomTabNavigator(
   {
     Account: AccountScreen,
     Transaction: TransactionScreen,
@@ -67,7 +71,7 @@ const AppTabNavigator = createBottomTabNavigator(
 
 export const MainStackNavigator = createStackNavigator(
   {
-    MainTab: AppTabNavigator,
+    MainTab: MainTabNavigator,
     ...DetailScreens
   },
   {

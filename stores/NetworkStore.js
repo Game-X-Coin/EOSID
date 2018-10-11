@@ -2,9 +2,12 @@ import { observable, action, computed } from 'mobx';
 
 import { NetworkService } from '../services';
 
-import { UserStore } from './';
+import { UserStore } from './UserStore';
+import { AccountStore } from './AccountStore';
 
 import { DEFAULT_NETWORKS } from '../constants';
+
+import { eosApi } from '../utils/eosApi';
 
 class Store {
   @observable
@@ -14,10 +17,28 @@ class Store {
   networks = [];
 
   @computed
+  get eos() {
+    return new eosApi(this.currentUserNetwork.url);
+  }
+
+  @computed
   get userNetworks() {
     return this.networks.filter(
       network => network.userId === UserStore.currentUser.id
     );
+  }
+
+  @computed
+  get currentUserNetwork() {
+    const networks = [...this.defaultNetworks, ...this.userNetworks];
+
+    if (AccountStore.currentUserAccount) {
+      return networks.find(
+        network => network.id === AccountStore.currentUserAccount.networkId
+      );
+    }
+    // return default network
+    return networks[0];
   }
 
   @action

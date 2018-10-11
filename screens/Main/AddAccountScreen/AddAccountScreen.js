@@ -45,7 +45,10 @@ import HomeStyle from '../../../styles/HomeStyle';
   ) => {
     try {
       const publicKey = await AccountService.privateToPublic(values.privateKey);
-      const accounts = await AccountService.findKeyAccount(publicKey);
+      const accounts = await AccountService.findKeyAccount(
+        publicKey,
+        props.networkStore.eos
+      );
 
       setValues({
         ...values,
@@ -83,8 +86,8 @@ export class AddAccountScreen extends Component {
   }
 
   cancelSelectAccount() {
-    this.props.setFieldValue('showDialog', false)
-    this.props.setSubmitting(false)
+    this.props.setFieldValue('showDialog', false);
+    this.props.setSubmitting(false);
   }
 
   render() {

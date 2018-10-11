@@ -24,8 +24,10 @@ class Store {
 
   @action
   async changeUserAccount(accountId) {
-    // update user info
-    await UserStore.updateUser({ accountId });
+    if (accountId !== UserStore.currentUser.accountId) {
+      // update user info
+      await UserStore.updateUser({ accountId });
+    }
   }
 
   @action

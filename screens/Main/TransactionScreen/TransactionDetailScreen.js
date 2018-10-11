@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { SafeAreaView, ScrollView, Text, View } from 'react-native';
-import { Appbar, Divider, List } from 'react-native-paper';
+import { Appbar, Divider } from 'react-native-paper';
 import moment from 'moment';
 
 import HomeStyle from '../../../styles/HomeStyle';
-import eosApi from '../../../utils/eosApi';
 
-@inject('userStore')
+@inject('userStore', 'networkStore')
 @observer
 export class TransactionDetailScreen extends Component {
   moveScreen = routeName => this.props.navigation.navigate(routeName);
@@ -22,9 +21,14 @@ export class TransactionDetailScreen extends Component {
   }
 
   async componentDidMount() {
-    const { navigation } = this.props;
-    const txId = navigation.state.params.txId;
-    const transaction = await eosApi.transactions.get({ id: txId });
+    const {
+      navigation: { state },
+      networkStore: { eos }
+    } = this.props;
+
+    const txId = state.params.txId;
+    const transaction = await eos.transactions.get(txId);
+
     this.setState({ fetched: true, info: transaction });
   }
 
