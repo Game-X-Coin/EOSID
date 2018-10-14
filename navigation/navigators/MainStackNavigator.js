@@ -16,21 +16,25 @@ import {
   AddNetworkScreen,
   NetworkScreen as SettingsNetworkScreen,
   TransactionDetailScreen,
-  AccountsScreen
+  AccountsScreen,
+  TransferScreen,
+  ConfirmPinScreen
 } from '../../screens/Main';
 
 // detail screens
 const DetailScreens = {
   // accounts
   AddAccount: AddAccountScreen,
+  Transfer: TransferScreen,
+
   // settings
   SettingsNetwork: SettingsNetworkScreen,
   AddNetwork: AddNetworkScreen,
   Accounts: AccountsScreen,
   // tx
-  TransactionDetail: {
-    screen: TransactionDetailScreen
-  }
+  TransactionDetail: TransactionDetailScreen,
+  // confirm pincode
+  ConfirmPin: ConfirmPinScreen
 };
 
 // for tab icons
@@ -75,6 +79,7 @@ export const MainStackNavigator = createStackNavigator(
     ...DetailScreens
   },
   {
-    headerMode: 'none'
+    headerMode: 'none',
+    cardStyle: { backgroundColor: '#fff' }
   }
 );
