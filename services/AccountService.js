@@ -1,14 +1,39 @@
 import { getRepository } from 'typeorm/browser';
-import { Eos as Ecc } from 'react-native-eosjs';
+import { Eos } from 'react-native-eosjs';
 
 import { AccountModel, AccountError } from '../db';
 
-const eosjsEcc = {
+const eosjs = {
   privateToPublic(privateKey) {
     return new Promise(resolve => {
-      Ecc.privateToPublic(privateKey, e => {
+      Eos.privateToPublic(privateKey, e => {
         resolve(e);
       });
+    });
+  },
+  transfer({
+    contract = 'eosio.token',
+    sender,
+    reciever,
+    amount,
+    symbol = 'EOS',
+    memo,
+    privateKey,
+    broadcast = true
+  }) {
+    return new Promise(resolve => {
+      Eos.transfer(
+        contract,
+        sender,
+        reciever,
+        `${amount} ${symbol}`,
+        memo,
+        privateKey,
+        broadcast,
+        e => {
+          resolve(e.data);
+        }
+      );
     });
   }
 };
@@ -23,7 +48,7 @@ export class AccountService {
 
   static async privateToPublic(privateKey) {
     // generate publickey
-    const { isSuccess, data } = await eosjsEcc.privateToPublic(privateKey);
+    const { isSuccess, data } = await eosjs.privateToPublic(privateKey);
 
     // invalid privateKey
     if (!isSuccess) {
@@ -65,5 +90,9 @@ export class AccountService {
 
     // remove
     await AccountRepo.remove(findAccount);
+  }
+
+  static async transfer(transferInfo) {
+    return await eosjs.transfer(transferInfo);
   }
 }
