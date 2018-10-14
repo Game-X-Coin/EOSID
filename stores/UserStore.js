@@ -1,13 +1,14 @@
 import { observable, computed, action } from 'mobx';
 
 import { UserService } from '../services';
+import { UserModel } from '../db';
 
 class Store {
   @observable
   users = [];
 
   @observable
-  currentUser = null;
+  currentUser = UserModel.placeholder;
 
   @computed
   get isSignIn() {
@@ -17,7 +18,7 @@ class Store {
   @action
   setUser(user) {
     console.log(user);
-    this.currentUser = user;
+    this.currentUser = user || UserModel.placeholder;
   }
 
   @action
