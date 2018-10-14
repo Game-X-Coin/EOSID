@@ -44,6 +44,8 @@ export default class RenderApp extends Component {
   }
 
   render() {
+    const { currentUserNetwork } = this.props.networkStore;
+
     if (!this.isLoadingComplete) {
       return (
         <AppLoading
@@ -59,7 +61,10 @@ export default class RenderApp extends Component {
         {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
         <AppNavigator />
 
-        <EosProvider />
+        <EosProvider
+          server={currentUserNetwork.url}
+          chainId={currentUserNetwork.chainId}
+        />
       </View>
     );
   }
