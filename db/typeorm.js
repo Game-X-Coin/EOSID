@@ -1,4 +1,4 @@
-import { createConnection } from 'typeorm/browser';
+import { createConnection } from 'typeorm-expo/browser';
 
 import { UserModel, NetworkModel, AccountModel } from './';
 

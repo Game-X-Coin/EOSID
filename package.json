@@ -15,7 +15,7 @@
   "author": "GXC",
   "bugs": {
     "url": "https://gitlab.com/Game-X-Coin/eosidmobile/issues",
-    "email": "dev@bcventures.io"
+    "email": "dev@gamexcoin.io"
   },
   "homepage": "https://gitlab.com/Game-X-Coin/eosidmobile",
   "scripts": {
@@ -45,7 +45,7 @@
     "react-native-paper": "^2.0.1",
     "react-native-sqlite-storage": "^3.3.5",
     "react-navigation": "^2.17.0",
-    "typeorm": "https://github.com/gomonk3037/typeorm-package",
+    "typeorm-expo": "^0.2.6",
     "yup": "^0.26.6"
   },
   "devDependencies": {
