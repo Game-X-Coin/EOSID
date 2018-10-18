@@ -1,4 +1,5 @@
 import React from 'react';
+import { View } from 'react-native';
 import {
   createStackNavigator,
   createBottomTabNavigator
@@ -14,19 +15,26 @@ import {
   SettingsScreen,
   AddNetworkScreen,
   NetworkScreen as SettingsNetworkScreen,
-  TransactionDetailScreen
+  TransactionDetailScreen,
+  AccountsScreen,
+  TransferScreen,
+  ConfirmPinScreen
 } from '../../screens/Main';
 
 // detail screens
 const DetailScreens = {
   // accounts
   AddAccount: AddAccountScreen,
+  Transfer: TransferScreen,
+
   // settings
   SettingsNetwork: SettingsNetworkScreen,
   AddNetwork: AddNetworkScreen,
-  TransactionDetail: {
-    screen: TransactionDetailScreen
-  }
+  Accounts: AccountsScreen,
+  // tx
+  TransactionDetail: TransactionDetailScreen,
+  // confirm pincode
+  ConfirmPin: ConfirmPinScreen
 };
 
 // for tab icons
@@ -37,7 +45,7 @@ const iconMap = {
 };
 
 // tab navigator
-const AppTabNavigator = createBottomTabNavigator(
+const MainTabNavigator = createBottomTabNavigator(
   {
     Account: AccountScreen,
     Transaction: TransactionScreen,
@@ -67,10 +75,11 @@ const AppTabNavigator = createBottomTabNavigator(
 
 export const MainStackNavigator = createStackNavigator(
   {
-    MainTab: AppTabNavigator,
+    MainTab: MainTabNavigator,
     ...DetailScreens
   },
   {
-    headerMode: 'none'
+    headerMode: 'none',
+    cardStyle: { backgroundColor: '#fff' }
   }
 );

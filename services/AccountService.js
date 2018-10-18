@@ -3,14 +3,37 @@ import { Eos } from 'react-native-eosjs';
 
 import { AccountModel, AccountError } from '../db';
 
-import eosApi from '../utils/eosApi';
-
 const eosjs = {
   privateToPublic(privateKey) {
     return new Promise(resolve => {
       Eos.privateToPublic(privateKey, e => {
         resolve(e);
       });
+    });
+  },
+  transfer({
+    contract = 'eosio.token',
+    sender,
+    reciever,
+    amount,
+    symbol = 'EOS',
+    memo,
+    privateKey,
+    broadcast = true
+  }) {
+    return new Promise(resolve => {
+      Eos.transfer(
+        contract,
+        sender,
+        reciever,
+        `${amount} ${symbol}`,
+        memo,
+        privateKey,
+        broadcast,
+        e => {
+          resolve(e.data);
+        }
+      );
     });
   }
 };
@@ -35,9 +58,9 @@ export class AccountService {
     return data.publicKey;
   }
 
-  static async findKeyAccount(publicKey) {
+  static async findKeyAccount(publicKey, userEos) {
     // find account
-    const { account_names } = await eosApi.accounts.getsByPublicKey(publicKey);
+    const { account_names } = await userEos.accounts.getsByPublicKey(publicKey);
 
     // invalid account
     if (!account_names.length) {
@@ -67,5 +90,9 @@ export class AccountService {
 
     // remove
     await AccountRepo.remove(findAccount);
+  }
+
+  static async transfer(transferInfo) {
+    return await eosjs.transfer(transferInfo);
   }
 }

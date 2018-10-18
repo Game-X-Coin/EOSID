@@ -26,6 +26,11 @@ export class SettingsScreen extends Component {
           <ScrollView style={HomeStyle.container}>
             <List.Section>
               <List.Item
+                title="Manage eos account"
+                left={() => <List.Icon icon="supervisor-account" />}
+                onPress={() => this.moveScreen('Accounts')}
+              />
+              <List.Item
                 title="Network"
                 left={() => <List.Icon icon="dns" />}
                 onPress={() => this.moveScreen('SettingsNetwork')}
