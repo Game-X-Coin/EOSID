@@ -1,5 +1,5 @@
 import React from 'react';
-import { View } from 'react-native';
+import { observer, inject } from 'mobx-react';
 import {
   createStackNavigator,
   createBottomTabNavigator
@@ -18,7 +18,8 @@ import {
   TransactionDetailScreen,
   AccountsScreen,
   TransferScreen,
-  ConfirmPinScreen
+  ConfirmPinScreen,
+  PermissionRequestScreen
 } from '../../screens/Main';
 
 // detail screens
@@ -34,7 +35,9 @@ const DetailScreens = {
   // tx
   TransactionDetail: TransactionDetailScreen,
   // confirm pincode
-  ConfirmPin: ConfirmPinScreen
+  ConfirmPin: ConfirmPinScreen,
+  // confirm dapp sign
+  PermissionRequest: PermissionRequestScreen
 };
 
 // for tab icons
@@ -73,9 +76,23 @@ const MainTabNavigator = createBottomTabNavigator(
   }
 );
 
+@inject('accountStore')
+@observer
+class MainTabNavigatorWrapper extends React.Component {
+  componentDidMount() {
+    this.props.accountStore.getAccountInfo();
+  }
+
+  render() {
+    return <MainTabNavigator navigation={this.props.navigation} />;
+  }
+}
+
+MainTabNavigatorWrapper.router = MainTabNavigator.router;
+
 export const MainStackNavigator = createStackNavigator(
   {
-    MainTab: MainTabNavigator,
+    MainTab: MainTabNavigatorWrapper,
     ...DetailScreens
   },
   {

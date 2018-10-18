@@ -7,3 +7,4 @@ export * from './TransactionScreen';
 export * from './AccountsScreen';
 export * from './TransferScreen';
 export * from './ConfirmPinScreen';
+export * from './PermissionRequestScreen';
