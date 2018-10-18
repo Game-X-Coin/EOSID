@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm/browser';
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm-expo/browser';
 
 export const NETWORK_KEY = 'network';
 

@@ -15,6 +15,9 @@ class Store {
   tokens = [];
 
   @observable
+  actions = [];
+
+  @observable
   fetched = false;
 
   @computed
@@ -83,6 +86,7 @@ class Store {
   async getAccountInfo() {
     this.info = {};
     this.tokens = [];
+    this.actions = [];
     this.fetched = false;
 
     if (!this.currentUserAccount) {
@@ -90,7 +94,7 @@ class Store {
       return;
     }
 
-    await Promise.all([this.getInfo(), this.getTokens()]);
+    await Promise.all([this.getInfo(), this.getTokens()], this.getActions());
 
     this.fetched = true;
   }
@@ -119,6 +123,14 @@ class Store {
     } else {
       this.tokens = [{ amount: '0.0000', symbol: 'EOS' }];
     }
+  }
+
+  async getActions() {
+    const { actions = [] } = await NetworkStore.eos.actions.gets({
+      account_name: this.currentUserAccount.name
+    });
+
+    this.actions = actions.reverse();
   }
 
   @action

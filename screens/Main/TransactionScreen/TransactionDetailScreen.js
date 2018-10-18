@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { SafeAreaView, ScrollView, Text, View } from 'react-native';
-import { Appbar, Divider } from 'react-native-paper';
+import { Appbar, Divider, Caption } from 'react-native-paper';
 import moment from 'moment';
 
 import HomeStyle from '../../../styles/HomeStyle';
@@ -9,8 +9,6 @@ import HomeStyle from '../../../styles/HomeStyle';
 @inject('userStore', 'networkStore')
 @observer
 export class TransactionDetailScreen extends Component {
-  moveScreen = routeName => this.props.navigation.navigate(routeName);
-
   constructor() {
     super();
 
@@ -36,107 +34,106 @@ export class TransactionDetailScreen extends Component {
     const { navigation } = this.props;
     const { fetched, info } = this.state;
 
+    const Item = ({ title, description, children }) => (
+      <View style={{ marginTop: 5, marginBottom: 5 }}>
+        <Caption>{title}</Caption>
+        {description && <Text>{description}</Text>}
+        {children}
+      </View>
+    );
+
+    const Badge = ({ title, color }) => (
+      <View
+        style={{
+          paddingVertical: 3,
+          paddingHorizontal: 7,
+          marginRight: 5,
+          backgroundColor: color,
+          borderRadius: 3
+        }}
+      >
+        <Text style={{ fontSize: 12, color: '#fff' }}>{title}</Text>
+      </View>
+    );
+
     return (
       <View style={HomeStyle.container}>
-        <SafeAreaView>
+        <SafeAreaView style={HomeStyle.container}>
           <Appbar.Header>
-            <Appbar.Content
-              title={'Transaction'}
-              subtitle={navigation.state.params.txId}
-            />
-            <Appbar.Action
-              icon="add"
-              onPress={() => this.moveScreen('AddAccount')}
-            />
+            <Appbar.BackAction onPress={() => navigation.goBack(null)} />
+            <Appbar.Content title="Transaction Detail" />
           </Appbar.Header>
-          <ScrollView style={{ padding: 15 }}>
-            <View style={{ marginTop: 5, marginBottom: 5 }}>
-              <Text style={{ fontWeight: 'bold' }}>Transaction ID</Text>
-              <Text>{navigation.state.params.txId}</Text>
-            </View>
-            <View style={{ marginTop: 5, marginBottom: 5 }}>
-              <Text style={{ fontWeight: 'bold' }}>Block Num</Text>
-              <Text>{info && info.block_num}</Text>
-            </View>
-            <View style={{ marginTop: 5, marginBottom: 5 }}>
-              <Text style={{ fontWeight: 'bold' }}>Block Time</Text>
-              <Text>
-                {info &&
+          <ScrollView style={{ flex: 1 }}>
+            <View style={{ paddingHorizontal: 15, paddingVertical: 10 }}>
+              <Item
+                title="Transaction ID"
+                description={navigation.state.params.txId}
+              />
+
+              <Item title="Transaction Status">
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <Badge
+                    title={info && info.trx.receipt.status}
+                    color="#2185d0"
+                  />
+                  <Badge
+                    title={
+                      info && info.last_irreversible_block
+                        ? 'irreversible'
+                        : 'reversible'
+                    }
+                    color="#21ba45"
+                  />
+                </View>
+              </Item>
+              <Item
+                title="CPU Usage"
+                description={`${info && info.trx.receipt.cpu_usage_us} us`}
+              />
+              <Item
+                title="Net Usage"
+                description={`${info &&
+                  info.trx.receipt.net_usage_words} words`}
+              />
+              <Item title="Block Number" description={info && info.block_num} />
+              <Item
+                title="Block Time"
+                description={
+                  info &&
                   `${moment(info.block_time).format('lll')} (${moment(
                     info.block_time
-                  ).fromNow()})`}
-              </Text>
-            </View>
-            <View style={{ marginTop: 5, marginBottom: 5 }}>
-              <Text style={{ fontWeight: 'bold' }}>Status</Text>
-              <Text>
-                {info && `${info.trx.receipt.status}`}
-                {info && info.last_irreversible_block
-                  ? ' irreversible'
-                  : ' reversible'}
-              </Text>
-            </View>
-            <View style={{ marginTop: 5, marginBottom: 5 }}>
-              <Text style={{ fontWeight: 'bold' }}>CPU Usage</Text>
-              <Text>{info && info.trx.receipt.cpu_usage_us} us</Text>
-            </View>
-            <View style={{ marginTop: 5, marginBottom: 5 }}>
-              <Text style={{ fontWeight: 'bold' }}>Net Usage</Text>
-              <Text>{info && info.trx.receipt.net_usage_words} words</Text>
-            </View>
-            <Divider />
-            <View style={{ marginTop: 5, marginBottom: 5 }}>
-              <Text style={{ fontSize: 16, fontWeight: 'bold' }}>Actions</Text>
-              {fetched &&
-                info &&
-                info.trx.trx.actions.map((action, i) => (
-                  <View key={i}>
-                    <View>
-                      <Text style={{ fontWeight: 'bold' }}>{`${
-                        action.account
-                      }::${action.name}`}</Text>
-                    </View>
-                    <View>
-                      {action.authorization.map((auth, i) => (
-                        <Text key={i}>{`${auth.actor}@${
-                          auth.permission
-                        }`}</Text>
-                      ))}
-                    </View>
-                    <View>
-                      <Text style={{ color: 'gray' }}>
-                        {JSON.stringify(action.data)}
+                  ).fromNow()})`
+                }
+              />
+
+              <Divider style={{ marginVertical: 10 }} />
+
+              <View>
+                <Text style={{ fontSize: 18, marginBottom: 10 }}>Actions</Text>
+
+                {fetched &&
+                  info &&
+                  info.trx.trx.actions.map((action, i) => (
+                    <View key={i}>
+                      <Text style={{ fontSize: 16, marginBottom: 5 }}>
+                        {`${action.account}::${action.name}`}
                       </Text>
+
+                      <View style={{ flexDirection: 'row', marginBottom: 5 }}>
+                        {action.authorization.map((auth, ai) => (
+                          <Badge
+                            key={ai}
+                            title={`${auth.actor}@${auth.permission}`}
+                            color="#2185d0"
+                          />
+                        ))}
+                      </View>
+                      <View>
+                        <Text>{JSON.stringify(action.data)}</Text>
+                      </View>
                     </View>
-                  </View>
-                ))}
-            </View>
-            <Divider />
-            <View style={{ marginTop: 5, marginBottom: 5 }}>
-              <Text style={{ fontSize: 16, fontWeight: 'bold' }}>Traces</Text>
-              {fetched &&
-                info &&
-                info.traces.map((trace, i) => (
-                  <View key={i}>
-                    <View>
-                      <Text style={{ fontWeight: 'bold' }}>{`${
-                        trace.act.account
-                      }::${trace.act.name}`}</Text>
-                    </View>
-                    <View>
-                      {trace.act.authorization.map((auth, i) => (
-                        <Text key={i}>{`${auth.actor}@${
-                          auth.permission
-                        }`}</Text>
-                      ))}
-                    </View>
-                    <View>
-                      <Text style={{ color: 'gray' }}>
-                        {JSON.stringify(trace.act.data)}
-                      </Text>
-                    </View>
-                  </View>
-                ))}
+                  ))}
+              </View>
             </View>
           </ScrollView>
         </SafeAreaView>

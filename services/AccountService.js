@@ -1,4 +1,4 @@
-import { getRepository } from 'typeorm/browser';
+import { getRepository } from 'typeorm-expo/browser';
 import { Eos } from 'react-native-eosjs';
 
 import { AccountModel, AccountError } from '../db';
