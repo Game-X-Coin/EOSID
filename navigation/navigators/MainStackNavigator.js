@@ -1,11 +1,8 @@
 import React from 'react';
 import { observer, inject } from 'mobx-react';
-import {
-  createStackNavigator,
-  createBottomTabNavigator
-} from 'react-navigation';
-
-import { NavigationTabBarIcon } from '../../components/TabBarIcon';
+import { createStackNavigator } from 'react-navigation';
+import { createMaterialBottomTabNavigator } from 'react-navigation-material-bottom-tabs';
+import { Icon } from 'expo';
 
 import { TransactionScreen } from '../../screens';
 
@@ -27,7 +24,6 @@ const DetailScreens = {
   // accounts
   AddAccount: AddAccountScreen,
   Transfer: TransferScreen,
-
   // settings
   SettingsNetwork: SettingsNetworkScreen,
   AddNetwork: AddNetworkScreen,
@@ -42,37 +38,33 @@ const DetailScreens = {
 
 // for tab icons
 const iconMap = {
-  Account: 'contact',
-  Transaction: 'albums',
-  Settings: 'settings'
+  Account: 'md-contact',
+  Transaction: 'md-filing',
+  Settings: 'md-settings'
 };
 
 // tab navigator
-const MainTabNavigator = createBottomTabNavigator(
+const MainTabNavigator = createMaterialBottomTabNavigator(
   {
     Account: AccountScreen,
     Transaction: TransactionScreen,
     Settings: SettingsScreen
   },
   {
+    shifting: true,
     navigationOptions: ({ navigation }) => ({
-      // title: translate(`navigation.${navigation.state.routeName}`),
-      tabBarIcon: ({ focused, tintColor }) => {
+      tabBarIcon: ({ tintColor }) => {
         const { routeName } = navigation.state;
 
         return (
-          <NavigationTabBarIcon name={iconMap[routeName]} focused={focused} />
+          <Icon.Ionicons
+            size={26}
+            name={iconMap[routeName]}
+            color={tintColor}
+          />
         );
       }
-    }),
-    tabBarOptions: {
-      style: {
-        height: 57
-      },
-      labelStyle: {
-        paddingBottom: 5
-      }
-    }
+    })
   }
 );
 
