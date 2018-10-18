@@ -26,20 +26,7 @@ import HomeStyle from '../../../styles/HomeStyle';
 @observer
 export class AccountScreen extends Component {
   @observable
-  account = {};
-
-  @observable
-  balances = [];
-
-  @observable
-  fetched = false;
-
-  @observable
   selectAccount = false;
-
-  componentDidMount() {
-    this.props.accountStore.getAccountInfo();
-  }
 
   prettyBytes(value) {
     return bytes(value, { thousandsSeparator: ',' });

@@ -1,4 +1,4 @@
-import { getRepository } from 'typeorm/browser';
+import { getRepository } from 'typeorm-expo/browser';
 
 import { NetworkModel, NetworkError } from '../db';
 
