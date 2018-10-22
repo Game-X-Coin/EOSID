@@ -65,6 +65,7 @@ class Store {
     }).then(account => {
       this.setAccounts([...this.accounts, account]);
       this.changeUserAccount(account.id);
+      this.getAccountInfo();
     });
   }
 
@@ -100,9 +101,11 @@ class Store {
   }
 
   async getInfo() {
-    const account = this.currentUserAccount;
+    const info = await NetworkStore.eos.accounts.get(
+      this.currentUserAccount.name
+    );
 
-    const info = await NetworkStore.eos.accounts.get(account.name);
+    console.log(info);
 
     this.info = info;
   }
@@ -142,6 +145,18 @@ class Store {
     }).then(async tx => {
       await this.getTokens();
       return tx;
+    });
+  }
+
+  @action
+  async manageResource(data) {
+    return AccountService.manageResource({
+      ...data,
+      sender: this.currentUserAccount.name,
+      privateKey: this.currentUserAccount.privateKey
+    }).then(async res => {
+      await this.getInfo();
+      await this.getTokens();
     });
   }
 }
