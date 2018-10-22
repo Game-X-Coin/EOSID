@@ -14,7 +14,9 @@ import {
   Portal,
   Modal,
   List,
-  RadioButton
+  RadioButton,
+  Caption,
+  Button
 } from 'react-native-paper';
 import { LinearGradient, Icon } from 'expo';
 import bytes from 'bytes';
@@ -58,8 +60,8 @@ export class AccountScreen extends Component {
     const { selectAccount } = this;
 
     const NoAccount = () => (
-      <View>
-        <Title style={{ marginVertical: 10 }}>
+      <View style={{ flex: 1, padding: 15 }}>
+        <Title style={{ marginBottom: 5 }}>
           You do not have any accounts added.
         </Title>
         <Card onPress={() => this.moveScreen('AddAccount')}>
@@ -92,15 +94,33 @@ export class AccountScreen extends Component {
         net_limit,
         net_weight,
         ram_usage,
-        ram_quota
+        ram_quota,
+        refund_request
       } = info;
 
       const delegatedCPU = cpu_weight * 0.0001;
       const delegatedNET = net_weight * 0.0001;
+      const refundAmount =
+        Number(refund_request.cpu_amount.split(' ')[0]) +
+        Number(refund_request.net_amount.split(' ')[0]);
       const undelegatedAmount = parseFloat(
         tokens.find(token => token.symbol === 'EOS').amount
       );
       const totalAsset = delegatedCPU + delegatedNET + undelegatedAmount;
+
+      const ItemTitle = ({ title }) => (
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginBottom: 10
+          }}
+        >
+          <Caption>{title}</Caption>
+
+          <Divider style={{ flex: 1, marginLeft: 10 }} />
+        </View>
+      );
 
       const DelegatedItem = ({
         title,
@@ -111,25 +131,35 @@ export class AccountScreen extends Component {
       }) => (
         <View>
           <View style={{ flexDirection: 'row' }}>
-            <Text style={{ flex: 1 }}>
-              <Text style={{ fontWeight: 'bold' }}>{title}</Text>
-              {` (${subTitle})`}
-            </Text>
+            <View
+              style={{
+                flex: 1,
+                flexDirection: 'row',
+                alignItems: 'flex-start'
+              }}
+            >
+              <Text style={{ marginRight: 5, fontSize: 15 }}>{title}</Text>
+              <Caption>{subTitle}</Caption>
+            </View>
 
             <Text>{amount && `${amount.toFixed(4)} EOS`}</Text>
           </View>
-          <ProgressBar progress={percentage} color={color} />
+          <ProgressBar
+            progress={percentage}
+            color={color}
+            style={{ paddingVertical: 8 }}
+          />
         </View>
       );
 
       return (
-        <View>
+        <View style={{ flex: 1, padding: 20 }}>
           <LinearGradient
             colors={[Colors.grey700, Colors.grey900]}
             start={[1, 0]}
             end={[0, 1]}
             style={{
-              marginTop: 20,
+              marginBottom: 15,
               padding: 20,
               borderRadius: 5
             }}
@@ -142,50 +172,59 @@ export class AccountScreen extends Component {
             </Title>
           </LinearGradient>
 
-          <View style={{ marginTop: 25, paddingHorizontal: 5 }}>
+          <View style={{ paddingBottom: 15 }}>
+            <ItemTitle title="Resources" />
+
             <DelegatedItem
               title="CPU"
-              subTitle={`${this.prettyTime(cpu_limit.used)}/${this.prettyTime(
-                cpu_limit.max
-              )}`}
+              subTitle={`(${this.prettyTime(
+                cpu_limit.used
+              )} / ${this.prettyTime(cpu_limit.max)})`}
               amount={delegatedCPU}
               percentage={cpu_limit.used / cpu_limit.max}
-              color={Colors.red800}
+              color={Colors.blue700}
             />
 
             <DelegatedItem
               title="Network"
-              subTitle={`${this.prettyTime(net_limit.used)}/${this.prettyTime(
-                net_limit.max
-              )}`}
+              subTitle={`(${this.prettyBytes(
+                net_limit.used
+              )} / ${this.prettyBytes(net_limit.max)})`}
               amount={delegatedNET}
               percentage={cpu_limit.used / cpu_limit.max}
-              color={Colors.cyan800}
+              color={Colors.green700}
             />
+
+            {refund_request && (
+              <DelegatedItem
+                title="Refunding"
+                subTitle={refund_request.request_time}
+                amount={refundAmount}
+                percentage={refundAmount / (delegatedCPU + delegatedNET)}
+                color={Colors.orange700}
+              />
+            )}
 
             <DelegatedItem
               title="RAM"
-              subTitle={`${this.prettyBytes(ram_usage)}/${this.prettyBytes(
+              subTitle={`(${this.prettyBytes(ram_usage)} / ${this.prettyBytes(
                 ram_quota
-              )}`}
+              )})`}
               percentage={ram_usage / ram_quota}
               color={Colors.purple800}
             />
+
+            <Button
+              style={{ marginTop: 5 }}
+              onPress={() => this.moveScreen('ManageResource')}
+            >
+              Manage Resource
+            </Button>
           </View>
 
-          <Divider style={{ marginVertical: 15 }} />
-
           <View>
-            <Text
-              style={{
-                marginHorizontal: 10,
-                marginBottom: 15,
-                fontSize: 17,
-                fontWeight: 'bold'
-              }}
-            >
-              Tokens
-            </Text>
+            <ItemTitle title="Tokens" />
+
             {tokens.map(({ symbol, amount }, i) => (
               <TouchableRipple
                 key={i}
@@ -194,8 +233,9 @@ export class AccountScreen extends Component {
                 <View
                   style={{
                     flexDirection: 'row',
-                    paddingVertical: 10,
-                    paddingHorizontal: 15
+                    marginHorizontal: -5,
+                    paddingHorizontal: 5,
+                    paddingVertical: 10
                   }}
                 >
                   <Text style={{ flex: 1, fontSize: 17 }}>{symbol}</Text>
@@ -259,7 +299,7 @@ export class AccountScreen extends Component {
 
     return (
       <View style={HomeStyle.container}>
-        <SafeAreaView>
+        <SafeAreaView style={HomeStyle.container}>
           <Appbar.Header>
             <View
               style={{ flex: 1, flexDirection: 'row', paddingHorizontal: 15 }}
@@ -286,7 +326,7 @@ export class AccountScreen extends Component {
             />
           </Appbar.Header>
 
-          <ScrollView style={{ paddingHorizontal: 15 }}>
+          <ScrollView style={HomeStyle.container}>
             {currentUserAccount ? (
               fetched ? (
                 <HaveAccount />

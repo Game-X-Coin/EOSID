@@ -35,6 +35,34 @@ const eosjs = {
         }
       );
     });
+  },
+  stake({ sender, reciever, cpu, net, symbol = 'EOS', privateKey }) {
+    return new Promise(resolve => {
+      Eos.delegate(
+        privateKey,
+        sender,
+        reciever ? reciever : sender,
+        `${cpu.toFixed(4)} ${symbol}`,
+        `${net.toFixed(4)} ${symbol}`,
+        e => {
+          resolve(e.data);
+        }
+      );
+    });
+  },
+  unstake({ sender, reciever, cpu, net, symbol = 'EOS', privateKey }) {
+    return new Promise(resolve => {
+      Eos.undelegate(
+        privateKey,
+        sender,
+        reciever ? reciever : sender,
+        `${cpu.toFixed(4)} ${symbol}`,
+        `${net.toFixed(4)} ${symbol}`,
+        e => {
+          resolve(e.data);
+        }
+      );
+    });
   }
 };
 
@@ -94,5 +122,11 @@ export class AccountService {
 
   static async transfer(transferInfo) {
     return await eosjs.transfer(transferInfo);
+  }
+
+  static async manageResource({ isStaking, ...data }) {
+    const promise = isStaking ? eosjs.stake(data) : eosjs.unstake(data);
+
+    return await promise;
   }
 }
