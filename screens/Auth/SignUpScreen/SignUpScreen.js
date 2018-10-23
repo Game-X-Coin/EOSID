@@ -1,35 +1,24 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react/native';
-import { SafeAreaView } from 'react-native';
-import { Appbar } from 'react-native-paper';
-import Pincode from '@haskkor/react-native-pincode';
+
+import { NewPincode } from '../../../components/Pincode';
 
 @inject('userStore')
 @observer
 export class SignUpScreen extends Component {
-  storePincode = async pincode => {
+  signUp = async pincode => {
     const { userStore, navigation } = this.props;
 
-    try {
-      await userStore.signUp({ pincode });
-      navigation.navigate('Account');
-    } catch (error) {
-      console.log(error);
-    }
+    await userStore.signUp({ pincode });
+    navigation.navigate('ImportAccount', { isSignUp: true });
   };
 
   render() {
     return (
-      <SafeAreaView style={{ flex: 1 }}>
-        <Appbar.Header>
-          <Appbar.BackAction
-            onPress={() => this.props.navigation.goBack(null)}
-          />
-          <Appbar.Content title="Sign up" />
-        </Appbar.Header>
-
-        <Pincode status="choose" storePin={this.storePincode} />
-      </SafeAreaView>
+      <NewPincode
+        onEnter={this.signUp}
+        backAction={() => this.props.navigation.goBack(null)}
+      />
     );
   }
 }

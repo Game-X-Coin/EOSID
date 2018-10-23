@@ -27,7 +27,6 @@
     "lint-js": "eslint --ignore-path .gitignore --ignore-pattern \"!**/.*\" ."
   },
   "dependencies": {
-    "@haskkor/react-native-pincode": "^1.6.6",
     "axios": "^0.18.0",
     "bytes": "^3.0.0",
     "expo": "^30.0.1",
