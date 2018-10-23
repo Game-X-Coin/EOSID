@@ -61,10 +61,11 @@ class Store {
   async addAccount(accountInfo) {
     return AccountService.addAccount({
       ...accountInfo,
-      userId: UserStore.currentUser.id
-    }).then(account => {
+      userId: UserStore.currentUser.id,
+      pincode: UserStore.pincode
+    }).then(async account => {
       this.setAccounts([...this.accounts, account]);
-      this.changeUserAccount(account.id);
+      await this.changeUserAccount(account.id);
       this.getAccountInfo();
     });
   }
@@ -138,10 +139,13 @@ class Store {
 
   @action
   async transfer(formData) {
+    const { name, encryptedPrivateKey } = this.currentUserAccount;
+
     return AccountService.transfer({
       ...formData,
-      sender: this.currentUserAccount.name,
-      privateKey: this.currentUserAccount.privateKey
+      sender: name,
+      encryptedPrivateKey,
+      pincode: UserStore.pincode
     }).then(async tx => {
       await this.getTokens();
       return tx;
@@ -150,10 +154,13 @@ class Store {
 
   @action
   async manageResource(data) {
+    const { name, encryptedPrivateKey } = this.currentUserAccount;
+
     return AccountService.manageResource({
       ...data,
-      sender: this.currentUserAccount.name,
-      privateKey: this.currentUserAccount.privateKey
+      sender: name,
+      encryptedPrivateKey,
+      pincode: UserStore.pincode
     }).then(async res => {
       await this.getInfo();
       await this.getTokens();

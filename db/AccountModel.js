@@ -52,7 +52,7 @@ export class AccountModel {
   publicKey = '';
 
   @Column('varchar')
-  privateKey = '';
+  encryptedPrivateKey = '';
 
   @Column('varchar')
   networkId = '';
@@ -62,12 +62,19 @@ export class AccountModel {
 
   constructor(data) {
     if (data) {
-      const { id, name, publicKey, privateKey, networkId, userId } = data;
+      const {
+        id,
+        name,
+        publicKey,
+        encryptedPrivateKey,
+        networkId,
+        userId
+      } = data;
 
       this.id = id;
       this.name = name;
       this.publicKey = publicKey;
-      this.privateKey = privateKey;
+      this.encryptedPrivateKey = encryptedPrivateKey;
       this.networkId = networkId;
       this.userId = userId;
     }
