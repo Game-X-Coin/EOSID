@@ -4,13 +4,12 @@ import { createStackNavigator } from 'react-navigation';
 import { createMaterialBottomTabNavigator } from 'react-navigation-material-bottom-tabs';
 import { Icon } from 'expo';
 
-import { TransactionScreen } from '../../screens';
-
 import {
   AccountScreen,
   SettingsScreen,
   AddNetworkScreen,
   NetworkScreen as SettingsNetworkScreen,
+  TransactionScreen,
   TransactionDetailScreen,
   AccountsScreen,
   TransferScreen,
