@@ -17,7 +17,7 @@ import HomeStyle from '../../../styles/HomeStyle';
 @observer
 @withFormik({
   mapPropsToValues: props => ({
-    reciever: '',
+    receiver: '',
     amount: '',
     memo: '',
 
@@ -34,7 +34,7 @@ import HomeStyle from '../../../styles/HomeStyle';
       .amount;
 
     return Yup.object().shape({
-      reciever: Yup.string().required(),
+      receiver: Yup.string().required(),
       amount: Yup.string()
         .required()
         .matches(/^\d*\.?\d{1,4}$/, 'Please enter valid amount')
@@ -113,7 +113,7 @@ export class TransferScreen extends Component {
           <Dialog.Title>Transfer succeed</Dialog.Title>
           <Dialog.Content>
             <Paragraph>
-              {values.amount} {symbol} transfered to {values.reciever}
+              {values.amount} {symbol} transfered to {values.receiver}
             </Paragraph>
           </Dialog.Content>
           <Dialog.Actions>
@@ -147,12 +147,12 @@ export class TransferScreen extends Component {
               />
 
               <TextField
-                label="Reciever"
-                value={values.reciever}
-                error={touched.reciever && errors.reciever}
+                label="Receiver"
+                value={values.receiver}
+                error={touched.receiver && errors.receiver}
                 onChangeText={_ => {
-                  setFieldTouched('reciever', true);
-                  setFieldValue('reciever', _);
+                  setFieldTouched('receiver', true);
+                  setFieldValue('receiver', _);
                 }}
               />
 

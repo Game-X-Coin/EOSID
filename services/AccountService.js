@@ -14,7 +14,7 @@ const eosjs = {
   transfer({
     contract = 'eosio.token',
     sender,
-    reciever,
+    receiver,
     amount,
     symbol = 'EOS',
     memo,
@@ -25,7 +25,7 @@ const eosjs = {
       Eos.transfer(
         contract,
         sender,
-        reciever,
+        receiver,
         `${amount} ${symbol}`,
         memo,
         privateKey,
