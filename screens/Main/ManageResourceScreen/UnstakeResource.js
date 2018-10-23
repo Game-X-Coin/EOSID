@@ -116,11 +116,10 @@ export class UnstakeResource extends Component {
 
     const totalAmount = (cpu + net).toFixed(4);
 
-    const ConfirmTitle = `Confirm unstake ${totalAmount} EOS from cpu/net`;
-
     navigation.navigate('ConfirmPin', {
       pinProps: {
-        titleEnter: ConfirmTitle
+        title: 'Confirm Unstake',
+        description: `Unstake ${totalAmount} EOS from cpu/net`
       },
       // when PIN matched
       async cb() {

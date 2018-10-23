@@ -122,11 +122,10 @@ export class StakeResource extends Component {
 
     const totalAmount = (cpu + net).toFixed(4);
 
-    const ConfirmTitle = `Confirm stake ${totalAmount} EOS for cpu/net`;
-
     navigation.navigate('ConfirmPin', {
       pinProps: {
-        titleEnter: ConfirmTitle
+        title: 'Confirm Stake',
+        description: `Stake ${totalAmount} EOS for cpu/net`
       },
       // when PIN matched
       async cb() {

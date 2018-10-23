@@ -52,7 +52,8 @@ import HomeStyle from '../../../styles/HomeStyle';
 
     navigation.navigate('ConfirmPin', {
       pinProps: {
-        titleEnter: `Transfer ${values.amount} ${symbol} by entering PIN code`
+        title: 'Confirm Transfer',
+        description: `Transfer ${values.amount.toFixed(4)} ${symbol}`
       },
       // when PIN matched
       async cb() {
