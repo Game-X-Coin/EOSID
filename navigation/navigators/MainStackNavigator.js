@@ -8,7 +8,6 @@ import { TransactionScreen } from '../../screens';
 
 import {
   AccountScreen,
-  AddAccountScreen,
   SettingsScreen,
   AddNetworkScreen,
   NetworkScreen as SettingsNetworkScreen,
@@ -20,10 +19,12 @@ import {
   ManageResourceScreen
 } from '../../screens/Main';
 
+import { ImportAccountScreen } from '../../screens/Shared';
+
 // detail screens
 const DetailScreens = {
   // accounts
-  AddAccount: AddAccountScreen,
+  ImportAccount: ImportAccountScreen,
   Transfer: TransferScreen,
   ManageResource: ManageResourceScreen,
   // settings

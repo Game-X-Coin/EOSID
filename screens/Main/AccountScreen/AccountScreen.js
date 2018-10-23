@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { observable, reaction } from 'mobx';
+import { observable } from 'mobx';
 import { observer, inject } from 'mobx-react';
 import { SafeAreaView, ScrollView, View } from 'react-native';
 import {
@@ -64,7 +64,7 @@ export class AccountScreen extends Component {
         <Title style={{ marginBottom: 5 }}>
           You do not have any accounts added.
         </Title>
-        <Card onPress={() => this.moveScreen('AddAccount')}>
+        <Card onPress={() => this.moveScreen('ImportAccount')}>
           <LinearGradient
             colors={[Colors.purple200, Colors.purple900]}
             start={[1, 0]}
@@ -101,8 +101,9 @@ export class AccountScreen extends Component {
       const delegatedCPU = cpu_weight * 0.0001;
       const delegatedNET = net_weight * 0.0001;
       const refundAmount =
+        refund_request &&
         Number(refund_request.cpu_amount.split(' ')[0]) +
-        Number(refund_request.net_amount.split(' ')[0]);
+          Number(refund_request.net_amount.split(' ')[0]);
       const undelegatedAmount = parseFloat(
         tokens.find(token => token.symbol === 'EOS').amount
       );
@@ -289,7 +290,7 @@ export class AccountScreen extends Component {
               title="Add account"
               onPress={() => {
                 this.hideSelectAccount();
-                this.moveScreen('AddAccount');
+                this.moveScreen('ImportAccount');
               }}
             />
           </List.Section>
@@ -322,7 +323,7 @@ export class AccountScreen extends Component {
             </View>
             <Appbar.Action
               icon="add"
-              onPress={() => this.moveScreen('AddAccount')}
+              onPress={() => this.moveScreen('ImportAccount')}
             />
           </Appbar.Header>
 
