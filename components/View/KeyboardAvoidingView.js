@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
 import { KeyboardAvoidingView as RNKeyboardAvoidingView } from 'react-native';
 
-import { ScrollView } from './ScrollView';
-
 export class KeyboardAvoidingView extends Component {
   render() {
+    const { style, children } = this.props;
     return (
-      <RNKeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
-        <ScrollView {...this.props} />
+      <RNKeyboardAvoidingView behavior="padding" style={{ flex: 1, ...style }}>
+        {children}
       </RNKeyboardAvoidingView>
     );
   }

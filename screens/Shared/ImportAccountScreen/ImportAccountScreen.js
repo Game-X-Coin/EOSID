@@ -1,12 +1,6 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import {
-  SafeAreaView,
-  ScrollView,
-  View,
-  KeyboardAvoidingView,
-  Keyboard
-} from 'react-native';
+import { SafeAreaView, View, Keyboard } from 'react-native';
 import {
   Appbar,
   Button,
@@ -25,6 +19,8 @@ import * as Yup from 'yup';
 
 import { AccountError } from '../../../db';
 import { AccountService } from '../../../services';
+
+import { ScrollView, KeyboardAvoidingView } from '../../../components/View';
 
 import HomeStyle from '../../../styles/HomeStyle';
 
@@ -164,52 +160,50 @@ export class ImportAccountScreen extends Component {
         {/* Dialog */}
         <SelectAccountDialog />
 
-        <KeyboardAvoidingView behavior="padding" style={HomeStyle.container}>
+        <KeyboardAvoidingView behavior="padding">
           <ScrollView
             keyboardShouldPersistTaps="always"
-            style={HomeStyle.container}
+            style={{ paddingHorizontal: 20, paddingBottom: 60 }}
           >
-            <View style={{ flex: 1, paddingHorizontal: 20, paddingBottom: 60 }}>
-              <TextField
-                autoFocus
-                multiline
-                label="Private key"
-                title="Enter the private key of the account to import"
-                style={{ fontFamily: 'monospace' }}
-                value={values.privateKey}
-                error={touched.privateKey && errors.privateKey}
-                onChangeText={_ => {
-                  setFieldTouched('privateKey', true);
-                  setFieldValue('privateKey', _);
-                }}
+            <TextField
+              autoFocus
+              multiline
+              label="Private key"
+              title="Enter the private key of the account to import"
+              style={{ fontFamily: 'monospace' }}
+              value={values.privateKey}
+              error={touched.privateKey && errors.privateKey}
+              onChangeText={_ => {
+                setFieldTouched('privateKey', true);
+                setFieldValue('privateKey', _);
+              }}
+            />
+
+            <Dropdown
+              label="Network"
+              title="Network of account to import"
+              data={networks}
+              value={values.networkId}
+              error={touched.networkId && errors.networkId}
+              onChangeText={_ => {
+                setFieldTouched('networkId', true);
+                setFieldValue('networkId', _);
+              }}
+            />
+
+            <Divider style={{ marginVertical: 15 }} />
+
+            <View style={{ flexDirection: 'row' }}>
+              <Icon.Ionicons
+                name="md-lock"
+                size={30}
+                color={Colors.grey900}
+                style={{ marginRight: 15 }}
               />
-
-              <Dropdown
-                label="Network"
-                title="Network of account to import"
-                data={networks}
-                value={values.networkId}
-                error={touched.networkId && errors.networkId}
-                onChangeText={_ => {
-                  setFieldTouched('networkId', true);
-                  setFieldValue('networkId', _);
-                }}
-              />
-
-              <Divider style={{ marginVertical: 15 }} />
-
-              <View style={{ flexDirection: 'row' }}>
-                <Icon.Ionicons
-                  name="md-lock"
-                  size={30}
-                  color={Colors.grey900}
-                  style={{ marginRight: 15 }}
-                />
-                <Text style={{ flex: 1, color: Colors.grey900 }}>
-                  EOSID encrypts the private key and stores it securely on the
-                  device.
-                </Text>
-              </View>
+              <Text style={{ flex: 1, color: Colors.grey900 }}>
+                EOSID encrypts the private key and stores it securely on the
+                device.
+              </Text>
             </View>
           </ScrollView>
 
