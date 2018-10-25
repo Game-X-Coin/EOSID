@@ -34,15 +34,9 @@ export class ManageResourceScreen extends Component {
           </Appbar.Header>
           <View style={HomeStyle.container}>
             {this.isStaking ? (
-              <StakeResource
-                changeResourceMode={this.changeResourceMode}
-                navigation={this.props.navigation}
-              />
+              <StakeResource changeResourceMode={this.changeResourceMode} />
             ) : (
-              <UnstakeResource
-                changeResourceMode={this.changeResourceMode}
-                navigation={this.props.navigation}
-              />
+              <UnstakeResource changeResourceMode={this.changeResourceMode} />
             )}
           </View>
         </SafeAreaView>

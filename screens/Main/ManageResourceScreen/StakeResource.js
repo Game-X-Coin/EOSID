@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { observable, computed } from 'mobx';
 import { observer, inject } from 'mobx-react';
+import { withNavigation } from 'react-navigation';
 import { ScrollView, View } from 'react-native';
 import {
   Text,
@@ -65,6 +66,7 @@ class ResourceView extends Component {
   }
 }
 
+@withNavigation
 @inject('accountStore')
 @observer
 export class StakeResource extends Component {

@@ -2,6 +2,7 @@ import React, { Component, PureComponent } from 'react';
 import { observable, computed } from 'mobx';
 import { observer, inject } from 'mobx-react';
 import { ScrollView, View } from 'react-native';
+import { withNavigation } from 'react-navigation';
 import {
   Text,
   Button,
@@ -17,7 +18,6 @@ import { Slider } from '../../../components/Slider';
 class ResourceView extends PureComponent {
   render() {
     const {
-      style,
       title,
       amount,
       amountPercent,
@@ -68,6 +68,7 @@ class ResourceView extends PureComponent {
   }
 }
 
+@withNavigation
 @inject('accountStore')
 @observer
 export class UnstakeResource extends Component {
