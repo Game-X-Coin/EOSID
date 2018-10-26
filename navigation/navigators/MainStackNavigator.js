@@ -16,7 +16,8 @@ import {
   AccountsScreen,
   TransferScreen,
   ConfirmPinScreen,
-  PermissionRequestScreen
+  PermissionRequestScreen,
+  ManageResourceScreen
 } from '../../screens/Main';
 
 // detail screens
@@ -24,6 +25,7 @@ const DetailScreens = {
   // accounts
   AddAccount: AddAccountScreen,
   Transfer: TransferScreen,
+  ManageResource: ManageResourceScreen,
   // settings
   SettingsNetwork: SettingsNetworkScreen,
   AddNetwork: AddNetworkScreen,
