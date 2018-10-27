@@ -1,8 +1,9 @@
 import React from 'react';
 import { observer, inject } from 'mobx-react';
+import { Linking } from 'react-native';
 import { createStackNavigator } from 'react-navigation';
 import { createMaterialBottomTabNavigator } from 'react-navigation-material-bottom-tabs';
-import { Icon } from 'expo';
+import { Icon, Linking as ExpoLinking } from 'expo';
 
 import { TransactionScreen } from '../../screens';
 
@@ -73,6 +74,38 @@ const MainTabNavigator = createMaterialBottomTabNavigator(
 @inject('accountStore')
 @observer
 class MainTabNavigatorWrapper extends React.Component {
+  constructor(params) {
+    super(params);
+
+    this.addLinkingListener();
+    this.state = { redirectData: null, initialLinkingUri: '' };
+  }
+
+  handleLinkingHandler = event => {
+    const data = ExpoLinking.parse(event.url);
+    if (data.path && data.path !== '') {
+      this.props.navigation.navigate(data.path, data.queryParams);
+    }
+    this.setState({ redirectData: data });
+  };
+
+  addLinkingListener = () => {
+    ExpoLinking.addEventListener('url', this.handleLinkingHandler);
+  };
+
+  async componentWillMount() {
+    const initialLinkingUri = await Linking.getInitialURL();
+    const data = ExpoLinking.parse(initialLinkingUri);
+    if (data.path && data.path !== '') {
+      this.props.navigation.navigate(data.path, data.queryParams);
+    }
+    this.setState({ initialLinkingUri });
+  }
+
+  componentWillUnmount() {
+    ExpoLinking.removeEventListener('url', this.handleLinkingHandler);
+  }
+
   componentDidMount() {
     this.props.accountStore.getAccountInfo();
   }
