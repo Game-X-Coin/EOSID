@@ -2,7 +2,9 @@ import { observable, action, computed } from 'mobx';
 
 import { AccountService } from '../services';
 
-import { UserStore, NetworkStore } from './';
+import { UserStore } from './';
+
+import api from '../utils/eos/API';
 
 class Store {
   @observable
@@ -22,9 +24,27 @@ class Store {
 
   @computed
   get userAccounts() {
-    return this.accounts.filter(
-      account => account.userId === UserStore.currentUser.id
+    return (
+      this.accounts.filter(
+        account => account.userId === UserStore.currentUser.id
+      ) || []
     );
+  }
+
+  findAccount(accountName) {
+    if (!accountName) {
+      return this.currentUserAccount;
+    }
+
+    const foundAccount = this.userAccounts.find(
+      account => account.name === accountName
+    );
+    if (!foundAccount) {
+      throw new Error(
+        `not found ${accountName}, import '${accountName}' account`
+      );
+    }
+    return foundAccount;
   }
 
   @computed
@@ -46,7 +66,6 @@ class Store {
 
   @action
   setAccounts(accounts) {
-    console.log(accounts);
     this.accounts = accounts;
   }
 
@@ -101,9 +120,8 @@ class Store {
   }
 
   async getInfo() {
-    const info = await NetworkStore.eos.accounts.get(
-      this.currentUserAccount.name
-    );
+    const account = this.currentUserAccount;
+    const info = await api.accounts.get({ account_name: account.name });
 
     console.log(info);
 
@@ -113,9 +131,7 @@ class Store {
   async getTokens() {
     const account = this.currentUserAccount;
 
-    const tokens = await NetworkStore.eos.currency.balance({
-      account: account.name
-    });
+    const tokens = await api.currency.balance({ account: account.name });
 
     if (tokens.length) {
       this.tokens = tokens.map(token => {
@@ -129,19 +145,19 @@ class Store {
   }
 
   async getActions() {
-    const { actions = [] } = await NetworkStore.eos.actions.gets({
-      account_name: this.currentUserAccount.name
+    const account = this.currentUserAccount;
+    const { actions = [] } = await api.actions.gets({
+      account_name: account.name
     });
 
     this.actions = actions.reverse();
   }
 
   @action
-  async transfer(formData) {
+  async transfer(data) {
     return AccountService.transfer({
-      ...formData,
-      sender: this.currentUserAccount.name,
-      privateKey: this.currentUserAccount.privateKey
+      ...data
+      // from: this.currentUserAccount.name
     }).then(async tx => {
       await this.getTokens();
       return tx;
@@ -151,9 +167,8 @@ class Store {
   @action
   async manageResource(data) {
     return AccountService.manageResource({
-      ...data,
-      sender: this.currentUserAccount.name,
-      privateKey: this.currentUserAccount.privateKey
+      ...data
+      // from: this.currentUserAccount.name
     }).then(async res => {
       await this.getInfo();
       await this.getTokens();
