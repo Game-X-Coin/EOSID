@@ -100,9 +100,10 @@ export class AccountScreen extends Component {
 
       const delegatedCPU = cpu_weight * 0.0001;
       const delegatedNET = net_weight * 0.0001;
-      const refundAmount =
-        Number(refund_request.cpu_amount.split(' ')[0]) +
-        Number(refund_request.net_amount.split(' ')[0]);
+      const refundAmount = refund_request
+        ? Number(refund_request.cpu_amount.split(' ')[0]) +
+          Number(refund_request.net_amount.split(' ')[0])
+        : 0;
       const undelegatedAmount = parseFloat(
         tokens.find(token => token.symbol === 'EOS').amount
       );
