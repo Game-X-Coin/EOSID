@@ -20,7 +20,7 @@ import {
   ManageResourceScreen
 } from '../../screens/Main';
 
-import { ImportAccountScreen } from '../../screens/Shared';
+import { ImportAccountScreen, ShowErrorScreen } from '../../screens/Shared';
 
 // detail screens
 const DetailScreens = {
@@ -39,7 +39,9 @@ const DetailScreens = {
   // confirm pincode
   ConfirmPin: ConfirmPinScreen,
   // confirm dapp sign
-  PermissionRequest: PermissionRequestScreen
+  PermissionRequest: PermissionRequestScreen,
+  // show error
+  ShowError: ShowErrorScreen
 };
 
 // for tab icons
