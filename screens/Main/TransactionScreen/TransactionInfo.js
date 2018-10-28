@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { observable } from 'mobx';
 import { observer, inject } from 'mobx-react';
 import { Text, Caption, List } from 'react-native-paper';
+import { withNavigation } from 'react-navigation';
 import moment from 'moment';
 
 import { ScrollView } from '../../../components/View';
@@ -9,6 +10,7 @@ import { TransactionEmptyState } from './TransactionEmptyState';
 
 import { PageIndicator } from '../../../components/Indicator';
 
+@withNavigation
 @inject('accountStore')
 @observer
 export class TransactionInfo extends Component {
@@ -40,13 +42,8 @@ export class TransactionInfo extends Component {
           {actions.map(({ block_time, action_trace }, i) => (
             <List.Item
               key={i}
-              title={
-                <Text>
-                  {action_trace.act.name}{' '}
-                  <Caption>by {action_trace.act.account}</Caption>
-                </Text>
-              }
-              // description={JSON.stringify(action_trace.act.data)}
+              title={action_trace.act.name}
+              description={action_trace.act.account}
               right={() => (
                 <Caption style={{ alignSelf: 'center' }}>
                   {moment(block_time).fromNow()}
