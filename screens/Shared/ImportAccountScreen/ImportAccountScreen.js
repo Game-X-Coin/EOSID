@@ -160,11 +160,8 @@ export class ImportAccountScreen extends Component {
         {/* Dialog */}
         <SelectAccountDialog />
 
-        <KeyboardAvoidingView behavior="padding">
-          <ScrollView
-            keyboardShouldPersistTaps="always"
-            style={{ paddingHorizontal: 20, paddingBottom: 60 }}
-          >
+        <KeyboardAvoidingView>
+          <ScrollView style={{ paddingHorizontal: 20, paddingBottom: 60 }}>
             <TextField
               autoFocus
               multiline
@@ -191,9 +188,7 @@ export class ImportAccountScreen extends Component {
               }}
             />
 
-            <Divider style={{ marginVertical: 15 }} />
-
-            <View style={{ flexDirection: 'row' }}>
+            <View style={{ flexDirection: 'row', marginTop: 20 }}>
               <Icon.Ionicons
                 name="md-lock"
                 size={30}
