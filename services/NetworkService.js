@@ -2,7 +2,7 @@ import { getRepository } from 'typeorm-expo/browser';
 
 import { NetworkModel, NetworkError } from '../db';
 
-import { eosApi } from '../utils/eosApi';
+import api from '../utils/eos/API';
 
 export class NetworkService {
   static async getNetworks() {
@@ -14,12 +14,10 @@ export class NetworkService {
 
   static async addNetwork(networkInfo) {
     const NetworkRepo = getRepository(NetworkModel);
-    const eos = new eosApi(networkInfo.url);
-
     let info;
 
     try {
-      info = await eos.info.get();
+      info = await api.info.getBy(networkInfo.url);
     } catch (error) {
       return Promise.reject(NetworkError.NoResponseUrl);
     }

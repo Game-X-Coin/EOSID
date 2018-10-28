@@ -1,65 +1,8 @@
 import { getRepository } from 'typeorm-expo/browser';
-import { Eos } from 'react-native-eosjs';
-import ecc from 'eosjs-ecc-rn';
 import { AES, enc } from 'crypto-js';
 
 import { AccountModel, AccountError } from '../db';
-
-const eosjs = {
-  transfer({
-    contract = 'eosio.token',
-    sender,
-    reciever,
-    amount,
-    symbol = 'EOS',
-    memo,
-    privateKey,
-    broadcast = true
-  }) {
-    return new Promise(resolve => {
-      Eos.transfer(
-        contract,
-        sender,
-        reciever,
-        `${amount} ${symbol}`,
-        memo,
-        privateKey,
-        broadcast,
-        e => {
-          resolve(e.data);
-        }
-      );
-    });
-  },
-  stake({ sender, reciever, cpu, net, symbol = 'EOS', privateKey }) {
-    return new Promise(resolve => {
-      Eos.delegate(
-        privateKey,
-        sender,
-        reciever ? reciever : sender,
-        `${cpu.toFixed(4)} ${symbol}`,
-        `${net.toFixed(4)} ${symbol}`,
-        e => {
-          resolve(e.data);
-        }
-      );
-    });
-  },
-  unstake({ sender, reciever, cpu, net, symbol = 'EOS', privateKey }) {
-    return new Promise(resolve => {
-      Eos.undelegate(
-        privateKey,
-        sender,
-        reciever ? reciever : sender,
-        `${cpu.toFixed(4)} ${symbol}`,
-        `${net.toFixed(4)} ${symbol}`,
-        e => {
-          resolve(e.data);
-        }
-      );
-    });
-  }
-};
+import api from '../utils/eos/API';
 
 export class AccountService {
   static async getAccounts() {
@@ -69,14 +12,12 @@ export class AccountService {
     return accounts;
   }
 
-  static async privateToPublic(privateKey) {
-    // check privateKey
-    if (!ecc.isValidPrivate(privateKey)) {
+  static privateToPublic(privateKey) {
+    try {
+      return api.Key.privateToPublic({ wif: privateKey });
+    } catch (error) {
       return Promise.reject(AccountError.InvalidPrivateKey);
     }
-
-    // generate private key
-    return ecc.privateToPublic(privateKey);
   }
 
   static async findKeyAccount(publicKey, userEos) {
@@ -119,15 +60,22 @@ export class AccountService {
     await AccountRepo.remove(findAccount);
   }
 
-  static async transfer({ pincode, encryptedPrivateKey, ...transferInfo }) {
+  static async transfer({
+    pincode,
+    receiver,
+    encryptedPrivateKey,
+    ...transferInfo
+  }) {
     // decrypt privatekey
     const privateKey = AES.decrypt(encryptedPrivateKey, pincode).toString(
       enc.Utf8
     );
 
-    const promise = eosjs.transfer({ ...transferInfo, privateKey });
-
-    return await promise;
+    return await api.transactions.transfer({
+      privateKey,
+      to: receiver,
+      ...transferInfo
+    });
   }
 
   static async manageResource({
@@ -142,11 +90,11 @@ export class AccountService {
     );
 
     const promise = isStaking
-      ? eosjs.stake({
+      ? api.transactions.stake({
           ...data,
           privateKey
         })
-      : eosjs.unstake({ ...data, privateKey });
+      : api.transactions.unstake({ ...data, privateKey });
 
     return await promise;
   }

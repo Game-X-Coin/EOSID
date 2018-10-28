@@ -3,7 +3,6 @@ import { observable } from 'mobx';
 import { observer, inject } from 'mobx-react/native';
 import { Platform, StatusBar, StyleSheet, View } from 'react-native';
 import { AppLoading, Font, Icon } from 'expo';
-import { EosProvider } from 'react-native-eosjs';
 
 import AppNavigator from './navigation/AppNavigator';
 
@@ -44,8 +43,6 @@ export default class RenderApp extends Component {
   }
 
   render() {
-    const { currentUserNetwork } = this.props.networkStore;
-
     if (!this.isLoadingComplete) {
       return (
         <AppLoading
@@ -60,11 +57,6 @@ export default class RenderApp extends Component {
       <View style={styles.container}>
         {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
         <AppNavigator />
-
-        <EosProvider
-          server={currentUserNetwork.url}
-          chainId={currentUserNetwork.chainId}
-        />
       </View>
     );
   }

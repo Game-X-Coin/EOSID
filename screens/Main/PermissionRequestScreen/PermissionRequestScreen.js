@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observable } from 'mobx';
 import { observer, inject } from 'mobx-react';
-import { SafeAreaView, View, ScrollView } from 'react-native';
+import { SafeAreaView, View, ScrollView, Linking } from 'react-native';
 import {
   Appbar,
   Button,
@@ -23,6 +23,8 @@ import {
 } from './RequestTypes';
 
 import HomeStyle from '../../../styles/HomeStyle';
+import api from '../../../utils/eos/API';
+import { Games } from '../../../constants/Apps';
 
 @inject('accountStore')
 @observer
@@ -33,6 +35,30 @@ export class PermissionRequestScreen extends Component {
   @observable
   selectedAccount = this.props.accountStore.currentUserAccount;
 
+  constructor(params) {
+    super(params);
+
+    this.state = {
+      params: {},
+      app: {}
+    };
+  }
+
+  componentDidMount() {
+    let {
+      params = {
+        appId: 1,
+        action: 'authorize',
+        q: 'abcdefg',
+        redirectURL: 'https://www.gamexcoin.io'
+      }
+    } = this.props.navigation.state;
+
+    const app = this.getApp(parseInt(params.appId)) || {};
+
+    this.setState({ params, app });
+  }
+
   showChangeAccountDialog = () => (this.changeAccountDialog = true);
   hideChangeAccountDialog = () => (this.changeAccountDialog = false);
   changeAccount = account => {
@@ -42,16 +68,46 @@ export class PermissionRequestScreen extends Component {
 
   moveScreen = routeName => this.props.navigation.navigate(routeName);
 
-  onConfirm = () => {};
+  onConfirm = () => {
+    const { navigation, accountStore } = this.props;
+    const { params, app } = this.state;
 
-  onCancel = () => {};
+    navigation.navigate('ConfirmPin', {
+      pinProps: {
+        titleEnter: `Sign ${app.name} by entering PIN code`
+      },
+      async cb() {
+        const currentAccount = accountStore.currentUserAccount;
+
+        const signature = api.Sign.get({
+          data: params.q,
+          privateKey: currentAccount.privateKey
+        });
+        const result = {
+          signature,
+          account: currentAccount.name,
+          publicKey: currentAccount.publicKey
+        };
+
+        if (params.redirectURL) {
+          Linking.openURL(params.redirectURL, result);
+        }
+      }
+    });
+  };
+
+  onCancel = () => {
+    this.props.navigation.goBack();
+  };
+
+  getApp = appId => Games.find(app => app.id === appId);
 
   render() {
     const { changeAccountDialog, selectedAccount } = this;
     const { userAccounts } = this.props.accountStore;
-    let {
-      params = { code: '3FVASC', appName: 'Zombie Rizing', type: 'authorize' }
-    } = this.props.navigation.state;
+    const { params, app } = this.state;
+    console.log({ params });
+    console.log({ app });
 
     const RenderRequest = () => {
       const requestTypes = {
@@ -60,7 +116,7 @@ export class PermissionRequestScreen extends Component {
         transaction: <TransactionRequest transaction={params.transaction} />
       };
 
-      return requestTypes[params.type];
+      return requestTypes[params.action];
     };
 
     const ChangeAccountDialog = () => (
@@ -120,10 +176,10 @@ export class PermissionRequestScreen extends Component {
                       color: Colors.green500
                     }}
                   >
-                    {params.code}
+                    {params.q}
                   </Text>
                   <Text style={{ fontSize: 20, marginBottom: 5 }}>
-                    {params.appName}
+                    {app.name}
                   </Text>
                   <Caption>
                     Make sure it matches the code shown in the application.
@@ -137,11 +193,11 @@ export class PermissionRequestScreen extends Component {
                   <Caption>
                     Confirm the request, this will allow{' '}
                     <Text style={{ fontWeight: 'bold', color: 'gray' }}>
-                      {params.appName}
+                      {app.name}
                     </Text>{' '}
                     to
                   </Caption>
-                  <RenderRequest />
+                  {params.action && <RenderRequest />}
                 </View>
 
                 <Divider />

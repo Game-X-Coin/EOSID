@@ -7,7 +7,7 @@ import { AccountStore } from './AccountStore';
 
 import { DEFAULT_NETWORKS } from '../constants';
 
-import { eosApi } from '../utils/eosApi';
+import api from '../utils/eos/API';
 
 class Store {
   @observable
@@ -18,7 +18,7 @@ class Store {
 
   @computed
   get eos() {
-    return new eosApi(this.currentUserNetwork.url);
+    return api;
   }
 
   @computed
