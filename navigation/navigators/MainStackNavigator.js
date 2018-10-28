@@ -13,6 +13,8 @@ import {
   TransactionDetailScreen,
   AccountsScreen,
   TransferScreen,
+  TransferAmountScreen,
+  TransferResultScreen,
   ConfirmPinScreen,
   PermissionRequestScreen,
   ManageResourceScreen
@@ -24,8 +26,10 @@ import { ImportAccountScreen } from '../../screens/Shared';
 const DetailScreens = {
   // accounts
   ImportAccount: ImportAccountScreen,
-  Transfer: TransferScreen,
   ManageResource: ManageResourceScreen,
+  Transfer: TransferScreen,
+  TransferAmount: TransferAmountScreen,
+  TransferResult: TransferResultScreen,
   // settings
   SettingsNetwork: SettingsNetworkScreen,
   AddNetwork: AddNetworkScreen,
