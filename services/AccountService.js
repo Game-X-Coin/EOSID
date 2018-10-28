@@ -1,4 +1,5 @@
 import { getRepository } from 'typeorm-expo/browser';
+import { AES, enc } from 'crypto-js';
 
 import { AccountModel, AccountError } from '../db';
 import api from '../utils/eos/API';
@@ -31,11 +32,17 @@ export class AccountService {
     return account_names;
   }
 
-  static async addAccount(accountInfo) {
+  static async addAccount({ pincode, privateKey, ...accountInfo }) {
     const AccountRepo = getRepository(AccountModel);
 
+    // encrypt private key
+    const encryptedPrivateKey = AES.encrypt(privateKey, pincode).toString();
+
     // create new account instance
-    const newAccount = new AccountModel(accountInfo);
+    const newAccount = new AccountModel({
+      ...accountInfo,
+      encryptedPrivateKey
+    });
 
     // save
     await AccountRepo.save(newAccount);
@@ -53,15 +60,41 @@ export class AccountService {
     await AccountRepo.remove(findAccount);
   }
 
-  static async transfer(transferInfo) {
-    const { receiver } = transferInfo;
-    return await api.transactions.transfer({ ...transferInfo, to: receiver });
+  static async transfer({
+    pincode,
+    receiver,
+    encryptedPrivateKey,
+    ...transferInfo
+  }) {
+    // decrypt privatekey
+    const privateKey = AES.decrypt(encryptedPrivateKey, pincode).toString(
+      enc.Utf8
+    );
+
+    return await api.transactions.transfer({
+      privateKey,
+      to: receiver,
+      ...transferInfo
+    });
   }
 
-  static async manageResource({ isStaking, ...data }) {
+  static async manageResource({
+    pincode,
+    encryptedPrivateKey,
+    isStaking,
+    ...data
+  }) {
+    // decrypt privatekey
+    const privateKey = AES.decrypt(encryptedPrivateKey, pincode).toString(
+      enc.Utf8
+    );
+
     const promise = isStaking
-      ? api.transactions.stake(data)
-      : api.transactions.unstake(data);
+      ? api.transactions.stake({
+          ...data,
+          privateKey
+        })
+      : api.transactions.unstake({ ...data, privateKey });
 
     return await promise;
   }

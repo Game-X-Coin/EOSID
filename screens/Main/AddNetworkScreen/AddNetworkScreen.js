@@ -1,12 +1,14 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { SafeAreaView, ScrollView, View } from 'react-native';
+import { SafeAreaView } from 'react-native';
 import { Appbar, Button } from 'react-native-paper';
 import { TextField } from 'react-native-material-textfield';
 import { withFormik } from 'formik';
 import * as Yup from 'yup';
 
 import { NetworkError } from '../../../db';
+
+import { KeyboardAvoidingView, ScrollView } from '../../../components/View';
 
 import HomeStyle from '../../../styles/HomeStyle';
 
@@ -58,47 +60,47 @@ export class AddNetworkScreen extends Component {
     } = this.props;
 
     return (
-      <View style={HomeStyle.container}>
-        <SafeAreaView style={HomeStyle.container}>
-          <Appbar.Header>
-            <Appbar.BackAction onPress={() => navigation.goBack(null)} />
-            <Appbar.Content title={'Add custom network'} />
-          </Appbar.Header>
+      <SafeAreaView style={HomeStyle.container}>
+        <Appbar.Header>
+          <Appbar.BackAction onPress={() => navigation.goBack(null)} />
+          <Appbar.Content title="Add Network" />
+        </Appbar.Header>
 
-          <ScrollView style={HomeStyle.container}>
-            <View style={{ paddingHorizontal: 15 }}>
-              <TextField
-                label="Name"
-                value={values.name}
-                error={touched.name && errors.name}
-                onChangeText={_ => {
-                  setFieldTouched('name', true);
-                  setFieldValue('name', _);
-                }}
-              />
+        <KeyboardAvoidingView>
+          <ScrollView style={{ paddingHorizontal: 20 }}>
+            <TextField
+              autoFocus
+              label="Name"
+              title="Name to identify your network"
+              value={values.name}
+              error={touched.name && errors.name}
+              onChangeText={_ => {
+                setFieldTouched('name', true);
+                setFieldValue('name', _);
+              }}
+            />
 
-              <TextField
-                label="Url"
-                value={values.url}
-                error={touched.url && errors.url}
-                onChangeText={_ => {
-                  setFieldTouched('url', true);
-                  setFieldValue('url', _);
-                }}
-              />
-
-              <Button
-                mode="contained"
-                style={{ padding: 5, marginTop: 15 }}
-                loading={isSubmitting}
-                onPress={() => handleSubmit()}
-              >
-                Add network
-              </Button>
-            </View>
+            <TextField
+              label="URL"
+              value={values.url}
+              error={touched.url && errors.url}
+              onChangeText={_ => {
+                setFieldTouched('url', true);
+                setFieldValue('url', _);
+              }}
+            />
           </ScrollView>
-        </SafeAreaView>
-      </View>
+
+          <Button
+            mode="contained"
+            style={{ padding: 5, borderRadius: 0 }}
+            loading={isSubmitting}
+            onPress={handleSubmit}
+          >
+            Add network
+          </Button>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
     );
   }
 }

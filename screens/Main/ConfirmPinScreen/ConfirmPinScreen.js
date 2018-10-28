@@ -1,47 +1,35 @@
 import React, { Component } from 'react';
-import { SafeAreaView } from 'react-native';
-import { observable } from 'mobx';
 import { observer, inject } from 'mobx-react/native';
-import Pincode from '@haskkor/react-native-pincode';
-import { Appbar } from 'react-native-paper';
+
+import { ConfirmPincode } from '../../../components/Pincode';
 
 @inject('userStore')
 @observer
 export class ConfirmPinScreen extends Component {
-  @observable
-  pinStatus = 'initial';
-
-  confirmPin = async pincode => {
+  confirmPin = async (pincode, { setFailure }) => {
     const { userStore, navigation } = this.props;
 
     try {
       await userStore.signIn({ pincode });
-      navigation.state.params.cb();
+      navigation.state.params && navigation.state.params.cb();
       navigation.goBack(null);
     } catch (error) {
-      this.pinStatus = 'failure';
+      setFailure();
     }
   };
 
   render() {
     const { navigation } = this.props;
-    const { pinProps = {} } = navigation.state.params;
+    const pinProps = navigation.state.params
+      ? navigation.state.params.pinProps
+      : {};
 
     return (
-      <SafeAreaView style={{ flex: 1 }}>
-        <Appbar.Header>
-          <Appbar.BackAction onPress={() => navigation.goBack(null)} />
-        </Appbar.Header>
-
-        <Pincode
-          touchIDDisabled
-          status="enter"
-          storedPin="____"
-          pinStatus={this.pinStatus}
-          handleResultEnterPin={this.confirmPin}
-          {...pinProps}
-        />
-      </SafeAreaView>
+      <ConfirmPincode
+        onEnter={this.confirmPin}
+        backAction={() => this.props.navigation.goBack(null)}
+        {...pinProps}
+      />
     );
   }
 }

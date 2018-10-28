@@ -29,11 +29,11 @@
     "lint-js": "eslint --ignore-path .gitignore --ignore-pattern \"!**/.*\" ."
   },
   "dependencies": {
-    "@haskkor/react-native-pincode": "^1.6.6",
     "axios": "^0.18.0",
     "bytes": "^3.0.0",
     "eosjs-ecc-rn": "^4.0.5",
     "eosjs-rn": "^20.0.0-beta2.2",
+    "crypto-js": "^3.1.9-1",
     "expo": "^30.0.1",
     "formik": "^1.3.1",
     "jest-expo": "^30.0.0",
