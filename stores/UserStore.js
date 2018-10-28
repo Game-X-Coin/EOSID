@@ -10,9 +10,17 @@ class Store {
   @observable
   currentUser = UserModel.placeholder;
 
+  @observable
+  pincode = '';
+
   @computed
   get isSignIn() {
-    return Boolean(this.currentUser);
+    return Boolean(this.pincode);
+  }
+
+  @action
+  setPincode(pincode) {
+    this.pincode = pincode;
   }
 
   @action
@@ -42,6 +50,7 @@ class Store {
   async signIn(formData) {
     return UserService.signIn(formData).then(user => {
       this.setUser(user);
+      this.setPincode(formData.pincode);
     });
   }
 
@@ -49,6 +58,7 @@ class Store {
   async signUp(formData) {
     return UserService.signUp(formData).then(user => {
       this.setUser(user);
+      this.setPincode(formData.pincode);
       this.getUsers();
     });
   }
@@ -56,6 +66,7 @@ class Store {
   @action
   async signOut() {
     this.setUser(null);
+    this.setPincode(null);
   }
 }
 

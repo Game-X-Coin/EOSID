@@ -4,28 +4,32 @@ import { createStackNavigator } from 'react-navigation';
 import { createMaterialBottomTabNavigator } from 'react-navigation-material-bottom-tabs';
 import { Icon } from 'expo';
 
-import { TransactionScreen } from '../../screens';
-
 import {
   AccountScreen,
-  AddAccountScreen,
   SettingsScreen,
   AddNetworkScreen,
   NetworkScreen as SettingsNetworkScreen,
+  TransactionScreen,
   TransactionDetailScreen,
   AccountsScreen,
   TransferScreen,
+  TransferAmountScreen,
+  TransferResultScreen,
   ConfirmPinScreen,
   PermissionRequestScreen,
   ManageResourceScreen
 } from '../../screens/Main';
 
+import { ImportAccountScreen, ShowErrorScreen } from '../../screens/Shared';
+
 // detail screens
 const DetailScreens = {
   // accounts
-  AddAccount: AddAccountScreen,
-  Transfer: TransferScreen,
+  ImportAccount: ImportAccountScreen,
   ManageResource: ManageResourceScreen,
+  Transfer: TransferScreen,
+  TransferAmount: TransferAmountScreen,
+  TransferResult: TransferResultScreen,
   // settings
   SettingsNetwork: SettingsNetworkScreen,
   AddNetwork: AddNetworkScreen,
@@ -35,7 +39,9 @@ const DetailScreens = {
   // confirm pincode
   ConfirmPin: ConfirmPinScreen,
   // confirm dapp sign
-  PermissionRequest: PermissionRequestScreen
+  PermissionRequest: PermissionRequestScreen,
+  // show error
+  ShowError: ShowErrorScreen
 };
 
 // for tab icons

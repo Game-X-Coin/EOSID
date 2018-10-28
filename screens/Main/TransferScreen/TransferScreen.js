@@ -1,188 +1,183 @@
 import React, { Component } from 'react';
+import { observable } from 'mobx';
 import { observer, inject } from 'mobx-react';
+import { SafeAreaView, View } from 'react-native';
 import {
-  SafeAreaView,
-  ScrollView,
-  View,
-  KeyboardAvoidingView
-} from 'react-native';
-import { Appbar, Button, Portal, Dialog, Paragraph } from 'react-native-paper';
+  Appbar,
+  Button,
+  Divider,
+  Text,
+  Caption,
+  TouchableRipple
+} from 'react-native-paper';
 import { TextField } from 'react-native-material-textfield';
-import { withFormik } from 'formik';
-import * as Yup from 'yup';
+
+import { TransferLogService } from '../../../services';
+
+import { KeyboardAvoidingView, ScrollView } from '../../../components/View';
 
 import HomeStyle from '../../../styles/HomeStyle';
+import { Indicator } from '../../../components/Indicator';
+
+const debounce = (func, wait) => {
+  let timeout;
+
+  return function() {
+    const debounceFunc = () => func.apply(this, arguments);
+
+    clearTimeout(timeout);
+    timeout = setTimeout(debounceFunc, wait);
+  };
+};
 
 @inject('accountStore')
 @observer
-@withFormik({
-  mapPropsToValues: props => ({
-    reciever: '',
-    amount: '',
-    memo: '',
+export class TransferLogs extends Component {
+  @observable
+  transferLogs = [];
 
-    dialog: {
-      tx: null,
-      show: false
-    }
-  }),
-  validationSchema: ({ navigation, accountStore }) => {
-    const { symbol } = navigation.state.params;
-    const { tokens } = accountStore;
+  async componentDidMount() {
+    const { currentUserAccount } = this.props.accountStore;
 
-    const availableAmount = tokens.find(token => token.symbol === symbol)
-      .amount;
+    const logs = await TransferLogService.getTransferLogsByAcocuntId(
+      currentUserAccount.id
+    );
 
-    return Yup.object().shape({
-      reciever: Yup.string().required(),
-      amount: Yup.string()
-        .required()
-        .matches(/^\d*\.?\d{1,4}$/, 'Please enter valid amount')
-        .test(
-          'larger-than-available',
-          'Insufficient amount of token',
-          value => parseFloat(value) <= availableAmount
-        ),
-      memo: Yup.string()
-    });
-  },
-  handleSubmit: async (values, { props, setSubmitting, setFieldValue }) => {
-    const { navigation, accountStore } = props;
-    const { symbol } = navigation.state.params;
-
-    navigation.navigate('ConfirmPin', {
-      pinProps: {
-        titleEnter: `Transfer ${values.amount} ${symbol} by entering PIN code`
-      },
-      // when PIN matched
-      async cb() {
-        const tx = await accountStore.transfer({ ...values, symbol });
-        setSubmitting(false);
-        // show result dialog
-        setFieldValue('dialog', {
-          tx,
-          show: true
-        });
-      }
-    });
+    // desc
+    this.transferLogs = logs.reverse();
   }
-})
+
+  render() {
+    return (
+      <View>
+        <View style={{ paddingHorizontal: 20 }}>
+          <Text>Recent History</Text>
+          <Divider style={{ marginVertical: 10 }} />
+        </View>
+
+        {this.transferLogs.map(log => (
+          <TouchableRipple
+            key={log.id}
+            style={{
+              paddingHorizontal: 20,
+              paddingVertical: 5,
+              marginBottom: 5
+            }}
+            onPress={() => this.props.onLogPress(log)}
+          >
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center'
+              }}
+            >
+              <View style={{ flex: 1 }}>
+                <Text>{log.reciever}</Text>
+                <Caption>{log.createdAt}</Caption>
+              </View>
+              <Text style={{ fontSize: 15 }}>
+                {log.amount} {log.symbol}
+              </Text>
+            </View>
+          </TouchableRipple>
+        ))}
+      </View>
+    );
+  }
+}
+
+@inject('networkStore')
+@observer
 export class TransferScreen extends Component {
-  viewHistory() {
-    this.hideDialog();
-    this.props.navigation.replace('TransactionDetail', {
-      txId: this.props.values.dialog.tx.transaction_id
-    });
+  @observable
+  loading = false;
+
+  @observable
+  reciever = '';
+
+  @observable
+  error = '';
+
+  componentDidMount() {
+    this.checkReciever = debounce(this.checkReciever.bind(this), 500);
   }
 
-  confirmDialog() {
-    this.hideDialog();
-    this.props.navigation.navigate('Account');
+  onChangeReciever(v) {
+    this.reciever = v;
+    this.error = '';
+    this.checkReciever(v);
   }
 
-  hideDialog() {
-    this.props.setFieldValue('dialog', {
-      tx: null,
-      show: false
+  async checkReciever(v) {
+    try {
+      this.loading = true;
+      await this.props.networkStore.eos.accounts.get(v);
+    } catch (error) {
+      this.error = 'The account you entered does not exist.';
+    } finally {
+      this.loading = false;
+    }
+  }
+
+  handleSubmit() {
+    const { navigation } = this.props;
+    const { symbol = 'EOS' } = navigation.state.params || {};
+
+    navigation.navigate('TransferAmount', {
+      reciever: this.reciever,
+      symbol
     });
   }
 
   render() {
-    const {
-      navigation,
-      accountStore,
-
-      values,
-      errors,
-      touched,
-      setFieldValue,
-      setFieldTouched,
-      handleSubmit,
-      isSubmitting
-    } = this.props;
-
-    const { symbol } = navigation.state.params;
-    const { tokens } = accountStore;
-
-    const availableAmount = tokens.find(token => token.symbol === symbol)
-      .amount;
-
-    const ResultDialog = () => (
-      <Portal>
-        <Dialog visible={values.dialog.show}>
-          <Dialog.Title>Transfer succeed</Dialog.Title>
-          <Dialog.Content>
-            <Paragraph>
-              {values.amount} {symbol} transfered to {values.reciever}
-            </Paragraph>
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button onPress={() => this.viewHistory()}>View history</Button>
-            <Button onPress={() => this.confirmDialog()}>Confirm</Button>
-          </Dialog.Actions>
-        </Dialog>
-      </Portal>
-    );
+    const { navigation } = this.props;
+    const { reciever, loading, error } = this;
 
     return (
-      <View style={HomeStyle.container}>
-        <SafeAreaView style={HomeStyle.container}>
-          <Appbar.Header>
-            <Appbar.BackAction onPress={() => navigation.goBack(null)} />
-            <Appbar.Content title="Transfer" />
-          </Appbar.Header>
+      <SafeAreaView style={HomeStyle.container}>
+        <Appbar.Header>
+          <Appbar.BackAction onPress={() => navigation.goBack(null)} />
+          <Appbar.Content title="Reciever" />
+        </Appbar.Header>
 
-          <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
-            <ScrollView style={{ flex: 1, paddingHorizontal: 15 }}>
+        <KeyboardAvoidingView>
+          <ScrollView>
+            <View style={{ padding: 20 }}>
               <TextField
-                label="Transfer amount"
-                keyboardType="numeric"
-                value={values.amount}
-                title={`You have ${availableAmount} ${symbol}`}
-                error={touched.amount && errors.amount}
-                onChangeText={_ => {
-                  setFieldTouched('amount', true);
-                  setFieldValue('amount', _);
-                }}
+                autoFocus
+                label="Enter reciever's account"
+                title="example: eosauthority"
+                value={reciever}
+                error={error}
+                renderAccessory={() =>
+                  loading && (
+                    <View style={{ paddingHorizontal: 5 }}>
+                      <Indicator size="small" />
+                    </View>
+                  )
+                }
+                onChangeText={v => this.onChangeReciever(v)}
               />
 
-              <TextField
-                label="Reciever"
-                value={values.reciever}
-                error={touched.reciever && errors.reciever}
-                onChangeText={_ => {
-                  setFieldTouched('reciever', true);
-                  setFieldValue('reciever', _);
+              <Button
+                mode="contained"
+                style={{
+                  marginVertical: 20,
+                  padding: 5
                 }}
-              />
+                disabled={!reciever.length}
+                onPress={() => !loading && !error && this.handleSubmit()}
+              >
+                Next
+              </Button>
+            </View>
 
-              <TextField
-                label="Memo (optional)"
-                value={values.memo}
-                error={touched.memo && errors.memo}
-                onChangeText={_ => {
-                  setFieldTouched('memo', true);
-                  setFieldValue('memo', _);
-                }}
-              />
-            </ScrollView>
-
-            <Button
-              mode="contained"
-              style={{
-                margin: 15,
-                padding: 5
-              }}
-              loading={isSubmitting}
-              onPress={() => handleSubmit()}
-            >
-              Transfer
-            </Button>
-          </KeyboardAvoidingView>
-
-          <ResultDialog />
-        </SafeAreaView>
-      </View>
+            <TransferLogs
+              onLogPress={log => this.onChangeReciever(log.reciever)}
+            />
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
     );
   }
 }

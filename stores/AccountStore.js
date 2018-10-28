@@ -1,6 +1,6 @@
 import { observable, action, computed } from 'mobx';
 
-import { AccountService } from '../services';
+import { AccountService, TransferLogService } from '../services';
 
 import { UserStore, NetworkStore } from './';
 
@@ -11,8 +11,11 @@ class Store {
   @observable
   info = {};
 
+  /**
+   * { EOS: 100.3213, JUNGLE: 0.1231 }
+   */
   @observable
-  tokens = [];
+  tokens = {};
 
   @observable
   actions = [];
@@ -61,10 +64,11 @@ class Store {
   async addAccount(accountInfo) {
     return AccountService.addAccount({
       ...accountInfo,
-      userId: UserStore.currentUser.id
-    }).then(account => {
+      userId: UserStore.currentUser.id,
+      pincode: UserStore.pincode
+    }).then(async account => {
       this.setAccounts([...this.accounts, account]);
-      this.changeUserAccount(account.id);
+      await this.changeUserAccount(account.id);
       this.getAccountInfo();
     });
   }
@@ -86,7 +90,7 @@ class Store {
   @action
   async getAccountInfo() {
     this.info = {};
-    this.tokens = [];
+    this.tokens = {};
     this.actions = [];
     this.fetched = false;
 
@@ -105,8 +109,6 @@ class Store {
       this.currentUserAccount.name
     );
 
-    console.log(info);
-
     this.info = info;
   }
 
@@ -117,15 +119,13 @@ class Store {
       account: account.name
     });
 
-    if (tokens.length) {
-      this.tokens = tokens.map(token => {
-        const [amount, symbol] = token.split(' ');
-
-        return { amount, symbol };
-      });
-    } else {
-      this.tokens = [{ amount: '0.0000', symbol: 'EOS' }];
-    }
+    this.tokens = {
+      EOS: '0.0000',
+      ...tokens.reduce((ac, v) => {
+        const [amount, symbol] = v.split(' ');
+        return { ...ac, [symbol]: amount };
+      }, {})
+    };
   }
 
   async getActions() {
@@ -138,25 +138,37 @@ class Store {
 
   @action
   async transfer(formData) {
+    const { id, name, encryptedPrivateKey } = this.currentUserAccount;
+
     return AccountService.transfer({
       ...formData,
-      sender: this.currentUserAccount.name,
-      privateKey: this.currentUserAccount.privateKey
+      sender: name,
+      encryptedPrivateKey,
+      pincode: UserStore.pincode
     }).then(async tx => {
+      // fetch lastets tokens
       await this.getTokens();
+      // log transfer
+      TransferLogService.addTransferLog({ ...formData, accountId: id });
+
       return tx;
     });
   }
 
   @action
   async manageResource(data) {
+    const { name, encryptedPrivateKey } = this.currentUserAccount;
+
     return AccountService.manageResource({
       ...data,
-      sender: this.currentUserAccount.name,
-      privateKey: this.currentUserAccount.privateKey
-    }).then(async res => {
+      sender: name,
+      encryptedPrivateKey,
+      pincode: UserStore.pincode
+    }).then(async tx => {
       await this.getInfo();
       await this.getTokens();
+
+      return tx;
     });
   }
 }
