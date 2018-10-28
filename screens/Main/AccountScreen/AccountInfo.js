@@ -106,9 +106,7 @@ export class AccountInfo extends Component {
       refund_request &&
       Number(refund_request.cpu_amount.split(' ')[0]) +
         Number(refund_request.net_amount.split(' ')[0]);
-    const undelegatedAmount =
-      tokens.find(token => token.symbol === 'EOS') &&
-      parseFloat(tokens.find(token => token.symbol === 'EOS').amount);
+    const undelegatedAmount = parseFloat(tokens.EOS);
     const totalAsset = delegatedCPU + delegatedNET + undelegatedAmount;
 
     if (!fetched) {
@@ -192,9 +190,9 @@ export class AccountInfo extends Component {
         <View>
           <ItemTitle title="Tokens" />
 
-          {tokens.map(({ symbol, amount }, i) => (
+          {Object.keys(tokens).map(symbol => (
             <TouchableRipple
-              key={i}
+              key={symbol}
               onPress={() => this.moveScreen('Transfer', { symbol })}
             >
               <View
@@ -206,7 +204,7 @@ export class AccountInfo extends Component {
                 }}
               >
                 <Text style={{ flex: 1, fontSize: 17 }}>{symbol}</Text>
-                <Text style={{ fontSize: 17 }}>{amount}</Text>
+                <Text style={{ fontSize: 17 }}>{tokens[symbol]}</Text>
               </View>
             </TouchableRipple>
           ))}

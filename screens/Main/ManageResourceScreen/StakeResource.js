@@ -78,10 +78,7 @@ export class StakeResource extends Component {
 
   @computed
   get unstakedAmount() {
-    return parseFloat(
-      this.props.accountStore.tokens.find(token => token.symbol === 'EOS')
-        .amount
-    );
+    return parseFloat(this.props.accountStore.tokens.EOS);
   }
 
   @computed
