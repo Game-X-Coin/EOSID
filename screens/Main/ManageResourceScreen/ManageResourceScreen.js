@@ -1,46 +1,43 @@
 import React, { Component } from 'react';
-import { observable } from 'mobx';
-import { observer, inject } from 'mobx-react';
 import { SafeAreaView, View } from 'react-native';
+import { createMaterialTopTabNavigator } from 'react-navigation';
 import { Appbar } from 'react-native-paper';
 
 import { StakeResource } from './StakeResource';
 import { UnstakeResource } from './UnstakeResource';
 
+import Colors from '../../../constants/Colors';
 import HomeStyle from '../../../styles/HomeStyle';
 
-@inject('accountStore')
-@observer
-export class ManageResourceScreen extends Component {
-  @observable
-  isStaking = true;
+const TopTabNavigator = createMaterialTopTabNavigator(
+  {
+    Stake: StakeResource,
+    Unstake: UnstakeResource
+  },
+  {
+    swipeEnabled: false,
+    tabBarOptions: { style: { backgroundColor: Colors.primary } }
+  }
+);
 
-  // change mode to stake or unstake
-  changeResourceMode = bools => {
-    this.isStaking = bools;
-  };
-
-  moveScreen = routeName => this.props.navigation.navigate(routeName);
-
+class ManageResourceScreen extends Component {
   render() {
+    const { navigation } = this.props;
+
     return (
       <View style={HomeStyle.container}>
         <SafeAreaView style={HomeStyle.container}>
-          <Appbar.Header>
-            <Appbar.BackAction
-              onPress={() => this.props.navigation.goBack(null)}
-            />
+          <Appbar.Header style={{ elevation: 0 }}>
+            <Appbar.BackAction onPress={() => navigation.goBack(null)} />
             <Appbar.Content title="Manage Resource" />
           </Appbar.Header>
-          <View style={HomeStyle.container}>
-            {this.isStaking ? (
-              <StakeResource changeResourceMode={this.changeResourceMode} />
-            ) : (
-              <UnstakeResource changeResourceMode={this.changeResourceMode} />
-            )}
-          </View>
+          <TopTabNavigator navigation={navigation} />
         </SafeAreaView>
       </View>
     );
   }
 }
+
+ManageResourceScreen.router = TopTabNavigator.router;
+
+export { ManageResourceScreen };

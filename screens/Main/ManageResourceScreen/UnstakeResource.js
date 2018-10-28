@@ -2,11 +2,9 @@ import React, { Component, PureComponent } from 'react';
 import { observable, computed } from 'mobx';
 import { observer, inject } from 'mobx-react';
 import { ScrollView, View } from 'react-native';
-import { withNavigation } from 'react-navigation';
 import {
   Text,
   Button,
-  TouchableRipple,
   Caption,
   Divider,
   Colors,
@@ -14,6 +12,7 @@ import {
 } from 'react-native-paper';
 
 import { Slider } from '../../../components/Slider';
+import { DialogIndicator } from '../../../components/Indicator';
 
 class ResourceView extends PureComponent {
   render() {
@@ -68,7 +67,6 @@ class ResourceView extends PureComponent {
   }
 }
 
-@withNavigation
 @inject('accountStore')
 @observer
 export class UnstakeResource extends Component {
@@ -77,6 +75,9 @@ export class UnstakeResource extends Component {
     cpu: 0,
     net: 0
   };
+
+  @observable
+  showDialog = false;
 
   @computed
   get stakedAmount() {
@@ -123,8 +124,9 @@ export class UnstakeResource extends Component {
         description: `Unstake ${totalAmount} EOS from cpu/net`
       },
       // when PIN matched
-      async cb() {
+      cb: async () => {
         // show loading spinner
+        this.showDialog = true;
 
         // fetch
         await accountStore.manageResource({
@@ -132,51 +134,29 @@ export class UnstakeResource extends Component {
           net
         });
 
-        // hide loading spinner
-
         // move
         navigation.navigate('Account');
       }
     });
   }
 
-  moveScreen = routeName => this.props.navigation.navigate(routeName);
-
   render() {
-    const { resourceAmount, resourceSlide, unstakableAmount } = this;
+    const {
+      resourceAmount,
+      resourceSlide,
+      unstakableAmount,
+      showDialog
+    } = this;
 
     return (
       <React.Fragment>
+        <DialogIndicator
+          visible={showDialog}
+          title="Preparing to unstake resource..."
+        />
+
         <ScrollView style={{ flex: 1 }}>
-          <View style={{ flex: 1, paddingHorizontal: 20 }}>
-            {/* Title */}
-            <View style={{ marginVertical: 20 }}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'center'
-                }}
-              >
-                <TouchableRipple
-                  borderless
-                  style={{ marginRight: 40 }}
-                  onPress={() => this.props.changeResourceMode(true)}
-                >
-                  <Text style={{ color: 'gray' }}>Stake</Text>
-                </TouchableRipple>
-
-                <Text
-                  style={{
-                    paddingBottom: 3,
-                    borderBottomColor: Colors.purple500,
-                    borderBottomWidth: 3
-                  }}
-                >
-                  Unstake
-                </Text>
-              </View>
-            </View>
-
+          <View style={{ flex: 1, padding: 20 }}>
             {/* Resource Views */}
             <ResourceView
               title={`CPU - ${unstakableAmount.cpu.toFixed(4)} EOS unstakable`}

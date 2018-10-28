@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { observable, computed } from 'mobx';
 import { observer, inject } from 'mobx-react';
-import { withNavigation } from 'react-navigation';
 import { ScrollView, View } from 'react-native';
 import {
   Text,
@@ -13,6 +12,7 @@ import {
   Paragraph
 } from 'react-native-paper';
 
+import { DialogIndicator } from '../../../components/Indicator';
 import { Slider } from '../../../components/Slider';
 
 class ResourceView extends Component {
@@ -66,7 +66,6 @@ class ResourceView extends Component {
   }
 }
 
-@withNavigation
 @inject('accountStore')
 @observer
 export class StakeResource extends Component {
@@ -75,6 +74,9 @@ export class StakeResource extends Component {
 
   @observable
   resourceSlide = 0.7;
+
+  @observable
+  showDialog = false;
 
   @computed
   get unstakedAmount() {
@@ -127,8 +129,9 @@ export class StakeResource extends Component {
         description: `Stake ${totalAmount} EOS for cpu/net`
       },
       // when PIN matched
-      async cb() {
+      cb: async () => {
         // show loading spinner
+        this.showDialog = true;
 
         // fetch
         await accountStore.manageResource({
@@ -137,18 +140,16 @@ export class StakeResource extends Component {
           isStaking: true
         });
 
-        // hide loading spinner
-
         // move
         navigation.navigate('Account');
       }
     });
   }
 
-  moveScreen = routeName => this.props.navigation.navigate(routeName);
-
   render() {
     const {
+      showDialog,
+
       resourceAmount,
       resourceSlide,
       stakableSlide,
@@ -166,36 +167,13 @@ export class StakeResource extends Component {
 
     return (
       <React.Fragment>
+        <DialogIndicator
+          visible={showDialog}
+          title="Preparing to stake resource..."
+        />
+
         <ScrollView style={{ flex: 1 }}>
-          <View style={{ flex: 1, paddingHorizontal: 20 }}>
-            <View style={{ marginVertical: 20 }}>
-              {/* Title */}
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'center'
-                }}
-              >
-                <Text
-                  style={{
-                    marginRight: 40,
-                    paddingBottom: 3,
-                    borderBottomColor: Colors.purple500,
-                    borderBottomWidth: 3
-                  }}
-                >
-                  Stake
-                </Text>
-
-                <TouchableRipple
-                  borderless
-                  onPress={() => this.props.changeResourceMode(false)}
-                >
-                  <Text style={{ color: 'gray' }}>Unstake</Text>
-                </TouchableRipple>
-              </View>
-            </View>
-
+          <View style={{ flex: 1, padding: 20 }}>
             {/* Description */}
             <View>
               <Caption>Stakable Amount</Caption>
@@ -218,13 +196,13 @@ export class StakeResource extends Component {
                   return (
                     <TouchableRipple
                       key={key}
-                      style={{ marginRight: 5 }}
+                      style={{ marginRight: 7 }}
                       onPress={() => this.changeStakable(easyControls[key])}
                     >
                       <View
                         style={{
-                          paddingHorizontal: 10,
-                          paddingVertical: 7,
+                          paddingHorizontal: 15,
+                          paddingVertical: 8,
                           borderRadius: 3,
                           borderWidth: 1,
                           borderColor: Colors.grey900,
@@ -237,7 +215,7 @@ export class StakeResource extends Component {
                       >
                         <Text
                           style={{
-                            fontSize: 13,
+                            fontSize: 14,
                             ...(active
                               ? {
                                   color: '#fff'
