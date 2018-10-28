@@ -164,9 +164,11 @@ class Store {
       sender: name,
       encryptedPrivateKey,
       pincode: UserStore.pincode
-    }).then(async res => {
+    }).then(async tx => {
       await this.getInfo();
       await this.getTokens();
+
+      return tx;
     });
   }
 }

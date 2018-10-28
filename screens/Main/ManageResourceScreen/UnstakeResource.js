@@ -125,17 +125,27 @@ export class UnstakeResource extends Component {
       },
       // when PIN matched
       cb: async () => {
-        // show loading spinner
+        // show loading dialog
         this.showDialog = true;
 
         // fetch
-        await accountStore.manageResource({
+        const result = await accountStore.manageResource({
           cpu,
           net
         });
 
-        // move
-        navigation.navigate('Account');
+        // hide dialog
+        this.showDialog = false;
+
+        if (result.code) {
+          navigation.navigate('ShowError', {
+            title: 'Unstake Resource Failed',
+            description: 'Please check the error, it may be a network error.',
+            error: result
+          });
+        } else {
+          navigation.navigate('Account');
+        }
       }
     });
   }

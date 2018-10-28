@@ -69,14 +69,22 @@ import HomeStyle from '../../../styles/HomeStyle';
 
         const result = await accountStore.transfer(values);
 
-        console.log(result);
+        // hide dialog
+        setFieldValue('showDialog', false);
 
-        navigation.replace('TransferResult', {
-          ...values,
-          amount: fixedAmount,
-          error: result.code === 500 && result, // when error
-          result
-        });
+        if (result.code === 500) {
+          navigation.navigate('ShowError', {
+            title: 'Transfer Failed',
+            description: 'Please check the error, it may be a network error.',
+            error: result
+          });
+        } else {
+          navigation.navigate('TransferResult', {
+            ...values,
+            amount: fixedAmount,
+            result
+          });
+        }
       }
     });
   }
