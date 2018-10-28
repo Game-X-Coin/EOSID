@@ -11,21 +11,25 @@ import {
   Divider,
   TouchableRipple,
   Caption,
-  Button
+  Button,
+  Appbar
 } from 'react-native-paper';
-import { LinearGradient } from 'expo';
+import { Icon, LinearGradient } from 'expo';
 import bytes from 'bytes';
 import prettyMs from 'pretty-ms';
 
 import { PageIndicator } from '../../../components/Indicator';
 import { ScrollView } from '../../../components/View';
 
-const ItemTitle = ({ title }) => (
+import { AccountSelectDrawer } from './AccountSelectDrawer';
+
+const ItemTitle = ({ title, style }) => (
   <View
     style={{
       flexDirection: 'row',
       alignItems: 'center',
-      marginBottom: 10
+      marginBottom: 10,
+      ...style
     }}
   >
     <Caption>{title}</Caption>
@@ -63,6 +67,9 @@ const DelegatedItem = ({ title, subTitle, amount, percentage, color }) => (
 @observer
 export class AccountInfo extends Component {
   @observable
+  drawerVisible = false;
+
+  @observable
   refreshing = false;
 
   onRefresh = async () => {
@@ -84,132 +91,185 @@ export class AccountInfo extends Component {
     return prettyMs(value * 0.001);
   }
 
+  showDrawer() {
+    this.drawerVisible = true;
+  }
+
+  hideDrawer() {
+    this.drawerVisible = false;
+  }
+
   moveScreen = (...args) => this.props.navigation.navigate(...args);
 
   render() {
-    const { info, tokens, fetched } = this.props.accountStore;
+    const {
+      info,
+      tokens,
+      fetched,
+      currentUserAccount
+    } = this.props.accountStore;
 
     const {
-      account_name,
-      cpu_limit,
-      cpu_weight,
-      net_limit,
-      net_weight,
-      ram_usage,
-      ram_quota,
+      cpu_limit = { max: 0, used: 0 },
+      cpu_weight = 0,
+      net_limit = { max: 0, used: 0 },
+      net_weight = 0,
+      ram_usage = 0,
+      ram_quota = 0,
       refund_request
     } = info;
 
     const delegatedCPU = cpu_weight * 0.0001;
     const delegatedNET = net_weight * 0.0001;
+    const undelegatedAmount =
+      Object.keys(tokens).length && parseFloat(tokens.EOS);
+    const totalAsset = delegatedCPU + delegatedNET + undelegatedAmount;
     const refundAmount =
       refund_request &&
       Number(refund_request.cpu_amount.split(' ')[0]) +
         Number(refund_request.net_amount.split(' ')[0]);
-    const undelegatedAmount = parseFloat(tokens.EOS);
-    const totalAsset = delegatedCPU + delegatedNET + undelegatedAmount;
 
-    if (!fetched) {
-      return <PageIndicator />;
-    }
+    const CustomAppbar = () => (
+      <Appbar.Header dark style={{ backgroundColor: 'transparent' }}>
+        <View style={{ flex: 1, flexDirection: 'row', paddingHorizontal: 15 }}>
+          <TouchableRipple borderless onPress={() => this.showDrawer()}>
+            <Title
+              style={{
+                color: '#fff',
+                fontSize: 18
+              }}
+            >
+              {currentUserAccount.name}{' '}
+              <Icon.Ionicons name="md-arrow-dropdown" size={18} />
+            </Title>
+          </TouchableRipple>
+          <View style={{ flex: 1 }} />
+        </View>
+        <Appbar.Action
+          icon="add"
+          onPress={() => this.moveScreen('ImportAccount')}
+        />
+      </Appbar.Header>
+    );
 
     return (
-      <ScrollView
-        refreshing={this.refreshing}
-        onRefresh={this.onRefresh}
-        style={{ flex: 1, padding: 20 }}
-      >
-        <LinearGradient
-          colors={[Colors.grey700, Colors.grey900]}
-          start={[1, 0]}
-          end={[0, 1]}
-          style={{
-            marginBottom: 15,
-            padding: 20,
-            borderRadius: 5
-          }}
-        >
-          <Text style={{ color: '#fff', fontSize: 17, paddingBottom: 15 }}>
-            {account_name}
-          </Text>
-          <Title style={{ color: '#fff', fontSize: 25 }}>
-            {totalAsset.toFixed(4)} EOS
-          </Title>
-        </LinearGradient>
+      <React.Fragment>
+        {/* Drawer */}
+        <AccountSelectDrawer
+          visible={this.drawerVisible}
+          onHide={() => this.hideDrawer()}
+        />
 
-        <View style={{ paddingBottom: 15 }}>
-          <ItemTitle title="Resources" />
-
-          <DelegatedItem
-            title="CPU"
-            subTitle={`(${this.prettyTime(cpu_limit.used)} / ${this.prettyTime(
-              cpu_limit.max
-            )})`}
-            amount={delegatedCPU}
-            percentage={cpu_limit.used / cpu_limit.max}
-            color={Colors.blue700}
-          />
-
-          <DelegatedItem
-            title="Network"
-            subTitle={`(${this.prettyBytes(
-              net_limit.used
-            )} / ${this.prettyBytes(net_limit.max)})`}
-            amount={delegatedNET}
-            percentage={cpu_limit.used / cpu_limit.max}
-            color={Colors.green700}
-          />
-
-          {refund_request && (
-            <DelegatedItem
-              title="Refunding"
-              subTitle={refund_request.request_time}
-              amount={refundAmount}
-              percentage={refundAmount / (delegatedCPU + delegatedNET)}
-              color={Colors.orange700}
-            />
-          )}
-
-          <DelegatedItem
-            title="RAM"
-            subTitle={`(${this.prettyBytes(ram_usage)} / ${this.prettyBytes(
-              ram_quota
-            )})`}
-            percentage={ram_usage / ram_quota}
-            color={Colors.purple800}
-          />
-
-          <Button
-            style={{ marginTop: 5 }}
-            onPress={() => this.moveScreen('ManageResource')}
+        <ScrollView refreshing={this.refreshing} onRefresh={this.onRefresh}>
+          <LinearGradient
+            colors={['#3023ae', '#c86dd7']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
           >
-            Manage Resource
-          </Button>
-        </View>
+            <CustomAppbar />
 
-        <View>
-          <ItemTitle title="Tokens" />
-
-          {Object.keys(tokens).map(symbol => (
-            <TouchableRipple
-              key={symbol}
-              onPress={() => this.moveScreen('Transfer', { symbol })}
+            <View
+              style={{
+                paddingTop: 15,
+                paddingBottom: 35,
+                alignItems: 'center'
+              }}
             >
-              <View
-                style={{
-                  flexDirection: 'row',
-                  marginHorizontal: -5,
-                  paddingHorizontal: 5,
-                  paddingVertical: 10
-                }}
-              >
-                <Text style={{ flex: 1, fontSize: 17 }}>{symbol}</Text>
-                <Text style={{ fontSize: 17 }}>{tokens[symbol]}</Text>
+              <Title style={{ marginBottom: 5, color: '#fff', fontSize: 25 }}>
+                {fetched ? `${totalAsset.toFixed(4)} EOS` : 'fetch assets...'}
+              </Title>
+
+              <Text style={{ color: '#fff' }}>TOTAL BALANCE</Text>
+            </View>
+          </LinearGradient>
+
+          {!fetched ? (
+            <PageIndicator style={{ height: 300 }} />
+          ) : (
+            <React.Fragment>
+              {/* Resources */}
+              <View style={{ padding: 20 }}>
+                <ItemTitle title="Resources" />
+
+                <DelegatedItem
+                  title="CPU"
+                  subTitle={`(${this.prettyTime(
+                    cpu_limit.used
+                  )} / ${this.prettyTime(cpu_limit.max)})`}
+                  amount={delegatedCPU}
+                  percentage={cpu_limit.used / cpu_limit.max}
+                  color={Colors.blue700}
+                />
+
+                <DelegatedItem
+                  title="Network"
+                  subTitle={`(${this.prettyBytes(
+                    net_limit.used
+                  )} / ${this.prettyBytes(net_limit.max)})`}
+                  amount={delegatedNET}
+                  percentage={cpu_limit.used / cpu_limit.max}
+                  color={Colors.green700}
+                />
+
+                {refund_request && (
+                  <DelegatedItem
+                    title="Refunding"
+                    subTitle={refund_request.request_time}
+                    amount={refundAmount}
+                    percentage={refundAmount / (delegatedCPU + delegatedNET)}
+                    color={Colors.orange700}
+                  />
+                )}
+
+                <DelegatedItem
+                  title="RAM"
+                  subTitle={`(${this.prettyBytes(
+                    ram_usage
+                  )} / ${this.prettyBytes(ram_quota)})`}
+                  percentage={ram_usage / ram_quota}
+                  color={Colors.grey900}
+                />
+
+                <Button
+                  style={{ marginTop: 5 }}
+                  onPress={() => this.moveScreen('ManageResource')}
+                >
+                  Manage Resource
+                </Button>
               </View>
-            </TouchableRipple>
-          ))}
-        </View>
-      </ScrollView>
+
+              {/* Tokens */}
+              <View style={{ paddingBottom: 20 }}>
+                <ItemTitle title="Tokens" style={{ paddingHorizontal: 20 }} />
+                {Object.keys(tokens).map(symbol => (
+                  <TouchableRipple
+                    key={symbol}
+                    onPress={() => this.moveScreen('Transfer', { symbol })}
+                  >
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        paddingHorizontal: 20,
+                        paddingVertical: 10
+                      }}
+                    >
+                      <Text style={{ flex: 1, fontSize: 17 }}>{symbol}</Text>
+                      <Text style={{ fontSize: 17 }}>{tokens[symbol]}</Text>
+                    </View>
+                  </TouchableRipple>
+                ))}
+
+                <Button
+                  style={{ marginTop: 5, marginHorizontal: 20 }}
+                  onPress={() => this.moveScreen('Transfer')}
+                >
+                  Transfer Token
+                </Button>
+              </View>
+            </React.Fragment>
+          )}
+        </ScrollView>
+      </React.Fragment>
     );
   }
 }
