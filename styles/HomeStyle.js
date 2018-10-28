@@ -1,10 +1,10 @@
 import { StyleSheet } from 'react-native';
-import Colors from '../constants/Colors';
+import { Theme } from '../constants';
 
 const styles = {
   container: {
     flex: 1,
-    backgroundColor: Colors.mainBackgroundColor
+    backgroundColor: Theme.mainBackgroundColor
   },
   developmentModeText: {
     marginBottom: 20,

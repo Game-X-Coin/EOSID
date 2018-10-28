@@ -1,7 +1,8 @@
 const tintColor = '#2f95dc';
 const mainBackgroundColor = '#fff';
 
-export default {
+export const Theme = {
+  primary: '#6200ee',
   tintColor,
   mainBackgroundColor,
   tabIconDefault: '#ccc',

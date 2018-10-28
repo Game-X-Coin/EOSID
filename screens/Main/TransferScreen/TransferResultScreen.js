@@ -4,6 +4,8 @@ import { SafeAreaView, View } from 'react-native';
 import { Colors, Button, Text, Appbar } from 'react-native-paper';
 import { TextField } from 'react-native-material-textfield';
 
+import { Theme } from '../../../constants';
+
 import { EmptyState } from '../../../components/EmptyState';
 import { ScrollView } from '../../../components/View';
 
@@ -53,7 +55,7 @@ export class TransferResultScreen extends Component {
     }
 
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: '#6200ee' }}>
+      <SafeAreaView style={{ flex: 1, backgroundColor: Theme.primary }}>
         <Appbar.Header dark style={{ backgroundColor: 'transparent' }}>
           <Appbar.Action icon="close" onPress={() => this.confirm()} />
           <Appbar.Content title="Transfer Result" />

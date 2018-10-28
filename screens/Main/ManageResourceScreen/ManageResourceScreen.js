@@ -6,7 +6,7 @@ import { Appbar } from 'react-native-paper';
 import { StakeResource } from './StakeResource';
 import { UnstakeResource } from './UnstakeResource';
 
-import Colors from '../../../constants/Colors';
+import { Theme } from '../../../constants';
 import HomeStyle from '../../../styles/HomeStyle';
 
 const TopTabNavigator = createMaterialTopTabNavigator(
@@ -16,7 +16,7 @@ const TopTabNavigator = createMaterialTopTabNavigator(
   },
   {
     swipeEnabled: false,
-    tabBarOptions: { style: { backgroundColor: Colors.primary } }
+    tabBarOptions: { style: { backgroundColor: Theme.primary } }
   }
 );
 

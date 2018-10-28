@@ -5,6 +5,8 @@ import { View } from 'react-native';
 import { Text, TouchableRipple, Colors } from 'react-native-paper';
 import { Icon } from 'expo';
 
+import { Theme } from '../../constants';
+
 const shuffle = array => {
   let counter = array.length;
 
@@ -94,7 +96,7 @@ export class Pincode extends Component {
 
   render() {
     const { numKeys, pincode, availableLength } = this;
-    const { description, backgroundColor = '#6200ee' } = this.props;
+    const { description, backgroundColor = Theme.primary } = this.props;
 
     const isFailing = this.state.status === 'failure';
 
