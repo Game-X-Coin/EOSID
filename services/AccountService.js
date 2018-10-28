@@ -1,7 +1,7 @@
 import { getRepository } from 'typeorm-expo/browser';
 import { Eos } from 'react-native-eosjs';
 import ecc from 'eosjs-ecc-rn';
-import { AES } from 'crypto-js';
+import { AES, enc } from 'crypto-js';
 
 import { AccountModel, AccountError } from '../db';
 
@@ -121,7 +121,9 @@ export class AccountService {
 
   static async transfer({ pincode, encryptedPrivateKey, ...transferInfo }) {
     // decrypt privatekey
-    const privateKey = AES.decrypt(encryptedPrivateKey, pincode).toString();
+    const privateKey = AES.decrypt(encryptedPrivateKey, pincode).toString(
+      enc.Utf8
+    );
 
     const promise = eosjs.transfer({ ...transferInfo, privateKey });
 
@@ -135,7 +137,9 @@ export class AccountService {
     ...data
   }) {
     // decrypt privatekey
-    const privateKey = AES.decrypt(encryptedPrivateKey, pincode).toString();
+    const privateKey = AES.decrypt(encryptedPrivateKey, pincode).toString(
+      enc.Utf8
+    );
 
     const promise = isStaking
       ? eosjs.stake({
