@@ -87,7 +87,7 @@ class Store {
       pincode: UserStore.pincode
     }).then(async account => {
       this.setAccounts([...this.accounts, account]);
-      await this.changeUserAccount(account.id);
+      this.changeUserAccount(account.id);
       this.getAccountInfo();
     });
   }
