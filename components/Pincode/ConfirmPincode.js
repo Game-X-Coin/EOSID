@@ -22,13 +22,13 @@ export class ConfirmPincode extends Component {
     const {
       title = 'Confirm Password',
       description = 'Confirm your password.',
-      backAction = () => null
+      backAction
     } = this.props;
 
     return (
       <React.Fragment>
         <Appbar.Header style={{ backgroundColor: 'transparent' }} dark>
-          <Appbar.BackAction onPress={backAction} />
+          {backAction && <Appbar.BackAction onPress={backAction} />}
           <Appbar.Content title={title} />
         </Appbar.Header>
 

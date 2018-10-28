@@ -1,10 +1,12 @@
+import React from 'react';
+import { inject, observer } from 'mobx-react';
 import { createStackNavigator } from 'react-navigation';
 
 import { WelcomeScreen, SignInScreen, SignUpScreen } from '../../screens/Auth';
 
 import { ImportAccountScreen } from '../../screens/Shared';
 
-export const AuthStackNavigator = createStackNavigator(
+const AuthStackNavigator = createStackNavigator(
   {
     Welcome: WelcomeScreen,
     SignIn: SignInScreen,
@@ -16,3 +18,21 @@ export const AuthStackNavigator = createStackNavigator(
     cardStyle: { backgroundColor: '#fff' }
   }
 );
+
+@inject('userStore')
+@observer
+class AuthStackNavigatorWrapper extends React.Component {
+  componentDidMount() {
+    if (this.props.userStore.users.length) {
+      this.props.navigation.replace('SignIn');
+    }
+  }
+
+  render() {
+    return <AuthStackNavigator navigation={this.props.navigation} />;
+  }
+}
+
+AuthStackNavigatorWrapper.router = AuthStackNavigator.router;
+
+export { AuthStackNavigatorWrapper as AuthStackNavigator };

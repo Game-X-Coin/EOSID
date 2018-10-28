@@ -18,11 +18,6 @@ export class SignInScreen extends Component {
   };
 
   render() {
-    return (
-      <ConfirmPincode
-        onEnter={this.signIn}
-        backAction={() => this.props.navigation.goBack(null)}
-      />
-    );
+    return <ConfirmPincode onEnter={this.signIn} />;
   }
 }
