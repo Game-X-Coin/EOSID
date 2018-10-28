@@ -1,6 +1,6 @@
 import { observable, action, computed } from 'mobx';
 
-import { AccountService } from '../services';
+import { AccountService, TransferLogService } from '../services';
 
 import { UserStore, NetworkStore } from './';
 
@@ -138,7 +138,7 @@ class Store {
 
   @action
   async transfer(formData) {
-    const { name, encryptedPrivateKey } = this.currentUserAccount;
+    const { id, name, encryptedPrivateKey } = this.currentUserAccount;
 
     return AccountService.transfer({
       ...formData,
@@ -146,7 +146,11 @@ class Store {
       encryptedPrivateKey,
       pincode: UserStore.pincode
     }).then(async tx => {
+      // fetch lastets tokens
       await this.getTokens();
+      // log transfer
+      TransferLogService.addTransferLog({ ...formData, accountId: id });
+
       return tx;
     });
   }
