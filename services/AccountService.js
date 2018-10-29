@@ -12,14 +12,6 @@ export class AccountService {
     return accounts;
   }
 
-  static privateToPublic(privateKey) {
-    try {
-      return api.Key.privateToPublic({ wif: privateKey });
-    } catch (error) {
-      return Promise.reject(AccountError.InvalidPrivateKey);
-    }
-  }
-
   static async findKeyAccount(publicKey, userEos) {
     // find account
     const { account_names } = await userEos.accounts.getsByPublicKey(publicKey);
@@ -62,6 +54,7 @@ export class AccountService {
 
   static async transfer({
     pincode,
+    sender,
     receiver,
     encryptedPrivateKey,
     ...transferInfo
@@ -71,10 +64,13 @@ export class AccountService {
       enc.Utf8
     );
 
+    console.log(receiver);
+
     return await api.transactions.transfer({
+      ...transferInfo,
       privateKey,
       to: receiver,
-      ...transferInfo
+      from: sender
     });
   }
 

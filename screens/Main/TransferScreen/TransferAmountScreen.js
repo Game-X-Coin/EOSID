@@ -20,7 +20,7 @@ import HomeStyle from '../../../styles/HomeStyle';
       state: { params = {} }
     }
   }) => ({
-    reciever: params.reciever,
+    receiver: params.receiver,
     amount: '',
     symbol: params.symbol,
     memo: '',
@@ -127,8 +127,8 @@ export class TransferAmountScreen extends Component {
         <KeyboardAvoidingView>
           <ScrollView style={{ padding: 20 }}>
             <TextField
-              label="Reciever"
-              value={values.reciever}
+              label="Receiver"
+              value={values.receiver}
               editable={false}
             />
 

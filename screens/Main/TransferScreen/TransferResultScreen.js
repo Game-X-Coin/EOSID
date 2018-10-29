@@ -18,7 +18,7 @@ export class TransferResultScreen extends Component {
 
   render() {
     const { navigation, accountStore } = this.props;
-    const { error, amount, symbol, reciever, memo } =
+    const { error, amount, symbol, receiver, memo } =
       navigation.state.params || {};
 
     const balance = symbol && accountStore.tokens[symbol];
@@ -64,7 +64,7 @@ export class TransferResultScreen extends Component {
         <View style={{ flex: 1, padding: 20, paddingTop: 30 }}>
           <View style={{ flex: 1 }}>
             <Text style={{ paddingBottom: 10, fontSize: 20, color: '#fff' }}>
-              {reciever}
+              {receiver}
             </Text>
             <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
               <Text style={{ fontSize: 30, marginRight: 5, color: '#fff' }}>

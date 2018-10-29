@@ -12,6 +12,7 @@ import {
 } from 'react-native-paper';
 import { TextField } from 'react-native-material-textfield';
 
+import api from '../../../utils/eos/API';
 import { TransferLogService } from '../../../services';
 
 import { KeyboardAvoidingView, ScrollView } from '../../../components/View';
@@ -72,7 +73,7 @@ export class TransferLogs extends Component {
               }}
             >
               <View style={{ flex: 1 }}>
-                <Text>{log.reciever}</Text>
+                <Text>{log.receiver}</Text>
                 <Caption>{log.createdAt}</Caption>
               </View>
               <Text style={{ fontSize: 15 }}>
@@ -86,37 +87,37 @@ export class TransferLogs extends Component {
   }
 }
 
-@inject('networkStore')
 @observer
 export class TransferScreen extends Component {
   @observable
   loading = false;
 
   @observable
-  reciever = '';
+  receiver = '';
 
   @observable
   error = '';
 
   componentDidMount() {
-    this.checkReciever = debounce(this.checkReciever.bind(this), 500);
+    this.checkReceiver = debounce(this.checkReceiver.bind(this), 500);
   }
 
-  onChangeReciever(v) {
-    this.reciever = v;
+  onChangeReceiver(v) {
+    this.receiver = v;
     this.error = '';
-    this.checkReciever(v);
+    this.checkReceiver(v);
   }
 
-  async checkReciever(v) {
-    try {
-      this.loading = true;
-      await this.props.networkStore.eos.accounts.get(v);
-    } catch (error) {
+  async checkReceiver(v) {
+    this.loading = true;
+
+    const result = await api.accounts.get({ account_name: v });
+
+    if (result.error) {
       this.error = 'The account you entered does not exist.';
-    } finally {
-      this.loading = false;
     }
+
+    this.loading = false;
   }
 
   handleSubmit() {
@@ -124,20 +125,20 @@ export class TransferScreen extends Component {
     const { symbol = 'EOS' } = navigation.state.params || {};
 
     navigation.navigate('TransferAmount', {
-      reciever: this.reciever,
+      receiver: this.receiver,
       symbol
     });
   }
 
   render() {
     const { navigation } = this.props;
-    const { reciever, loading, error } = this;
+    const { receiver, loading, error } = this;
 
     return (
       <SafeAreaView style={HomeStyle.container}>
         <Appbar.Header>
           <Appbar.BackAction onPress={() => navigation.goBack(null)} />
-          <Appbar.Content title="Reciever" />
+          <Appbar.Content title="Receiver" />
         </Appbar.Header>
 
         <KeyboardAvoidingView>
@@ -145,9 +146,9 @@ export class TransferScreen extends Component {
             <View style={{ padding: 20 }}>
               <TextField
                 autoFocus
-                label="Enter reciever's account"
+                label="Enter receiver's account"
                 title="example: eosauthority"
-                value={reciever}
+                value={receiver}
                 error={error}
                 renderAccessory={() =>
                   loading && (
@@ -156,7 +157,7 @@ export class TransferScreen extends Component {
                     </View>
                   )
                 }
-                onChangeText={v => this.onChangeReciever(v)}
+                onChangeText={v => this.onChangeReceiver(v)}
               />
 
               <Button
@@ -165,7 +166,7 @@ export class TransferScreen extends Component {
                   marginVertical: 20,
                   padding: 5
                 }}
-                disabled={!reciever.length}
+                disabled={!receiver.length}
                 onPress={() => !loading && !error && this.handleSubmit()}
               >
                 Next
@@ -173,7 +174,7 @@ export class TransferScreen extends Component {
             </View>
 
             <TransferLogs
-              onLogPress={log => this.onChangeReciever(log.reciever)}
+              onLogPress={log => this.onChangeReceiver(log.receiver)}
             />
           </ScrollView>
         </KeyboardAvoidingView>

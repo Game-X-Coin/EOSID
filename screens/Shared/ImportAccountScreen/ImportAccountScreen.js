@@ -7,7 +7,6 @@ import {
   Dialog,
   List,
   Portal,
-  Divider,
   Text,
   Colors
 } from 'react-native-paper';
@@ -20,15 +19,20 @@ import * as Yup from 'yup';
 import { AccountError } from '../../../db';
 import { AccountService } from '../../../services';
 
+import api from '../../../utils/eos/API';
+
 import { ScrollView, KeyboardAvoidingView } from '../../../components/View';
 
 import HomeStyle from '../../../styles/HomeStyle';
+import { DialogIndicator } from '../../../components/Indicator';
 
 @inject('networkStore', 'accountStore')
 @withFormik({
   mapPropsToValues: props => ({
     // select account
     showDialog: false,
+    // loading
+    showLoadingDialog: false,
     accounts: [],
     // form
     privateKey: '',
@@ -36,11 +40,16 @@ import HomeStyle from '../../../styles/HomeStyle';
     networkId: props.networkStore.defaultNetworks[0].id // default network
   }),
   validationSchema: props => {
-    const { errors } = AccountError.RequiredFields;
+    const { errors: RequiredFieldErrors } = AccountError.RequiredFields;
+    const { errors: InvalidPrivateKeyErrors } = AccountError.InvalidPrivateKey;
 
     return Yup.object().shape({
-      privateKey: Yup.string().required(errors.privateKey),
-      networkId: Yup.string().required(errors.networkId)
+      privateKey: Yup.string()
+        .required(RequiredFieldErrors.privateKey)
+        .test('validate-privateKey', InvalidPrivateKeyErrors.privateKey, v =>
+          api.Key.isValidPrivate({ wif: v })
+        ),
+      networkId: Yup.string().required(RequiredFieldErrors.networkId)
     });
   },
   handleSubmit: async (
@@ -49,11 +58,19 @@ import HomeStyle from '../../../styles/HomeStyle';
       props: { networkStore, accountStore, navigation },
       setSubmitting,
       setValues,
+      setFieldValue,
       setErrors
     }
   ) => {
     try {
-      const publicKey = await AccountService.privateToPublic(values.privateKey);
+      // avoid modal hiding
+      Keyboard.dismiss();
+
+      const publicKey = api.Key.privateToPublic({ wif: values.privateKey });
+
+      // show loading dialog
+      setFieldValue('showLoadingDialog', true);
+
       const accounts = await AccountService.findKeyAccount(
         publicKey,
         networkStore.eos
@@ -70,12 +87,10 @@ import HomeStyle from '../../../styles/HomeStyle';
 
         navigation.navigate('Account');
       } else {
-        // avoid modal hiding
-        Keyboard.dismiss();
-
         setValues({
           ...values,
           showDialog: true,
+          showLoadingDialog: false,
           accounts,
           publicKey
         });
@@ -96,12 +111,13 @@ export class ImportAccountScreen extends Component {
       name
     });
 
+    this.hideDialogs();
     this.moveToAccountScreen();
   }
 
-  cancelSelectAccount() {
+  hideDialogs() {
+    this.props.setFieldValue('showLoadingDialog', false);
     this.props.setFieldValue('showDialog', false);
-    this.props.setSubmitting(false);
   }
 
   moveToAccountScreen() {
@@ -118,8 +134,7 @@ export class ImportAccountScreen extends Component {
       touched,
       setFieldValue,
       setFieldTouched,
-      handleSubmit,
-      isSubmitting
+      handleSubmit
     } = this.props;
 
     const isSignUp =
@@ -134,7 +149,7 @@ export class ImportAccountScreen extends Component {
       <Portal>
         <Dialog
           visible={values.showDialog}
-          onDismiss={() => this.cancelSelectAccount()}
+          onDismiss={() => this.hideDialogs()}
         >
           <Dialog.Title>Select account</Dialog.Title>
           <Dialog.Content>
@@ -159,6 +174,12 @@ export class ImportAccountScreen extends Component {
 
         {/* Dialog */}
         <SelectAccountDialog />
+
+        {/* Import loading */}
+        <DialogIndicator
+          visible={values.showLoadingDialog}
+          title="Preparing to import account..."
+        />
 
         <KeyboardAvoidingView>
           <ScrollView style={{ paddingHorizontal: 20, paddingBottom: 60 }}>
@@ -215,7 +236,6 @@ export class ImportAccountScreen extends Component {
             <Button
               mode="contained"
               style={{ flex: 2, padding: 5, borderRadius: 0 }}
-              loading={isSubmitting}
               onPress={handleSubmit}
             >
               Import
