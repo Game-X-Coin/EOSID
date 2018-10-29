@@ -28,10 +28,7 @@ export class AccountService {
     const AccountRepo = getRepository(AccountModel);
 
     // encrypt private key
-    const encryptedPrivateKey = AccountService.encrypt(
-      privateKey,
-      pincode
-    ).toString();
+    const encryptedPrivateKey = AccountService.encrypt(privateKey, pincode);
 
     // create new account instance
     const newAccount = new AccountModel({
@@ -91,10 +88,7 @@ export class AccountService {
     ...data
   }) {
     // decrypt privatekey
-    const privateKey = AccountService.decryptKey(
-      encryptedPrivateKey,
-      pincode
-    ).toString(enc.Utf8);
+    const privateKey = AccountService.decryptKey(encryptedPrivateKey, pincode);
 
     const promise = isStaking
       ? api.transactions.stake({
