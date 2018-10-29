@@ -90,13 +90,11 @@ export class AccountService {
     // decrypt privatekey
     const privateKey = AccountService.decryptKey(encryptedPrivateKey, pincode);
 
-    const promise = isStaking
-      ? api.transactions.stake({
-          ...data,
-          privateKey,
-          pincode
-        })
-      : api.transactions.unstake({ ...data, privateKey });
+    const transactionFunction = isStaking
+      ? api.transactions.stake
+      : api.transactions.unstake;
+
+    const promise = transactionFunction({ ...data, privateKey, pincode });
 
     return await promise;
   }
