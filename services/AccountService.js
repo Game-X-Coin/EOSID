@@ -28,7 +28,7 @@ export class AccountService {
     const AccountRepo = getRepository(AccountModel);
 
     // encrypt private key
-    const encryptedPrivateKey = AccountService.encrypt(privateKey, pincode);
+    const encryptedPrivateKey = AccountService.encryptKey(privateKey, pincode);
 
     // create new account instance
     const newAccount = new AccountModel({
