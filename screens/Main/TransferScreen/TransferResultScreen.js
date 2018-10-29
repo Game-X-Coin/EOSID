@@ -83,13 +83,13 @@ export class TransferResultScreen extends Component {
             </View>
           </View>
 
-          {memo && (
+          {(memo || '') !== '' && (
             <TextField
               multiline
               label="Memo"
               baseColor="#fff"
               textColor="#fff"
-              value={memo}
+              value={memo || ''}
               editable={false}
             />
           )}
