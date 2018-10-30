@@ -38,7 +38,7 @@ class EosApi {
 
     return new Api({
       chainId: network.chainId,
-      rpc: this.Rpc,
+      rpc: EosApi.Rpc,
       signatureProvider,
       textDecoder: new TextDecoder(),
       textEncoder: new TextEncoder()
@@ -72,7 +72,7 @@ class EosApi {
         if (symbol === 'EOS') {
           return 4;
         }
-        const stats = this.currency.stats({ code: account, symbol });
+        const stats = EosApi.currency.stats({ code: account, symbol });
         const supplyBalance = stats[symbol].max_supply.split(' ')[0];
         return supplyBalance.split('.')[1].length;
       }
@@ -146,7 +146,7 @@ class EosApi {
 
           const accountName = params.actor ? params.actor : params.from;
 
-          return await this.getApi({ ...params, accountName }).transact(
+          return await EosApi.getApi({ ...params, accountName }).transact(
             { actions: [{ account, name, authorization, data }] },
             { broadcast, blocksBehind, expireSeconds }
           );
@@ -363,7 +363,7 @@ class EosApi {
         console.log('Private Key:\t', privateKey) // wif
         console.log('Public Key:\t', ecc.privateToPublic(privateKey)) // EOSkey...
       })
-     */
+      */
       randomKey: ({ cpuEntropyBits = 0 }) => ecc.randomKey(cpuEntropyBits),
       /* @example ecc.seedPrivate('secret') === wif */
       seedPrivate: ({ seed }) => ecc.seedPrivate(seed),
