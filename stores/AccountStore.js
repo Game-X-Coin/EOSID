@@ -146,8 +146,22 @@ class Store {
 
   async getActions() {
     const account = this.currentUserAccount;
+
+    const latestActions =
+      (
+        (await api.actions.latestActions({
+          account_name: account.name,
+          offset: 1
+        })) || {}
+      ).actions || [];
+    let seq = 0;
+    if (latestActions.length) {
+      seq = latestActions[0].account_action_seq;
+    }
+
     const { actions = [] } = await api.actions.gets({
-      account_name: account.name
+      account_name: account.name,
+      latestSeq: seq
     });
 
     this.actions = actions.reverse();
