@@ -94,8 +94,8 @@ export class AccountService {
       ? api.transactions.stake
       : api.transactions.unstake;
 
-    const promise = transactionFunction({ ...data, privateKey, pincode });
+    const params = { ...data, privateKey, pincode };
 
-    return await promise;
+    return await transactionFunction(params);
   }
 }

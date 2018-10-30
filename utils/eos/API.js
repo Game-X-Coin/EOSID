@@ -105,8 +105,8 @@ class EosApi {
         }),
       validateData: async params => {
         const { account, name } = params;
-        const code = await EosApi.code.get({ account_name: account });
-        const struct = code.abi.structs.find(struct => struct.name === name);
+        const result = await EosApi.abi.get({ account_name: account });
+        const struct = result.abi.structs.find(struct => struct.name === name);
         if (!struct) {
           throw new Error('not found code');
         }
@@ -178,7 +178,7 @@ class EosApi {
         }
 
         symbol = symbol.toUpperCase();
-        const precision = this.currency.precision({ code: account, symbol });
+        const precision = EosApi.currency.precision({ code: account, symbol });
         const fixedBalance = parseFloat(amount).toFixed(precision);
         params.quantity = `${fixedBalance} ${symbol}`;
 
@@ -190,13 +190,20 @@ class EosApi {
         let {
           account = 'eosio',
           name = 'delegatebw',
-          transfer = false,
-          netQuantity = 0,
-          cpuQuantity = 0,
+          transfer = true,
+          net = 0,
+          cpu = 0,
           symbol = 'EOS'
-        } = this.params;
+        } = params;
 
-        if (netQuantity <= 0 && cpuQuantity <= 0) {
+        if (typeof net === 'string') {
+          net = parseFloat(net);
+        }
+        if (typeof cpu === 'string') {
+          cpu = parseFloat(cpu);
+        }
+
+        if (net <= 0 && cpu <= 0) {
           throw new Error('must should stake positive quantity');
         }
 
@@ -209,17 +216,21 @@ class EosApi {
           params.receiver = params.from;
         }
 
+        if (params.from === params.receiver) {
+          transfer = false;
+        }
+
         if (!params.actor && params.from) {
           params.actor = params.from;
         }
 
-        const precision = this.currency.precision({ symbol });
+        const precision = EosApi.currency.precision({ symbol });
 
-        netQuantity = parseFloat(netQuantity).toFixed(precision);
-        cpuQuantity = parseFloat(cpuQuantity).toFixed(precision);
+        net = parseFloat(net).toFixed(precision);
+        cpu = parseFloat(cpu).toFixed(precision);
 
-        params.stake_net_quantity = `${netQuantity} ${symbol}`;
-        params.stake_cpu_quantity = `${cpuQuantity} ${symbol}`;
+        params.stake_net_quantity = `${net} ${symbol}`;
+        params.stake_cpu_quantity = `${cpu} ${symbol}`;
 
         const transaction = { ...params, account, name, transfer };
 
@@ -230,12 +241,19 @@ class EosApi {
           account = 'eosio',
           name = 'undelegatebw',
           transfer = false,
-          netQuantity = 0,
-          cpuQuantity = 0,
+          net = 0,
+          cpu = 0,
           symbol = 'EOS'
-        } = this.params;
+        } = params;
 
-        if (netQuantity <= 0 && cpuQuantity <= 0) {
+        if (typeof net === 'string') {
+          net = parseFloat(net);
+        }
+        if (typeof cpu === 'string') {
+          cpu = parseFloat(cpu);
+        }
+
+        if (net <= 0 && cpu <= 0) {
           throw new Error('must should unstake positive quantity');
         }
 
@@ -252,13 +270,17 @@ class EosApi {
           params.actor = params.from;
         }
 
+        if (params.from === params.receiver) {
+          transfer = false;
+        }
+
         const precision = EosApi.currency.precision({ symbol });
 
-        netQuantity = parseFloat(netQuantity).toFixed(precision);
-        cpuQuantity = parseFloat(cpuQuantity).toFixed(precision);
+        net = parseFloat(net).toFixed(precision);
+        cpu = parseFloat(cpu).toFixed(precision);
 
-        params.stake_net_quantity = `${netQuantity} ${symbol}`;
-        params.stake_cpu_quantity = `${cpuQuantity} ${symbol}`;
+        params.unstake_net_quantity = `${net} ${symbol}`;
+        params.unstake_cpu_quantity = `${cpu} ${symbol}`;
 
         const transaction = { ...params, account, name, transfer };
 
