@@ -38,7 +38,7 @@ class EosApi {
 
     return new Api({
       chainId: network.chainId,
-      rpc: this.Rpc,
+      rpc: EosApi.Rpc,
       signatureProvider,
       textDecoder: new TextDecoder(),
       textEncoder: new TextEncoder()
@@ -72,7 +72,7 @@ class EosApi {
         if (symbol === 'EOS') {
           return 4;
         }
-        const stats = this.currency.stats({ code: account, symbol });
+        const stats = EosApi.currency.stats({ code: account, symbol });
         const supplyBalance = stats[symbol].max_supply.split(' ')[0];
         return supplyBalance.split('.')[1].length;
       }
@@ -106,10 +106,16 @@ class EosApi {
       validateData: async params => {
         const { account, name } = params;
         const result = await EosApi.abi.get({ account_name: account });
-        const struct = result.abi.structs.find(struct => struct.name === name);
-        if (!struct) {
-          throw new Error('not found code');
+        if (!result.abi) {
+          throw new Error('not found contract code');
         }
+
+        const struct = result.abi.structs.find(struct => struct.name === name);
+
+        if (!struct) {
+          throw new Error('action and code not match');
+        }
+
         const data = {};
         struct.fields.forEach(field => {
           if (!params.hasOwnProperty(field.name)) {
@@ -146,7 +152,7 @@ class EosApi {
 
           const accountName = params.actor ? params.actor : params.from;
 
-          return await this.getApi({ ...params, accountName }).transact(
+          return await EosApi.getApi({ ...params, accountName }).transact(
             { actions: [{ account, name, authorization, data }] },
             { broadcast, blocksBehind, expireSeconds }
           );
@@ -302,18 +308,29 @@ class EosApi {
           offset,
           account_name
         }),
-      gets: ({ pos = 0, offset = 10, account_name }) =>
-        EosApi.isJungleNet
+      latestActions: ({ account_name, offset = 1 }) =>
+        EosApi.actions.gets({ pos: -1, offset: -1 * offset, account_name }),
+      gets: ({ latestSeq, pos, page = 1, offset = 9, account_name }) => {
+        if (!page || page < 1) {
+          page = 1;
+        }
+
+        if (pos && pos < -1) {
+          pos = -1;
+        }
+
+        return EosApi.isJungleNet
           ? new Fetch().post(`${JUNGLE_HISTORY_NET}/v1/history/get_actions`, {
-              pos,
+              pos: pos || latestSeq - page * offset,
               offset,
               account_name
             })
           : EosApi.Api.post('/v1/history/get_actions', {
-              pos,
+              pos: pos || latestSeq - page * offset,
               offset,
               account_name
-            })
+            });
+      }
     };
   }
   get producers() {
@@ -348,7 +365,7 @@ class EosApi {
         }).then(res => res.data)
     };
   }
-  get info() {
+  static get info() {
     return {
       get: () => EosApi.Api.post('/v1/chain/get_info', {}),
       getBy: url => new Fetch({ baseURL: url }).post('/v1/chain/get_info', {})
@@ -363,7 +380,7 @@ class EosApi {
         console.log('Private Key:\t', privateKey) // wif
         console.log('Public Key:\t', ecc.privateToPublic(privateKey)) // EOSkey...
       })
-     */
+      */
       randomKey: ({ cpuEntropyBits = 0 }) => ecc.randomKey(cpuEntropyBits),
       /* @example ecc.seedPrivate('secret') === wif */
       seedPrivate: ({ seed }) => ecc.seedPrivate(seed),
