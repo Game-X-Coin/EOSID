@@ -8,7 +8,7 @@ export class TransferLogModel {
   id = undefined;
 
   @Column('varchar')
-  reciever = '';
+  receiver = '';
 
   @Column('varchar')
   amount = '';
@@ -26,7 +26,7 @@ export class TransferLogModel {
     if (data) {
       const {
         id,
-        reciever,
+        receiver,
         amount,
         symbol,
         accountId,
@@ -34,7 +34,7 @@ export class TransferLogModel {
       } = data;
 
       this.id = id;
-      this.reciever = reciever;
+      this.receiver = receiver;
       this.amount = amount;
       this.symbol = symbol;
       this.accountId = accountId;

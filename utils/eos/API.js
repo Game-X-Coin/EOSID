@@ -2,6 +2,7 @@ import { Api, JsSignatureProvider, JsonRpc, RpcError } from 'eosjs-rn';
 import ecc from 'eosjs-ecc-rn';
 import { TextDecoder, TextEncoder } from 'text-encoding';
 import { AccountStore, NetworkStore } from '../../stores';
+import { AccountService } from '../../services';
 import Fetch from '../Fetch';
 
 const JUNGLE_NET = 'http://jungle.cryptolions.io:18888';
@@ -13,8 +14,7 @@ class EosApi {
 
   static get Api() {
     const network = NetworkStore.currentUserNetwork;
-    const endpoint = EosApi.isJungleNet ? JUNGLE_NET : network.url;
-    if (!EosApi.FetchAPI || EosApi.FetchAPI.baseURL !== endpoint) {
+    if (!EosApi.FetchAPI || EosApi.FetchAPI.baseURL !== network.url) {
       EosApi.FetchAPI = new Fetch({ baseURL: network.url });
     }
     EosApi.isJungleNet = network.url === JUNGLE_NET ? true : false;
@@ -27,10 +27,14 @@ class EosApi {
     return new JsonRpc(network.url, { fetch });
   }
 
-  static getApi(accountName = null) {
+  static getApi({ accountName, privateKey, pincode } = {}) {
     const network = NetworkStore.currentUserNetwork;
-    const account = AccountStore.findAccount(accountName);
-    const signatureProvider = new JsSignatureProvider([account.privateKey]);
+    if (!privateKey && pincode) {
+      const account = AccountStore.findAccount(accountName);
+      privateKey = AccountService(account.encryptedPrivateKey, pincode);
+    }
+
+    const signatureProvider = new JsSignatureProvider([privateKey]);
 
     return new Api({
       chainId: network.chainId,
@@ -101,8 +105,8 @@ class EosApi {
         }),
       validateData: async params => {
         const { account, name } = params;
-        const code = await EosApi.code.get({ account_name: account });
-        const struct = code.abi.structs.find(struct => struct.name === name);
+        const result = await EosApi.abi.get({ account_name: account });
+        const struct = result.abi.structs.find(struct => struct.name === name);
         if (!struct) {
           throw new Error('not found code');
         }
@@ -142,7 +146,7 @@ class EosApi {
 
           const accountName = params.actor ? params.actor : params.from;
 
-          return await this.getApi(accountName).transact(
+          return await this.getApi({ ...params, accountName }).transact(
             { actions: [{ account, name, authorization, data }] },
             { broadcast, blocksBehind, expireSeconds }
           );
@@ -174,7 +178,7 @@ class EosApi {
         }
 
         symbol = symbol.toUpperCase();
-        const precision = this.currency.precision({ code: account, symbol });
+        const precision = EosApi.currency.precision({ code: account, symbol });
         const fixedBalance = parseFloat(amount).toFixed(precision);
         params.quantity = `${fixedBalance} ${symbol}`;
 
@@ -186,13 +190,20 @@ class EosApi {
         let {
           account = 'eosio',
           name = 'delegatebw',
-          transfer = false,
-          netQuantity = 0,
-          cpuQuantity = 0,
+          transfer = true,
+          net = 0,
+          cpu = 0,
           symbol = 'EOS'
-        } = this.params;
+        } = params;
 
-        if (netQuantity <= 0 && cpuQuantity <= 0) {
+        if (typeof net === 'string') {
+          net = parseFloat(net);
+        }
+        if (typeof cpu === 'string') {
+          cpu = parseFloat(cpu);
+        }
+
+        if (net <= 0 && cpu <= 0) {
           throw new Error('must should stake positive quantity');
         }
 
@@ -205,17 +216,21 @@ class EosApi {
           params.receiver = params.from;
         }
 
+        if (params.from === params.receiver) {
+          transfer = false;
+        }
+
         if (!params.actor && params.from) {
           params.actor = params.from;
         }
 
-        const precision = this.currency.precision({ symbol });
+        const precision = EosApi.currency.precision({ symbol });
 
-        netQuantity = parseFloat(netQuantity).toFixed(precision);
-        cpuQuantity = parseFloat(cpuQuantity).toFixed(precision);
+        net = parseFloat(net).toFixed(precision);
+        cpu = parseFloat(cpu).toFixed(precision);
 
-        params.stake_net_quantity = `${netQuantity} ${symbol}`;
-        params.stake_cpu_quantity = `${cpuQuantity} ${symbol}`;
+        params.stake_net_quantity = `${net} ${symbol}`;
+        params.stake_cpu_quantity = `${cpu} ${symbol}`;
 
         const transaction = { ...params, account, name, transfer };
 
@@ -226,12 +241,19 @@ class EosApi {
           account = 'eosio',
           name = 'undelegatebw',
           transfer = false,
-          netQuantity = 0,
-          cpuQuantity = 0,
+          net = 0,
+          cpu = 0,
           symbol = 'EOS'
-        } = this.params;
+        } = params;
 
-        if (netQuantity <= 0 && cpuQuantity <= 0) {
+        if (typeof net === 'string') {
+          net = parseFloat(net);
+        }
+        if (typeof cpu === 'string') {
+          cpu = parseFloat(cpu);
+        }
+
+        if (net <= 0 && cpu <= 0) {
           throw new Error('must should unstake positive quantity');
         }
 
@@ -248,13 +270,17 @@ class EosApi {
           params.actor = params.from;
         }
 
-        const precision = this.currency.precision({ symbol });
+        if (params.from === params.receiver) {
+          transfer = false;
+        }
 
-        netQuantity = parseFloat(netQuantity).toFixed(precision);
-        cpuQuantity = parseFloat(cpuQuantity).toFixed(precision);
+        const precision = EosApi.currency.precision({ symbol });
 
-        params.stake_net_quantity = `${netQuantity} ${symbol}`;
-        params.stake_cpu_quantity = `${cpuQuantity} ${symbol}`;
+        net = parseFloat(net).toFixed(precision);
+        cpu = parseFloat(cpu).toFixed(precision);
+
+        params.unstake_net_quantity = `${net} ${symbol}`;
+        params.unstake_cpu_quantity = `${cpu} ${symbol}`;
 
         const transaction = { ...params, account, name, transfer };
 
@@ -325,7 +351,7 @@ class EosApi {
   get info() {
     return {
       get: () => EosApi.Api.post('/v1/chain/get_info', {}),
-      getBy: url => new Fetch({ baseURL: url })
+      getBy: url => new Fetch({ baseURL: url }).post('/v1/chain/get_info', {})
     };
   }
   static get Key() {

@@ -10,7 +10,7 @@ export class SignUpScreen extends Component {
     const { userStore, navigation } = this.props;
 
     await userStore.signUp({ pincode });
-    navigation.navigate('ImportAccount', { isSignUp: true });
+    navigation.replace('ImportAccount', { isSignUp: true });
   };
 
   render() {

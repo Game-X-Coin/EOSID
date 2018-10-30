@@ -12,14 +12,6 @@ export class AccountService {
     return accounts;
   }
 
-  static privateToPublic(privateKey) {
-    try {
-      return api.Key.privateToPublic({ wif: privateKey });
-    } catch (error) {
-      return Promise.reject(AccountError.InvalidPrivateKey);
-    }
-  }
-
   static async findKeyAccount(publicKey, userEos) {
     // find account
     const { account_names } = await userEos.accounts.getsByPublicKey(publicKey);
@@ -36,7 +28,7 @@ export class AccountService {
     const AccountRepo = getRepository(AccountModel);
 
     // encrypt private key
-    const encryptedPrivateKey = AES.encrypt(privateKey, pincode).toString();
+    const encryptedPrivateKey = AccountService.encryptKey(privateKey, pincode);
 
     // create new account instance
     const newAccount = new AccountModel({
@@ -60,21 +52,32 @@ export class AccountService {
     await AccountRepo.remove(findAccount);
   }
 
+  static encryptKey(encryptedPrivateKey, pincode) {
+    return AES.encrypt(encryptedPrivateKey, pincode).toString();
+  }
+
+  static decryptKey(encryptedPrivateKey, pincode) {
+    return AES.decrypt(encryptedPrivateKey, pincode).toString(enc.Utf8);
+  }
+
   static async transfer({
     pincode,
+    sender,
     receiver,
     encryptedPrivateKey,
     ...transferInfo
   }) {
-    // decrypt privatekey
-    const privateKey = AES.decrypt(encryptedPrivateKey, pincode).toString(
-      enc.Utf8
-    );
+    // decrypt private key
+    const privateKey = AccountService.decryptKey(encryptedPrivateKey, pincode);
+
+    console.log(receiver);
 
     return await api.transactions.transfer({
+      ...transferInfo,
       privateKey,
+      pincode,
       to: receiver,
-      ...transferInfo
+      from: sender
     });
   }
 
@@ -85,17 +88,14 @@ export class AccountService {
     ...data
   }) {
     // decrypt privatekey
-    const privateKey = AES.decrypt(encryptedPrivateKey, pincode).toString(
-      enc.Utf8
-    );
+    const privateKey = AccountService.decryptKey(encryptedPrivateKey, pincode);
 
-    const promise = isStaking
-      ? api.transactions.stake({
-          ...data,
-          privateKey
-        })
-      : api.transactions.unstake({ ...data, privateKey });
+    const transactionFunction = isStaking
+      ? api.transactions.stake
+      : api.transactions.unstake;
 
-    return await promise;
+    const params = { ...data, privateKey, pincode };
+
+    return await transactionFunction(params);
   }
 }
