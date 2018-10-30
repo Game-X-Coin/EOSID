@@ -14,8 +14,7 @@ class EosApi {
 
   static get Api() {
     const network = NetworkStore.currentUserNetwork;
-    const endpoint = EosApi.isJungleNet ? JUNGLE_NET : network.url;
-    if (!EosApi.FetchAPI || EosApi.FetchAPI.baseURL !== endpoint) {
+    if (!EosApi.FetchAPI || EosApi.FetchAPI.baseURL !== network.url) {
       EosApi.FetchAPI = new Fetch({ baseURL: network.url });
     }
     EosApi.isJungleNet = network.url === JUNGLE_NET ? true : false;
@@ -253,7 +252,7 @@ class EosApi {
           params.actor = params.from;
         }
 
-        const precision = this.currency.precision({ symbol });
+        const precision = EosApi.currency.precision({ symbol });
 
         netQuantity = parseFloat(netQuantity).toFixed(precision);
         cpuQuantity = parseFloat(cpuQuantity).toFixed(precision);
@@ -330,7 +329,7 @@ class EosApi {
   get info() {
     return {
       get: () => EosApi.Api.post('/v1/chain/get_info', {}),
-      getBy: url => new Fetch({ baseURL: url })
+      getBy: url => new Fetch({ baseURL: url }).post('/v1/chain/get_info', {})
     };
   }
   static get Key() {
