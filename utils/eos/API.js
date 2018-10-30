@@ -2,6 +2,7 @@ import { Api, JsSignatureProvider, JsonRpc, RpcError } from 'eosjs-rn';
 import ecc from 'eosjs-ecc-rn';
 import { TextDecoder, TextEncoder } from 'text-encoding';
 import { AccountStore, NetworkStore } from '../../stores';
+import { AccountService } from '../../services';
 import Fetch from '../Fetch';
 
 const JUNGLE_NET = 'http://jungle.cryptolions.io:18888';
@@ -13,8 +14,7 @@ class EosApi {
 
   static get Api() {
     const network = NetworkStore.currentUserNetwork;
-    const endpoint = EosApi.isJungleNet ? JUNGLE_NET : network.url;
-    if (!EosApi.FetchAPI || EosApi.FetchAPI.baseURL !== endpoint) {
+    if (!EosApi.FetchAPI || EosApi.FetchAPI.baseURL !== network.url) {
       EosApi.FetchAPI = new Fetch({ baseURL: network.url });
     }
     EosApi.isJungleNet = network.url === JUNGLE_NET ? true : false;
@@ -27,10 +27,14 @@ class EosApi {
     return new JsonRpc(network.url, { fetch });
   }
 
-  static getApi(accountName = null) {
+  static getApi({ accountName, privateKey, pincode } = {}) {
     const network = NetworkStore.currentUserNetwork;
-    const account = AccountStore.findAccount(accountName);
-    const signatureProvider = new JsSignatureProvider([account.privateKey]);
+    if (!privateKey && pincode) {
+      const account = AccountStore.findAccount(accountName);
+      privateKey = AccountService(account.encryptedPrivateKey, pincode);
+    }
+
+    const signatureProvider = new JsSignatureProvider([privateKey]);
 
     return new Api({
       chainId: network.chainId,
@@ -142,7 +146,7 @@ class EosApi {
 
           const accountName = params.actor ? params.actor : params.from;
 
-          return await this.getApi(accountName).transact(
+          return await this.getApi({ ...params, accountName }).transact(
             { actions: [{ account, name, authorization, data }] },
             { broadcast, blocksBehind, expireSeconds }
           );
@@ -248,7 +252,7 @@ class EosApi {
           params.actor = params.from;
         }
 
-        const precision = this.currency.precision({ symbol });
+        const precision = EosApi.currency.precision({ symbol });
 
         netQuantity = parseFloat(netQuantity).toFixed(precision);
         cpuQuantity = parseFloat(cpuQuantity).toFixed(precision);
@@ -325,7 +329,7 @@ class EosApi {
   get info() {
     return {
       get: () => EosApi.Api.post('/v1/chain/get_info', {}),
-      getBy: url => new Fetch({ baseURL: url })
+      getBy: url => new Fetch({ baseURL: url }).post('/v1/chain/get_info', {})
     };
   }
   static get Key() {

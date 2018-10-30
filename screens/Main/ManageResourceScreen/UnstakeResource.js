@@ -5,7 +5,6 @@ import { ScrollView, View } from 'react-native';
 import {
   Text,
   Button,
-  TouchableRipple,
   Caption,
   Divider,
   Colors,
@@ -13,11 +12,11 @@ import {
 } from 'react-native-paper';
 
 import { Slider } from '../../../components/Slider';
+import { DialogIndicator } from '../../../components/Indicator';
 
 class ResourceView extends PureComponent {
   render() {
     const {
-      style,
       title,
       amount,
       amountPercent,
@@ -77,6 +76,9 @@ export class UnstakeResource extends Component {
     net: 0
   };
 
+  @observable
+  showDialog = false;
+
   @computed
   get stakedAmount() {
     return {
@@ -116,67 +118,55 @@ export class UnstakeResource extends Component {
 
     const totalAmount = (cpu + net).toFixed(4);
 
-    const ConfirmTitle = `Confirm unstake ${totalAmount} EOS from cpu/net`;
-
     navigation.navigate('ConfirmPin', {
       pinProps: {
-        titleEnter: ConfirmTitle
+        title: 'Confirm Unstake',
+        description: `Unstake ${totalAmount} EOS from cpu/net`
       },
       // when PIN matched
-      async cb() {
-        // show loading spinner
+      cb: async () => {
+        // show loading dialog
+        this.showDialog = true;
 
         // fetch
-        await accountStore.manageResource({
+        const result = await accountStore.manageResource({
           cpu,
           net
         });
 
-        // hide loading spinner
+        // hide dialog
+        this.showDialog = false;
 
-        // move
-        navigation.navigate('Account');
+        if (result.code) {
+          navigation.navigate('ShowError', {
+            title: 'Unstake Resource Failed',
+            description: 'Please check the error, it may be a network error.',
+            error: result
+          });
+        } else {
+          navigation.navigate('Account');
+        }
       }
     });
   }
 
-  moveScreen = routeName => this.props.navigation.navigate(routeName);
-
   render() {
-    const { resourceAmount, resourceSlide, unstakableAmount } = this;
+    const {
+      resourceAmount,
+      resourceSlide,
+      unstakableAmount,
+      showDialog
+    } = this;
 
     return (
       <React.Fragment>
+        <DialogIndicator
+          visible={showDialog}
+          title="Preparing to unstake resource..."
+        />
+
         <ScrollView style={{ flex: 1 }}>
-          <View style={{ flex: 1, paddingHorizontal: 20 }}>
-            {/* Title */}
-            <View style={{ marginVertical: 20 }}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'center'
-                }}
-              >
-                <TouchableRipple
-                  borderless
-                  style={{ marginRight: 40 }}
-                  onPress={() => this.props.changeResourceMode(true)}
-                >
-                  <Text style={{ color: 'gray' }}>Stake</Text>
-                </TouchableRipple>
-
-                <Text
-                  style={{
-                    paddingBottom: 3,
-                    borderBottomColor: Colors.purple500,
-                    borderBottomWidth: 3
-                  }}
-                >
-                  Unstake
-                </Text>
-              </View>
-            </View>
-
+          <View style={{ flex: 1, padding: 20 }}>
             {/* Resource Views */}
             <ResourceView
               title={`CPU - ${unstakableAmount.cpu.toFixed(4)} EOS unstakable`}

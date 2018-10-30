@@ -1,4 +1,5 @@
 import { getRepository } from 'typeorm-expo/browser';
+import { AES, enc } from 'crypto-js';
 
 import { AccountModel, AccountError } from '../db';
 import api from '../utils/eos/API';
@@ -9,14 +10,6 @@ export class AccountService {
     const accounts = await AccountRepo.find();
 
     return accounts;
-  }
-
-  static privateToPublic(privateKey) {
-    try {
-      return api.Key.privateToPublic({ wif: privateKey });
-    } catch (error) {
-      return Promise.reject(AccountError.InvalidPrivateKey);
-    }
   }
 
   static async findKeyAccount(publicKey, userEos) {
@@ -31,11 +24,17 @@ export class AccountService {
     return account_names;
   }
 
-  static async addAccount(accountInfo) {
+  static async addAccount({ pincode, privateKey, ...accountInfo }) {
     const AccountRepo = getRepository(AccountModel);
 
+    // encrypt private key
+    const encryptedPrivateKey = AccountService.encryptKey(privateKey, pincode);
+
     // create new account instance
-    const newAccount = new AccountModel(accountInfo);
+    const newAccount = new AccountModel({
+      ...accountInfo,
+      encryptedPrivateKey
+    });
 
     // save
     await AccountRepo.save(newAccount);
@@ -53,15 +52,49 @@ export class AccountService {
     await AccountRepo.remove(findAccount);
   }
 
-  static async transfer(transferInfo) {
-    const { receiver } = transferInfo;
-    return await api.transactions.transfer({ ...transferInfo, to: receiver });
+  static encryptKey(encryptedPrivateKey, pincode) {
+    return AES.encrypt(encryptedPrivateKey, pincode).toString();
   }
 
-  static async manageResource({ isStaking, ...data }) {
-    const promise = isStaking
-      ? api.transactions.stake(data)
-      : api.transactions.unstake(data);
+  static decryptKey(encryptedPrivateKey, pincode) {
+    return AES.decrypt(encryptedPrivateKey, pincode).toString(enc.Utf8);
+  }
+
+  static async transfer({
+    pincode,
+    sender,
+    receiver,
+    encryptedPrivateKey,
+    ...transferInfo
+  }) {
+    // decrypt private key
+    const privateKey = AccountService.decryptKey(encryptedPrivateKey, pincode);
+
+    console.log(receiver);
+
+    return await api.transactions.transfer({
+      ...transferInfo,
+      privateKey,
+      pincode,
+      to: receiver,
+      from: sender
+    });
+  }
+
+  static async manageResource({
+    pincode,
+    encryptedPrivateKey,
+    isStaking,
+    ...data
+  }) {
+    // decrypt privatekey
+    const privateKey = AccountService.decryptKey(encryptedPrivateKey, pincode);
+
+    const transactionFunction = isStaking
+      ? api.transactions.stake
+      : api.transactions.unstake;
+
+    const promise = transactionFunction({ ...data, privateKey, pincode });
 
     return await promise;
   }

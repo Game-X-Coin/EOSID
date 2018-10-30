@@ -12,6 +12,7 @@ import {
   Paragraph
 } from 'react-native-paper';
 
+import { DialogIndicator } from '../../../components/Indicator';
 import { Slider } from '../../../components/Slider';
 
 class ResourceView extends Component {
@@ -74,12 +75,12 @@ export class StakeResource extends Component {
   @observable
   resourceSlide = 0.7;
 
+  @observable
+  showDialog = false;
+
   @computed
   get unstakedAmount() {
-    return parseFloat(
-      this.props.accountStore.tokens.find(token => token.symbol === 'EOS')
-        .amount
-    );
+    return parseFloat(this.props.accountStore.tokens.EOS);
   }
 
   @computed
@@ -122,35 +123,43 @@ export class StakeResource extends Component {
 
     const totalAmount = (cpu + net).toFixed(4);
 
-    const ConfirmTitle = `Confirm stake ${totalAmount} EOS for cpu/net`;
-
     navigation.navigate('ConfirmPin', {
       pinProps: {
-        titleEnter: ConfirmTitle
+        title: 'Confirm Stake',
+        description: `Stake ${totalAmount} EOS for cpu/net`
       },
       // when PIN matched
-      async cb() {
-        // show loading spinner
+      cb: async () => {
+        // show loading dialog
+        this.showDialog = true;
 
         // fetch
-        await accountStore.manageResource({
+        const result = await accountStore.manageResource({
           cpu,
           net,
           isStaking: true
         });
 
-        // hide loading spinner
+        // hide dialog
+        this.showDialog = false;
 
-        // move
-        navigation.navigate('Account');
+        if (result.code) {
+          navigation.navigate('ShowError', {
+            title: 'Stake Resource Failed',
+            description: 'Please check the error, it may be a network error.',
+            error: result
+          });
+        } else {
+          navigation.navigate('Account');
+        }
       }
     });
   }
 
-  moveScreen = routeName => this.props.navigation.navigate(routeName);
-
   render() {
     const {
+      showDialog,
+
       resourceAmount,
       resourceSlide,
       stakableSlide,
@@ -168,36 +177,13 @@ export class StakeResource extends Component {
 
     return (
       <React.Fragment>
+        <DialogIndicator
+          visible={showDialog}
+          title="Preparing to stake resource..."
+        />
+
         <ScrollView style={{ flex: 1 }}>
-          <View style={{ flex: 1, paddingHorizontal: 20 }}>
-            <View style={{ marginVertical: 20 }}>
-              {/* Title */}
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'center'
-                }}
-              >
-                <Text
-                  style={{
-                    marginRight: 40,
-                    paddingBottom: 3,
-                    borderBottomColor: Colors.purple500,
-                    borderBottomWidth: 3
-                  }}
-                >
-                  Stake
-                </Text>
-
-                <TouchableRipple
-                  borderless
-                  onPress={() => this.props.changeResourceMode(false)}
-                >
-                  <Text style={{ color: 'gray' }}>Unstake</Text>
-                </TouchableRipple>
-              </View>
-            </View>
-
+          <View style={{ flex: 1, padding: 20 }}>
             {/* Description */}
             <View>
               <Caption>Stakable Amount</Caption>
@@ -220,13 +206,13 @@ export class StakeResource extends Component {
                   return (
                     <TouchableRipple
                       key={key}
-                      style={{ marginRight: 5 }}
+                      style={{ marginRight: 7 }}
                       onPress={() => this.changeStakable(easyControls[key])}
                     >
                       <View
                         style={{
-                          paddingHorizontal: 10,
-                          paddingVertical: 7,
+                          paddingHorizontal: 15,
+                          paddingVertical: 8,
                           borderRadius: 3,
                           borderWidth: 1,
                           borderColor: Colors.grey900,
@@ -239,7 +225,7 @@ export class StakeResource extends Component {
                       >
                         <Text
                           style={{
-                            fontSize: 13,
+                            fontSize: 14,
                             ...(active
                               ? {
                                   color: '#fff'

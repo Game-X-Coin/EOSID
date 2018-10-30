@@ -21,7 +21,25 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
-    }
+      "supportsTablet": false,
+      "bundleIdentifier": "io.gamexcoin.eosid"
+    },
+    "android": {
+      "package": "io.gamexcoin.eosid",
+      "intentFilters": [{
+        "action": "VIEW",
+        "autoVerify": true,
+        "data": {
+          "scheme": "eosid",
+          "host": "eosid.gamexcoin.io",
+          "pathPrefix": "/"
+        },
+        "category": [
+          "BROWSABLE",
+          "DEFAULT"
+        ]
+      }]
+    },
+    "scheme": "eosid"
   }
 }
