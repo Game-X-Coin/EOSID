@@ -28,7 +28,7 @@ import { DialogIndicator } from '../../../components/Indicator';
 
 @inject('networkStore', 'accountStore')
 @withFormik({
-  mapPropsToValues: props => ({
+  mapPropsToValues: ({ networkStore }) => ({
     // select account
     showDialog: false,
     // loading
@@ -37,7 +37,7 @@ import { DialogIndicator } from '../../../components/Indicator';
     // form
     privateKey: '',
     publicKey: '',
-    networkId: props.networkStore.defaultNetworks[0].id // default network
+    networkId: networkStore.defaultNetworks[0].id // default network
   }),
   validationSchema: props => {
     const { errors: RequiredFieldErrors } = AccountError.RequiredFields;
@@ -55,7 +55,11 @@ import { DialogIndicator } from '../../../components/Indicator';
   handleSubmit: async (
     values,
     {
-      props: { networkStore, accountStore, navigation },
+      props: {
+        networkStore: { allNetworks },
+        accountStore,
+        navigation
+      },
       setSubmitting,
       setValues,
       setFieldValue,
@@ -73,7 +77,7 @@ import { DialogIndicator } from '../../../components/Indicator';
 
       const accounts = await AccountService.findKeyAccount(
         publicKey,
-        networkStore.eos
+        allNetworks.find(({ id }) => id === values.networkId).url
       );
 
       // key has single account
@@ -127,7 +131,7 @@ export class ImportAccountScreen extends Component {
   render() {
     const {
       navigation,
-      networkStore: { defaultNetworks, userNetworks },
+      networkStore: { allNetworks },
 
       values,
       errors,
@@ -140,7 +144,7 @@ export class ImportAccountScreen extends Component {
     const isSignUp =
       navigation.state.params && navigation.state.params.isSignUp;
 
-    const networks = [...defaultNetworks, ...userNetworks].map(network => ({
+    const networks = allNetworks.map(network => ({
       label: network.name,
       value: network.id
     }));

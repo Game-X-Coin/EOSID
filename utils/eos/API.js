@@ -49,8 +49,12 @@ class EosApi {
     return {
       get: ({ account_name }) =>
         EosApi.Api.post('/v1/chain/get_account', { account_name }),
-      getsByPublicKey: public_key =>
-        EosApi.Api.post('/v1/history/get_key_accounts', { public_key }),
+      getsByPublicKey: (public_key, url) =>
+        url
+          ? new Fetch({ baseURL: url }).post('/v1/history/get_key_accounts', {
+              public_key
+            })
+          : EosApi.Api.post('/v1/history/get_key_accounts', { public_key }),
       getControlledAccounts: ({ controlling_account }) =>
         EosApi.Api.post('/v1/history/get_controlled_accounts', {
           controlling_account

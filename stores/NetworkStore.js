@@ -29,16 +29,19 @@ class Store {
   }
 
   @computed
-  get currentUserNetwork() {
-    const networks = [...this.defaultNetworks, ...this.userNetworks];
+  get allNetworks() {
+    return [...this.defaultNetworks, ...this.userNetworks];
+  }
 
+  @computed
+  get currentUserNetwork() {
     if (AccountStore.currentUserAccount) {
-      return networks.find(
+      return this.allNetworks.find(
         network => network.id === AccountStore.currentUserAccount.networkId
       );
     }
     // return default network
-    return networks[0];
+    return this.defaultNetworks[0];
   }
 
   @action
