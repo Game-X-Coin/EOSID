@@ -14,7 +14,7 @@ export class NetworkScreen extends Component {
 
   render() {
     const { networkStore, navigation } = this.props;
-    const { defaultNetworks, userNetworks } = networkStore;
+    const { defaultNetworks, customNetworks } = networkStore;
 
     return (
       <View style={HomeStyle.container}>
@@ -36,10 +36,12 @@ export class NetworkScreen extends Component {
             </List.Section>
 
             <List.Section title="Custom">
-              {userNetworks.map(({ id, name, url }) => (
+              {customNetworks.map(({ id, name, url }) => (
                 <List.Item key={id} title={name} description={url} />
               ))}
-              {!userNetworks.length && <List.Item title="No custom networks" />}
+              {!customNetworks.length && (
+                <List.Item title="No custom networks" />
+              )}
             </List.Section>
           </ScrollView>
 

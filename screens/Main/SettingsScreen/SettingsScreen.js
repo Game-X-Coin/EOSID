@@ -53,18 +53,18 @@ const Item = ({ title, description, onPress }) => (
   </TouchableRipple>
 );
 
-@inject('userStore', 'accountStore', 'networkStore')
+@inject('accountStore', 'networkStore')
 @observer
 export class SettingsScreen extends Component {
   moveScreen = routeName => this.props.navigation.navigate(routeName);
 
-  signOut = () => {
+  /* signOut = () => {
     this.props.userStore.signOut();
     this.moveScreen('Auth');
-  };
+  }; */
 
   render() {
-    const { currentUserAccount } = this.props.accountStore;
+    const { currentAccount } = this.props.accountStore;
 
     return (
       <View style={HomeStyle.container}>
@@ -76,7 +76,7 @@ export class SettingsScreen extends Component {
             <Section title="User Settings">
               <Item
                 title="Accounts"
-                description={currentUserAccount && currentUserAccount.name}
+                description={currentAccount && currentAccount.name}
                 onPress={() => this.moveScreen('Accounts')}
               />
             </Section>
@@ -91,13 +91,13 @@ export class SettingsScreen extends Component {
               <Item title="Support" />
             </Section>
 
-            <Button
+            {/* <Button
               style={{ padding: 5, marginTop: 15 }}
               color={Colors.red500}
               onPress={this.signOut}
             >
               Sign out
-            </Button>
+            </Button> */}
           </ScrollView>
         </SafeAreaView>
       </View>

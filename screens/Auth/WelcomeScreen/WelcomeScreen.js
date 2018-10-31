@@ -1,10 +1,26 @@
 import React, { Component } from 'react';
+import { observer, inject } from 'mobx-react';
 import { View, SafeAreaView } from 'react-native';
 import { Button, Text, Title } from 'react-native-paper';
 import { Logo } from '../../../components/SVG';
 
+@inject('settingsStore')
+@observer
 export class WelcomeScreen extends Component {
-  moveScreen = routeName => this.props.navigation.navigate(routeName);
+  componentDidMount() {
+    const { navigation, settingsStore } = this.props;
+
+    if (settingsStore.initialized) {
+      navigation.navigate('Account');
+    }
+  }
+
+  async start() {
+    const { navigation, settingsStore } = this.props;
+
+    await settingsStore.initializeSettings();
+    navigation.navigate('ImportAccount', { isSignUp: true });
+  }
 
   render() {
     return (
@@ -33,7 +49,7 @@ export class WelcomeScreen extends Component {
           <Button
             style={{ padding: 5 }}
             mode="contained"
-            onPress={() => this.moveScreen('SignUp')}
+            onPress={() => this.start()}
           >
             Start EOSID
           </Button>

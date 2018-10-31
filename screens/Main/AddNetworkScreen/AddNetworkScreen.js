@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { SafeAreaView } from 'react-native';
+import { SafeAreaView, Keyboard } from 'react-native';
 import { Appbar, Button } from 'react-native-paper';
 import { TextField } from 'react-native-material-textfield';
 import { withFormik } from 'formik';
@@ -11,13 +11,16 @@ import { NetworkError } from '../../../db';
 import { KeyboardAvoidingView, ScrollView } from '../../../components/View';
 
 import HomeStyle from '../../../styles/HomeStyle';
+import { DialogIndicator } from '../../../components/Indicator';
 
 @inject('networkStore')
 @observer
 @withFormik({
   mapPropsToValues: props => ({
     name: '',
-    url: ''
+    url: '',
+
+    showDialog: false
   }),
   validationSchema: props => {
     const { InvalidUrl, RequiredFields } = NetworkError;
@@ -29,17 +32,32 @@ import HomeStyle from '../../../styles/HomeStyle';
         .url(InvalidUrl.errors.url)
     });
   },
-  handleSubmit: async (values, { props, setSubmitting, setErrors }) => {
+  handleSubmit: async (
+    values,
+    {
+      props: { networkStore, navigation },
+      setSubmitting,
+      setErrors,
+      setFieldValue
+    }
+  ) => {
     try {
-      await props.networkStore.addNetwork({
+      Keyboard.dismiss();
+      // show loading dialog
+      setFieldValue('showDialog', true);
+
+      await networkStore.addNetwork({
         name: values.name,
         url: values.url
       });
 
-      props.navigation.navigate('SettingsNetwork');
+      navigation.navigate('SettingsNetwork');
     } catch (error) {
       setErrors({ message: error.message, ...error.errors });
       setSubmitting(false);
+    } finally {
+      // hide loading dialog
+      setFieldValue('showDialog', false);
     }
   }
 })
@@ -55,8 +73,7 @@ export class AddNetworkScreen extends Component {
       touched,
       setFieldValue,
       setFieldTouched,
-      handleSubmit,
-      isSubmitting
+      handleSubmit
     } = this.props;
 
     return (
@@ -65,6 +82,11 @@ export class AddNetworkScreen extends Component {
           <Appbar.BackAction onPress={() => navigation.goBack(null)} />
           <Appbar.Content title="Add Network" />
         </Appbar.Header>
+
+        <DialogIndicator
+          visible={values.showDialog}
+          title="Preparing to add custom network..."
+        />
 
         <KeyboardAvoidingView>
           <ScrollView style={{ paddingHorizontal: 20 }}>
@@ -94,7 +116,6 @@ export class AddNetworkScreen extends Component {
           <Button
             mode="contained"
             style={{ padding: 5, borderRadius: 0 }}
-            loading={isSubmitting}
             onPress={handleSubmit}
           >
             Add network

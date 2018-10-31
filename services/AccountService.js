@@ -12,9 +12,12 @@ export class AccountService {
     return accounts;
   }
 
-  static async findKeyAccount(publicKey, userEos) {
+  static async findKeyAccount(publicKey, url) {
     // find account
-    const { account_names } = await userEos.accounts.getsByPublicKey(publicKey);
+    const { account_names } = await api.accounts.getsByPublicKey(
+      publicKey,
+      url
+    );
 
     // invalid account
     if (!account_names.length) {

@@ -26,9 +26,9 @@ import { ScrollView, KeyboardAvoidingView } from '../../../components/View';
 import HomeStyle from '../../../styles/HomeStyle';
 import { DialogIndicator } from '../../../components/Indicator';
 
-@inject('networkStore', 'accountStore')
+@inject('settingsStore', 'networkStore', 'accountStore')
 @withFormik({
-  mapPropsToValues: props => ({
+  mapPropsToValues: ({ networkStore }) => ({
     // select account
     showDialog: false,
     // loading
@@ -37,7 +37,7 @@ import { DialogIndicator } from '../../../components/Indicator';
     // form
     privateKey: '',
     publicKey: '',
-    networkId: props.networkStore.defaultNetworks[0].id // default network
+    networkId: networkStore.defaultNetworks[0].id // default network
   }),
   validationSchema: props => {
     const { errors: RequiredFieldErrors } = AccountError.RequiredFields;
@@ -55,7 +55,12 @@ import { DialogIndicator } from '../../../components/Indicator';
   handleSubmit: async (
     values,
     {
-      props: { networkStore, accountStore, navigation },
+      props: {
+        settingsStore,
+        networkStore: { allNetworks },
+        accountStore,
+        navigation
+      },
       setSubmitting,
       setValues,
       setFieldValue,
@@ -73,19 +78,32 @@ import { DialogIndicator } from '../../../components/Indicator';
 
       const accounts = await AccountService.findKeyAccount(
         publicKey,
-        networkStore.eos
+        allNetworks.find(({ id }) => id === values.networkId).url
       );
 
       // key has single account
       if (accounts.length === 1) {
-        await accountStore.addAccount({
-          name: accounts[0],
-          privateKey: values.privateKey,
-          networkId: values.networkId,
-          publicKey
-        });
+        const addAccount = async () => {
+          await accountStore.addAccount({
+            name: accounts[0],
+            privateKey: values.privateKey,
+            networkId: values.networkId,
+            publicKey
+          });
 
-        navigation.navigate('Account');
+          navigation.navigate('Account');
+        };
+
+        // new account pincode
+        if (!settingsStore.settings.accountPincodeEnabled) {
+          navigation.navigate('NewPin', {
+            async cb() {
+              await addAccount();
+            }
+          });
+        } else {
+          await addAccount();
+        }
       } else {
         setValues({
           ...values,
@@ -104,15 +122,29 @@ import { DialogIndicator } from '../../../components/Indicator';
 @observer
 export class ImportAccountScreen extends Component {
   async importAccount(name) {
-    const { accountStore, values } = this.props;
-
-    await accountStore.addAccount({
-      ...values,
-      name
-    });
+    const { settingsStore, accountStore, navigation, values } = this.props;
 
     this.hideDialogs();
-    this.moveToAccountScreen();
+
+    const addAccount = async () => {
+      await accountStore.addAccount({
+        ...values,
+        name
+      });
+
+      this.moveToAccountScreen();
+    };
+
+    // new account pincode
+    if (!settingsStore.settings.accountPincodeEnabled) {
+      navigation.navigate('NewPin', {
+        cb: async () => {
+          await addAccount();
+        }
+      });
+    } else {
+      await addAccount();
+    }
   }
 
   hideDialogs() {
@@ -127,7 +159,7 @@ export class ImportAccountScreen extends Component {
   render() {
     const {
       navigation,
-      networkStore: { defaultNetworks, userNetworks },
+      networkStore: { allNetworks },
 
       values,
       errors,
@@ -140,7 +172,7 @@ export class ImportAccountScreen extends Component {
     const isSignUp =
       navigation.state.params && navigation.state.params.isSignUp;
 
-    const networks = [...defaultNetworks, ...userNetworks].map(network => ({
+    const networks = allNetworks.map(network => ({
       label: network.name,
       value: network.id
     }));

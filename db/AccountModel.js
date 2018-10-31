@@ -57,26 +57,15 @@ export class AccountModel {
   @Column('varchar')
   networkId = '';
 
-  @Column('varchar')
-  userId = '';
-
   constructor(data) {
     if (data) {
-      const {
-        id,
-        name,
-        publicKey,
-        encryptedPrivateKey,
-        networkId,
-        userId
-      } = data;
+      const { id, name, publicKey, encryptedPrivateKey, networkId } = data;
 
       this.id = id;
       this.name = name;
       this.publicKey = publicKey;
       this.encryptedPrivateKey = encryptedPrivateKey;
       this.networkId = networkId;
-      this.userId = userId;
     }
   }
 
