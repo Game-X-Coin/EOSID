@@ -17,10 +17,8 @@ export class AccountsScreen extends Component {
 
   render() {
     const { accountStore, networkStore, navigation } = this.props;
-    const { userAccounts, currentUserAccount } = accountStore;
-    const { defaultNetworks, userNetworks } = networkStore;
-
-    const allNetworks = [...defaultNetworks, ...userNetworks];
+    const { accounts, currentAccount } = accountStore;
+    const { allNetworks } = networkStore;
 
     return (
       <SafeAreaView style={HomeStyle.container}>
@@ -35,7 +33,7 @@ export class AccountsScreen extends Component {
 
         <ScrollView>
           <List.Section title="Select to change account">
-            {userAccounts.map(({ id, name, networkId }) => (
+            {accounts.map(({ id, name, networkId }) => (
               <List.Item
                 key={id}
                 title={name}
@@ -45,7 +43,7 @@ export class AccountsScreen extends Component {
                 right={() => (
                   <RadioButton
                     status={
-                      name === (currentUserAccount && currentUserAccount.name)
+                      name === (currentAccount && currentAccount.name)
                         ? 'checked'
                         : 'unchecked'
                     }

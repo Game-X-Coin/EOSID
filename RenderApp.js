@@ -8,7 +8,7 @@ import AppNavigator from './navigation/AppNavigator';
 
 import { initializeDB } from './db';
 
-@inject('userStore', 'networkStore', 'accountStore')
+@inject('pincodeStore', 'settingsStore', 'networkStore', 'accountStore')
 @observer
 export default class RenderApp extends Component {
   @observable
@@ -31,10 +31,16 @@ export default class RenderApp extends Component {
   }
 
   async onFinishLoading() {
-    const { userStore, networkStore, accountStore } = this.props;
+    const {
+      pincodeStore,
+      settingsStore,
+      networkStore,
+      accountStore
+    } = this.props;
 
     await Promise.all([
-      userStore.getUsers(),
+      pincodeStore.getPincodes(),
+      settingsStore.getSettings(),
       networkStore.getNetworks(),
       accountStore.getAccounts()
     ]);

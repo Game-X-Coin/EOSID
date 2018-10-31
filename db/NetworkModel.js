@@ -48,18 +48,14 @@ export class NetworkModel {
   @Column('varchar')
   chainId = '';
 
-  @Column('varchar')
-  userId = '';
-
   constructor(data) {
     if (data) {
-      const { id, name, url, chainId, userId } = data;
+      const { id, name, url, chainId } = data;
 
       this.id = id;
       this.name = name;
       this.url = url;
       this.chainId = chainId;
-      this.userId = userId;
     }
   }
 

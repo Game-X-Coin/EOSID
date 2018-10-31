@@ -2,7 +2,6 @@ import { observable, action, computed } from 'mobx';
 
 import { NetworkService } from '../services';
 
-import { UserStore } from './UserStore';
 import { AccountStore } from './AccountStore';
 
 import { DEFAULT_NETWORKS } from '../constants';
@@ -14,7 +13,7 @@ class Store {
   defaultNetworks = DEFAULT_NETWORKS;
 
   @observable
-  networks = [];
+  customNetworks = [];
 
   @computed
   get eos() {
@@ -22,22 +21,17 @@ class Store {
   }
 
   @computed
-  get userNetworks() {
-    return this.networks.filter(
-      network => network.userId === UserStore.currentUser.id
-    );
-  }
-
-  @computed
   get allNetworks() {
-    return [...this.defaultNetworks, ...this.userNetworks];
+    return [...this.defaultNetworks, ...this.customNetworks];
   }
 
   @computed
-  get currentUserNetwork() {
-    if (AccountStore.currentUserAccount) {
+  get currentNetwork() {
+    const { currentAccount } = AccountStore;
+
+    if (currentAccount) {
       return this.allNetworks.find(
-        network => network.id === AccountStore.currentUserAccount.networkId
+        network => network.id === currentAccount.networkId
       );
     }
     // return default network
@@ -45,35 +39,34 @@ class Store {
   }
 
   @action
-  setNetworks(networks) {
+  setCustomNetworks(networks) {
     console.log('networks', networks);
-    this.networks = networks;
+    this.customNetworks = networks;
   }
 
   @action
   async getNetworks() {
     return NetworkService.getNetworks().then(networks => {
-      this.setNetworks(networks);
+      this.setCustomNetworks(networks);
     });
   }
 
   @action
   async addNetwork(networkInfo) {
     return NetworkService.addNetwork({
-      ...networkInfo,
-      userId: UserStore.currentUser.id
+      ...networkInfo
     }).then(network => {
-      this.setNetworks([...this.networks, network]);
+      this.setCustomNetworks([...this.customNetworks, network]);
     });
   }
 
   @action
   async removeNetwork(networkId) {
     return NetworkService.removeNetwork(networkId).then(_ => {
-      const filterDeletedNetwork = this.networks.filter(
+      const filterDeletedNetwork = this.customNetworks.filter(
         network => network.id !== networkId
       );
-      this.setNetworks(filterDeletedNetwork);
+      this.setCustomNetworks(filterDeletedNetwork);
     });
   }
 }

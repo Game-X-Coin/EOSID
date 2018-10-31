@@ -13,7 +13,7 @@ class EosApi {
   static isJungleNet = false;
 
   static get Api() {
-    const network = NetworkStore.currentUserNetwork;
+    const network = NetworkStore.currentNetwork;
     if (!EosApi.FetchAPI || EosApi.FetchAPI.baseURL !== network.url) {
       EosApi.FetchAPI = new Fetch({ baseURL: network.url });
     }
@@ -22,13 +22,13 @@ class EosApi {
   }
 
   static get Rpc() {
-    const network = NetworkStore.currentUserNetwork;
+    const network = NetworkStore.currentNetwork;
     EosApi.isJungleNet = network.url === JUNGLE_NET ? true : false;
     return new JsonRpc(network.url, { fetch });
   }
 
   static getApi({ accountName, privateKey, pincode } = {}) {
-    const network = NetworkStore.currentUserNetwork;
+    const network = NetworkStore.currentNetwork;
     if (!privateKey && pincode) {
       const account = AccountStore.findAccount(accountName);
       privateKey = AccountService(account.encryptedPrivateKey, pincode);

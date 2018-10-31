@@ -102,12 +102,7 @@ export class AccountInfo extends Component {
   moveScreen = (...args) => this.props.navigation.navigate(...args);
 
   render() {
-    const {
-      info,
-      tokens,
-      fetched,
-      currentUserAccount
-    } = this.props.accountStore;
+    const { info, tokens, fetched, currentAccount } = this.props.accountStore;
 
     const {
       cpu_limit = { max: 0, used: 0 },
@@ -139,7 +134,7 @@ export class AccountInfo extends Component {
                 fontSize: 18
               }}
             >
-              {currentUserAccount.name}{' '}
+              {currentAccount.name}{' '}
               <Icon.Ionicons name="md-arrow-dropdown" size={18} />
             </Title>
           </TouchableRipple>

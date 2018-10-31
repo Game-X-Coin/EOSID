@@ -12,7 +12,7 @@ import HomeStyle from '../../../styles/HomeStyle';
 @observer
 export class TransactionScreen extends Component {
   render() {
-    const { currentUserAccount } = this.props.accountStore;
+    const { currentAccount } = this.props.accountStore;
 
     return (
       <SafeAreaView style={HomeStyle.container}>
@@ -20,7 +20,7 @@ export class TransactionScreen extends Component {
           <Appbar.Content title="Transaction" />
         </Appbar.Header>
 
-        {currentUserAccount ? (
+        {currentAccount ? (
           <TransactionInfo />
         ) : (
           // account empty

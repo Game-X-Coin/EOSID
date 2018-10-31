@@ -14,11 +14,11 @@ export class AccountScreen extends Component {
   moveScreen = (...args) => this.props.navigation.navigate(...args);
 
   render() {
-    const { currentUserAccount } = this.props.accountStore;
+    const { currentAccount } = this.props.accountStore;
 
     return (
       <SafeAreaView style={HomeStyle.container}>
-        {!currentUserAccount && (
+        {!currentAccount && (
           <Appbar.Header>
             <Appbar.Content title="Account" />
             <Appbar.Action
@@ -28,7 +28,7 @@ export class AccountScreen extends Component {
           </Appbar.Header>
         )}
 
-        {currentUserAccount ? <AccountInfo /> : <AccountEmptyState />}
+        {currentAccount ? <AccountInfo /> : <AccountEmptyState />}
       </SafeAreaView>
     );
   }

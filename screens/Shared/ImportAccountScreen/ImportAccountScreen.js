@@ -26,7 +26,7 @@ import { ScrollView, KeyboardAvoidingView } from '../../../components/View';
 import HomeStyle from '../../../styles/HomeStyle';
 import { DialogIndicator } from '../../../components/Indicator';
 
-@inject('networkStore', 'accountStore')
+@inject('settingsStore', 'networkStore', 'accountStore')
 @withFormik({
   mapPropsToValues: ({ networkStore }) => ({
     // select account
@@ -56,6 +56,7 @@ import { DialogIndicator } from '../../../components/Indicator';
     values,
     {
       props: {
+        settingsStore,
         networkStore: { allNetworks },
         accountStore,
         navigation
@@ -82,14 +83,27 @@ import { DialogIndicator } from '../../../components/Indicator';
 
       // key has single account
       if (accounts.length === 1) {
-        await accountStore.addAccount({
-          name: accounts[0],
-          privateKey: values.privateKey,
-          networkId: values.networkId,
-          publicKey
-        });
+        const addAccount = async () => {
+          await accountStore.addAccount({
+            name: accounts[0],
+            privateKey: values.privateKey,
+            networkId: values.networkId,
+            publicKey
+          });
 
-        navigation.navigate('Account');
+          navigation.navigate('Account');
+        };
+
+        // new account pincode
+        if (!settingsStore.settings.accountPincodeEnabled) {
+          navigation.navigate('NewPin', {
+            async cb() {
+              await addAccount();
+            }
+          });
+        } else {
+          await addAccount();
+        }
       } else {
         setValues({
           ...values,
@@ -108,15 +122,29 @@ import { DialogIndicator } from '../../../components/Indicator';
 @observer
 export class ImportAccountScreen extends Component {
   async importAccount(name) {
-    const { accountStore, values } = this.props;
-
-    await accountStore.addAccount({
-      ...values,
-      name
-    });
+    const { settingsStore, accountStore, navigation, values } = this.props;
 
     this.hideDialogs();
-    this.moveToAccountScreen();
+
+    const addAccount = async () => {
+      await accountStore.addAccount({
+        ...values,
+        name
+      });
+
+      this.moveToAccountScreen();
+    };
+
+    // new account pincode
+    if (!settingsStore.settings.accountPincodeEnabled) {
+      navigation.navigate('NewPin', {
+        cb: async () => {
+          await addAccount();
+        }
+      });
+    } else {
+      await addAccount();
+    }
   }
 
   hideDialogs() {

@@ -2,7 +2,7 @@ import { observable, action, computed } from 'mobx';
 
 import { AccountService, TransferLogService } from '../services';
 
-import { UserStore } from './';
+import { SettingsStore, PincodeStore } from './';
 
 import api from '../utils/eos/API';
 
@@ -12,7 +12,6 @@ class Store {
 
   @observable
   info = {};
-
   /**
    * { EOS: 100.3213, JUNGLE: 0.1231 }
    */
@@ -25,21 +24,12 @@ class Store {
   @observable
   fetched = false;
 
-  @computed
-  get userAccounts() {
-    return (
-      this.accounts.filter(
-        account => account.userId === UserStore.currentUser.id
-      ) || []
-    );
-  }
-
   findAccount(accountName) {
     if (!accountName) {
-      return this.currentUserAccount;
+      return this.currentAccount;
     }
 
-    const foundAccount = this.userAccounts.find(
+    const foundAccount = this.accounts.find(
       account => account.name === accountName
     );
     if (!foundAccount) {
@@ -51,17 +41,17 @@ class Store {
   }
 
   @computed
-  get currentUserAccount() {
-    const { accountId } = UserStore.currentUser;
+  get currentAccount() {
+    const { accountId } = SettingsStore.settings;
 
-    return this.userAccounts.find(account => account.id === accountId);
+    return this.accounts.find(account => account.id === accountId);
   }
 
   @action
-  async changeUserAccount(accountId) {
-    if (accountId !== UserStore.currentUser.accountId) {
-      // update user info
-      await UserStore.updateUser({ accountId });
+  async changeCurrentAccount(accountId) {
+    if (accountId !== (this.currentAccount && this.currentAccount.accountId)) {
+      // update settings
+      await SettingsStore.updateSettings({ accountId });
       // fetch account info
       await this.getAccountInfo();
     }
@@ -83,11 +73,10 @@ class Store {
   async addAccount(accountInfo) {
     return AccountService.addAccount({
       ...accountInfo,
-      userId: UserStore.currentUser.id,
-      pincode: UserStore.pincode
+      pincode: PincodeStore.accountPincode
     }).then(async account => {
       await this.setAccounts([...this.accounts, account]);
-      await this.changeUserAccount(account.id);
+      await this.changeCurrentAccount(account.id);
       this.getAccountInfo();
     });
   }
@@ -100,8 +89,8 @@ class Store {
       );
 
       this.setAccounts(filterDeletedAccount);
-      this.changeUserAccount(
-        this.userAccounts.length ? this.userAccounts[0].id : ''
+      this.changeCurrentAccount(
+        this.accounts.length ? this.accounts[0].id : ''
       );
     });
   }
@@ -113,7 +102,7 @@ class Store {
     this.actions = [];
     this.fetched = false;
 
-    if (!this.currentUserAccount) {
+    if (!this.currentAccount) {
       this.fetched = true;
       return;
     }
@@ -124,14 +113,14 @@ class Store {
   }
 
   async getInfo() {
-    const account = this.currentUserAccount;
+    const account = this.currentAccount;
     const info = await api.accounts.get({ account_name: account.name });
 
     this.info = info;
   }
 
   async getTokens() {
-    const account = this.currentUserAccount;
+    const account = this.currentAccount;
 
     const tokens = await api.currency.balance({ account: account.name });
 
@@ -145,7 +134,7 @@ class Store {
   }
 
   async getActions() {
-    const account = this.currentUserAccount;
+    const account = this.currentAccount;
 
     const latestActions =
       (
@@ -169,13 +158,13 @@ class Store {
 
   @action
   async transfer(formData) {
-    const { id, name, encryptedPrivateKey } = this.currentUserAccount;
+    const { id, name, encryptedPrivateKey } = this.currentAccount;
 
     return AccountService.transfer({
       ...formData,
       sender: name,
       encryptedPrivateKey,
-      pincode: UserStore.pincode
+      pincode: PincodeStore.accountPincode
     }).then(async tx => {
       // fetch lastets tokens
       await this.getTokens();
@@ -188,13 +177,13 @@ class Store {
 
   @action
   async manageResource(data) {
-    const { name, encryptedPrivateKey } = this.currentUserAccount;
+    const { name, encryptedPrivateKey } = this.currentAccount;
 
     return AccountService.manageResource({
       ...data,
       sender: name,
       encryptedPrivateKey,
-      pincode: UserStore.pincode
+      pincode: PincodeStore.accountPincode
     }).then(async tx => {
       await this.getInfo();
       await this.getTokens();

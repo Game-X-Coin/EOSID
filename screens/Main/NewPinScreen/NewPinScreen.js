@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react/native';
 
-import { ConfirmPincode } from '../../../components/Pincode';
+import { NewPincode } from '../../../components/Pincode';
 
 @inject('pincodeStore')
 @observer
-export class ConfirmPinScreen extends Component {
-  confirmPin = async (pincode, { setFailure }) => {
+export class NewPinScreen extends Component {
+  newPin = async pincode => {
     const { pincodeStore, navigation } = this.props;
 
     try {
@@ -14,21 +14,15 @@ export class ConfirmPinScreen extends Component {
       navigation.state.params && navigation.state.params.cb();
       navigation.goBack(null);
     } catch (error) {
-      setFailure();
+      console.log(error);
     }
   };
 
   render() {
-    const { navigation } = this.props;
-    const pinProps = navigation.state.params
-      ? navigation.state.params.pinProps
-      : {};
-
     return (
-      <ConfirmPincode
-        onEnter={this.confirmPin}
+      <NewPincode
+        onEnter={this.newPin}
         backAction={() => this.props.navigation.goBack(null)}
-        {...pinProps}
       />
     );
   }

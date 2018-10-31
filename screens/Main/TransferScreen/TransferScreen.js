@@ -38,10 +38,10 @@ export class TransferLogs extends Component {
   transferLogs = [];
 
   async componentDidMount() {
-    const { currentUserAccount } = this.props.accountStore;
+    const { currentAccount } = this.props.accountStore;
 
     const logs = await TransferLogService.getTransferLogsByAcocuntId(
-      currentUserAccount.id
+      currentAccount.id
     );
 
     // desc
@@ -174,7 +174,10 @@ export class TransferScreen extends Component {
             </View>
 
             <TransferLogs
-              onLogPress={log => this.onChangeReceiver(log.receiver)}
+              onLogPress={log => {
+                this.onChangeReceiver(log.receiver);
+                this.handleSubmit();
+              }}
             />
           </ScrollView>
         </KeyboardAvoidingView>
