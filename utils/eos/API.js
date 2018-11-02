@@ -14,10 +14,12 @@ class EosApi {
 
   static get Api() {
     const network = NetworkStore.currentNetwork;
+
+    EosApi.isJungleNet = network.url === JUNGLE_NET ? true : false;
+
     if (!EosApi.FetchAPI || EosApi.FetchAPI.baseURL !== network.url) {
       EosApi.FetchAPI = new Fetch({ baseURL: network.url });
     }
-    EosApi.isJungleNet = network.url === JUNGLE_NET ? true : false;
     return EosApi.FetchAPI;
   }
 
@@ -85,13 +87,12 @@ class EosApi {
   static get transactions() {
     return {
       get: ({ id }) =>
-        (EosApi.isJungleNet
+        EosApi.isJungleNet
           ? new Fetch().post(
               `${JUNGLE_HISTORY_NET}/v1/history/get_transaction`,
               { id }
             )
-          : EosApi.Api.post('/v1/history/get_transaction', { id })
-        ).then(res => res.data),
+          : EosApi.Api.post('/v1/history/get_transaction', { id }),
       getRequiredKeys: ({ transaction, available_keys }) =>
         EosApi.Api.post('/v1/chain/get_required_keys', {
           transaction,
