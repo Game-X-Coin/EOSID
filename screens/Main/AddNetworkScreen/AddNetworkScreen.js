@@ -19,7 +19,6 @@ import { DialogIndicator } from '../../../components/Indicator';
   mapPropsToValues: props => ({
     name: '',
     url: '',
-
     showDialog: false
   }),
   validationSchema: props => {
@@ -48,7 +47,8 @@ import { DialogIndicator } from '../../../components/Indicator';
 
       await networkStore.addNetwork({
         name: values.name,
-        url: values.url
+        chainURL: values.url,
+        networkURL: values.url
       });
 
       navigation.navigate('SettingsNetwork');
