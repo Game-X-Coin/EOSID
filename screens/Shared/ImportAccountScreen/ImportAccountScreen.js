@@ -67,15 +67,17 @@ import { DialogIndicator } from '../../../components/Indicator';
       setErrors
     }
   ) => {
+    const { isSignUp } = navigation.state.params || {};
+
+    // avoid modal hiding
+    Keyboard.dismiss();
+
+    const publicKey = api.Key.privateToPublic({ wif: values.privateKey });
+
+    // show loading dialog
+    setFieldValue('showLoadingDialog', true);
+
     try {
-      // avoid modal hiding
-      Keyboard.dismiss();
-
-      const publicKey = api.Key.privateToPublic({ wif: values.privateKey });
-
-      // show loading dialog
-      setFieldValue('showLoadingDialog', true);
-
       const accounts = await AccountService.findKeyAccount(
         publicKey,
         allNetworks.find(({ id }) => id === values.networkId).url
@@ -83,6 +85,11 @@ import { DialogIndicator } from '../../../components/Indicator';
 
       // key has single account
       if (accounts.length === 1) {
+        setValues({
+          ...values,
+          showLoadingDialog: false
+        });
+
         const addAccount = async () => {
           await accountStore.addAccount({
             name: accounts[0],
@@ -91,7 +98,7 @@ import { DialogIndicator } from '../../../components/Indicator';
             publicKey
           });
 
-          navigation.navigate('Account');
+          isSignUp ? navigation.navigate('Account') : navigation.goBack(null);
         };
 
         // new account pincode
@@ -132,7 +139,7 @@ export class ImportAccountScreen extends Component {
         name
       });
 
-      this.moveToAccountScreen();
+      this.moveScreen();
     };
 
     // new account pincode
@@ -152,8 +159,11 @@ export class ImportAccountScreen extends Component {
     this.props.setFieldValue('showDialog', false);
   }
 
-  moveToAccountScreen() {
-    this.props.navigation.navigate('Account');
+  moveScreen() {
+    const { navigation } = this.props;
+    const { isSignUp } = navigation.state.params || {};
+
+    isSignUp ? navigation.navigate('Account') : navigation.goBack(null);
   }
 
   render() {
@@ -260,7 +270,7 @@ export class ImportAccountScreen extends Component {
             {isSignUp && (
               <Button
                 style={{ flex: 1, padding: 5, borderRadius: 0 }}
-                onPress={() => this.moveToAccountScreen()}
+                onPress={() => navigation.navigate('Account')}
               >
                 Skip
               </Button>
