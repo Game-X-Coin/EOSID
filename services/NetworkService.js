@@ -17,7 +17,7 @@ export class NetworkService {
     let info;
 
     try {
-      info = await api.info.getBy(networkInfo.url);
+      info = await api.info.get(networkInfo.ChainURL);
     } catch (error) {
       return Promise.reject(NetworkError.NoResponseUrl);
     }

@@ -73,8 +73,6 @@ export class AccountService {
     // decrypt private key
     const privateKey = AccountService.decryptKey(encryptedPrivateKey, pincode);
 
-    console.log(receiver);
-
     return await api.transactions.transfer({
       ...transferInfo,
       privateKey,
@@ -100,5 +98,12 @@ export class AccountService {
     const params = { ...data, privateKey, pincode };
 
     return await transactionFunction(params);
+  }
+
+  static sign({ pincode, encryptedPrivateKey, data }) {
+    // decrypt privatekey
+    const privateKey = AccountService.decryptKey(encryptedPrivateKey, pincode);
+
+    return api.Sign.get({ privateKey, data });
   }
 }

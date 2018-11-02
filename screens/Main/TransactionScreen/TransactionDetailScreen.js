@@ -7,7 +7,7 @@ import moment from 'moment';
 import HomeStyle from '../../../styles/HomeStyle';
 import { PageIndicator } from '../../../components/Indicator';
 
-@inject('userStore', 'networkStore')
+@inject('networkStore')
 @observer
 export class TransactionDetailScreen extends Component {
   constructor() {
@@ -26,7 +26,9 @@ export class TransactionDetailScreen extends Component {
     } = this.props;
 
     const txId = state.params.txId;
-    const transaction = await eos.transactions.get(txId);
+    const transaction = await eos.transactions.get({ id: txId });
+
+    console.log(transaction);
 
     this.setState({ fetched: true, info: transaction });
   }
@@ -123,6 +125,7 @@ export class TransactionDetailScreen extends Component {
 
                   {fetched &&
                     info &&
+                    info.trx.trx && 
                     info.trx.trx.actions.map((action, i) => (
                       <View key={i}>
                         <View style={{ flexDirection: 'row', marginBottom: 5 }}>
