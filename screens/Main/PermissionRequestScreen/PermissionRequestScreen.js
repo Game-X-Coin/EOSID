@@ -33,7 +33,7 @@ export class PermissionRequestScreen extends Component {
   changeAccountDialog = false;
 
   @observable
-  selectedAccount = this.props.accountStore.currentUserAccount;
+  selectedAccount = this.props.accountStore.currentAccount;
 
   constructor(params) {
     super(params);
@@ -54,7 +54,7 @@ export class PermissionRequestScreen extends Component {
       }
     } = this.props.navigation.state;
 
-    const app = this.getApp(parseInt(params.appId)) || {};
+    const app = this.getApp(parseFloat(params.appId)) || {};
 
     this.setState({ params, app });
   }
@@ -77,7 +77,7 @@ export class PermissionRequestScreen extends Component {
         titleEnter: `Sign ${app.name} by entering PIN code`
       },
       async cb() {
-        const currentAccount = accountStore.currentUserAccount;
+        const currentAccount = accountStore.currentAccount;
 
         const signature = api.Sign.get({
           data: params.q,
@@ -104,7 +104,7 @@ export class PermissionRequestScreen extends Component {
 
   render() {
     const { changeAccountDialog, selectedAccount } = this;
-    const { userAccounts } = this.props.accountStore;
+    const { accounts } = this.props.accountStore;
     const { params, app } = this.state;
     console.log({ params });
     console.log({ app });
@@ -127,7 +127,7 @@ export class PermissionRequestScreen extends Component {
         >
           <Dialog.Title>Change Account</Dialog.Title>
           <Dialog.Content>
-            {userAccounts.map(account => (
+            {accounts.map(account => (
               <List.Item
                 key={account.id}
                 title={account.name}

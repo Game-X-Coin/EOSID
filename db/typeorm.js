@@ -1,11 +1,16 @@
 import { createConnection } from 'typeorm-expo/browser';
 
-import { UserModel, NetworkModel, AccountModel, TransferLogModel } from './';
+import {
+  NetworkModel,
+  AccountModel,
+  TransferLogModel,
+  SettingsModel
+} from './';
 
 export const initializeDB = () =>
   createConnection({
     database: 'eosid',
-    entities: [UserModel, NetworkModel, AccountModel, TransferLogModel],
+    entities: [NetworkModel, AccountModel, TransferLogModel, SettingsModel],
     synchronize: true,
     type: 'expo'
   });

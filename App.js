@@ -4,12 +4,18 @@ import { Provider as PaperProvider } from 'react-native-paper';
 
 import RenderApp from './RenderApp';
 
-import { UserStore, NetworkStore, AccountStore } from './stores';
+import {
+  PincodeStore,
+  SettingsStore,
+  NetworkStore,
+  AccountStore
+} from './stores';
 
 export default class App extends Component {
   render() {
     const stores = {
-      userStore: UserStore,
+      pincodeStore: PincodeStore,
+      settingsStore: SettingsStore,
       networkStore: NetworkStore,
       accountStore: AccountStore
     };

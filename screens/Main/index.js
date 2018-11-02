@@ -8,3 +8,4 @@ export * from './TransferScreen';
 export * from './ConfirmPinScreen';
 export * from './PermissionRequestScreen';
 export * from './ManageResourceScreen';
+export * from './NewPinScreen';

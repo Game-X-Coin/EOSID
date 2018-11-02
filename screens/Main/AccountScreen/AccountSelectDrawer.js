@@ -23,7 +23,7 @@ export class AccountSelectDrawer extends Component {
 
   render() {
     const { visible, onHide = () => null } = this.props;
-    const { currentUserAccount, userAccounts } = this.props.accountStore;
+    const { currentAccount, accounts } = this.props.accountStore;
 
     return (
       <Portal>
@@ -39,14 +39,14 @@ export class AccountSelectDrawer extends Component {
             }}
             title="Select to change account"
           >
-            {userAccounts.map(({ id, name }) => (
+            {accounts.map(({ id, name }) => (
               <List.Item
                 key={id}
                 title={name}
                 right={() => (
                   <RadioButton
                     status={
-                      name === (currentUserAccount && currentUserAccount.name)
+                      name === (currentAccount && currentAccount.name)
                         ? 'checked'
                         : 'unchecked'
                     }

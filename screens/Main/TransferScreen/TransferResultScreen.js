@@ -48,7 +48,7 @@ export class TransferResultScreen extends Component {
           </View>
 
           <Button mode="outlined" onPress={() => this.confirm()}>
-            Confirm
+            Close
           </Button>
         </EmptyState>
       );
@@ -110,7 +110,7 @@ export class TransferResultScreen extends Component {
           color="#fff"
           onPress={() => this.confirm()}
         >
-          Confirm
+          Close
         </Button>
       </SafeAreaView>
     );
