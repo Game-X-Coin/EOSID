@@ -60,8 +60,8 @@ class EosApi {
 
   static get accounts() {
     return {
-      get: ({ account_name }) =>
-        EosApi.ChainAPI().post('/v1/chain/get_account', { account_name }),
+      get: ({ account_name, url }) =>
+        EosApi.ChainAPI(url).post('/v1/chain/get_account', { account_name }),
       getsByPublicKey: (public_key, url) =>
         EosApi.HistoryAPI(url).post('/v1/history/get_key_accounts', {
           public_key

@@ -78,13 +78,24 @@ import { DialogIndicator } from '../../../components/Indicator';
     setFieldValue('showLoadingDialog', true);
 
     try {
+      const network = allNetworks.find(({ id }) => id === values.networkId);
       const accounts = await AccountService.findKeyAccount(
         publicKey,
-        allNetworks.find(({ id }) => id === values.networkId).historyURL
+        network.historyURL
       );
 
       // key has single account
       if (accounts.length === 1) {
+        const accountName = accounts[0];
+        const accountInfo = await api.accounts.get({
+          account_name: accountName,
+          url: network.chainURL
+        });
+        const permissions = accountInfo.permissions;
+        const permission = permissions.find(permission =>
+          permission.required_auth.keys.find(key => key.key === publicKey)
+        );
+
         setValues({
           ...values,
           showLoadingDialog: false
@@ -92,10 +103,11 @@ import { DialogIndicator } from '../../../components/Indicator';
 
         const addAccount = async () => {
           await accountStore.addAccount({
-            name: accounts[0],
+            name: accountName,
             privateKey: values.privateKey,
             networkId: values.networkId,
-            publicKey
+            publicKey,
+            permission: permission.perm_name
           });
 
           isSignUp ? navigation.navigate('Account') : navigation.goBack(null);
@@ -129,14 +141,34 @@ import { DialogIndicator } from '../../../components/Indicator';
 @observer
 export class ImportAccountScreen extends Component {
   async importAccount(name) {
-    const { settingsStore, accountStore, navigation, values } = this.props;
+    const {
+      networkStore: { allNetworks },
+      settingsStore,
+      accountStore,
+      navigation,
+      values
+    } = this.props;
 
     this.hideDialogs();
+
+    const publicKey = api.Key.privateToPublic({ wif: values.privateKey });
+    const network = allNetworks.find(({ id }) => id === values.networkId);
+
+    const accountInfo = await api.accounts.get({
+      account_name: name,
+      url: network.chainURL
+    });
+    const permissions = accountInfo.permissions;
+    const permission = permissions.find(permission =>
+      permission.required_auth.keys.find(key => key.key === publicKey)
+    );
 
     const addAccount = async () => {
       await accountStore.addAccount({
         ...values,
-        name
+        name,
+        publicKey,
+        permission: permission.perm_name
       });
 
       this.moveScreen();

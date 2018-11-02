@@ -57,15 +57,26 @@ export class AccountModel {
   @Column('varchar')
   networkId = '';
 
+  @Column('varchar')
+  permission = '';
+
   constructor(data) {
     if (data) {
-      const { id, name, publicKey, encryptedPrivateKey, networkId } = data;
+      const {
+        id,
+        name,
+        publicKey,
+        encryptedPrivateKey,
+        networkId,
+        permission
+      } = data;
 
       this.id = id;
       this.name = name;
       this.publicKey = publicKey;
       this.encryptedPrivateKey = encryptedPrivateKey;
       this.networkId = networkId;
+      this.permission = permission;
     }
   }
 
