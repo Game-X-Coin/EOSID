@@ -10,11 +10,12 @@ export class ConfirmPinScreen extends Component {
     const { pincodeStore, navigation } = this.props;
 
     try {
-      await pincodeStore.saveAccountPincode(pincode);
-      navigation.state.params && navigation.state.params.cb();
-      navigation.goBack(null);
+      await pincodeStore.validateAccountPincode(pincode);
     } catch (error) {
       setFailure();
+    } finally {
+      navigation.state.params && navigation.state.params.cb();
+      navigation.goBack(null);
     }
   };
 
