@@ -11,33 +11,23 @@ class Store {
   appPincode = '';
 
   @action
-  async getPincodes() {
-    await Promise.all([this.getAccountPincode(), this.getAppPincode()]);
-  }
-
-  @action
-  async getAccountPincode() {
-    this.accountPincode = await PincodeService.getPincode('account');
-  }
-
-  @action
-  async getAppPincode() {
-    this.appPincode = await PincodeService.getPincode('app');
-  }
-
-  @action
   async validateAppPincode(pincode) {
-    return PincodeService.validatePincode(pincode, 'app');
+    return PincodeService.validatePincode(pincode, 'app').then(() => {
+      this.appPincode = pincode;
+    });
   }
 
   @action
   async validateAccountPincode(pincode) {
-    return PincodeService.validatePincode(pincode, 'account');
+    return PincodeService.validatePincode(pincode, 'account').then(() => {
+      this.accountPincode = pincode;
+    });
   }
 
   @action
   async saveAppPincode(pincode) {
-    return PincodeService.savePincode(pincode, 'app').then(async pincode => {
+    return PincodeService.savePincode(pincode, 'app').then(async () => {
+      this.appPincode = pincode;
       await SettingsStore.updateSettings({ appPincodeEnabled: true });
     });
   }
@@ -45,6 +35,7 @@ class Store {
   @action
   async saveAccountPincode(pincode) {
     return PincodeService.savePincode(pincode, 'account').then(async () => {
+      this.accountPincode = pincode;
       await SettingsStore.updateSettings({ accountPincodeEnabled: true });
     });
   }
