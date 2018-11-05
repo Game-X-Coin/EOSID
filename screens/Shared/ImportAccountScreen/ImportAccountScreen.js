@@ -80,7 +80,7 @@ import { DialogIndicator } from '../../../components/Indicator';
     try {
       const accounts = await AccountService.findKeyAccount(
         publicKey,
-        allNetworks.find(({ id }) => id === values.networkId).url
+        allNetworks.find(({ id }) => id === values.networkId).historyURL
       );
 
       // key has single account

@@ -5,26 +5,39 @@ import { AccountStore, NetworkStore } from '../../stores';
 import { AccountService } from '../../services';
 import Fetch from '../Fetch';
 
-const JUNGLE_NET = 'http://jungle.cryptolions.io:18888';
-const JUNGLE_HISTORY_NET = 'http://junglehistory.cryptolions.io:18888';
-
 class EosApi {
-  static FetchAPI = null;
+  static FetchChain = null;
+  static FetchHistory = null;
   static isJungleNet = false;
 
-  static get Api() {
-    const network = NetworkStore.currentNetwork;
-    if (!EosApi.FetchAPI || EosApi.FetchAPI.baseURL !== network.url) {
-      EosApi.FetchAPI = new Fetch({ baseURL: network.url });
+  static API(url, fetchAPI) {
+    if (!fetchAPI || fetchAPI.baseURL !== url) {
+      fetchAPI = new Fetch({ baseURL: url });
     }
-    EosApi.isJungleNet = network.url === JUNGLE_NET ? true : false;
-    return EosApi.FetchAPI;
+    return fetchAPI;
+  }
+
+  static ChainAPI(url) {
+    if (url) {
+      return new Fetch({ baseURL: url });
+    }
+    const network = NetworkStore.currentNetwork;
+    EosApi.FetchChain = EosApi.API(network.chainURL, EosApi.FetchChain);
+    return EosApi.FetchChain;
+  }
+
+  static HistoryAPI(url) {
+    if (url) {
+      return new Fetch({ baseURL: url });
+    }
+    const network = NetworkStore.currentNetwork;
+    EosApi.FetchHistory = EosApi.API(network.historyURL, EosApi.FetchHistory);
+    return EosApi.FetchHistory;
   }
 
   static get Rpc() {
     const network = NetworkStore.currentNetwork;
-    EosApi.isJungleNet = network.url === JUNGLE_NET ? true : false;
-    return new JsonRpc(network.url, { fetch });
+    return new JsonRpc(network.chainURL, { fetch });
   }
 
   static getApi({ accountName, privateKey, pincode } = {}) {
@@ -48,15 +61,13 @@ class EosApi {
   static get accounts() {
     return {
       get: ({ account_name }) =>
-        EosApi.Api.post('/v1/chain/get_account', { account_name }),
+        EosApi.ChainAPI().post('/v1/chain/get_account', { account_name }),
       getsByPublicKey: (public_key, url) =>
-        url
-          ? new Fetch({ baseURL: url }).post('/v1/history/get_key_accounts', {
-              public_key
-            })
-          : EosApi.Api.post('/v1/history/get_key_accounts', { public_key }),
+        EosApi.HistoryAPI(url).post('/v1/history/get_key_accounts', {
+          public_key
+        }),
       getControlledAccounts: ({ controlling_account }) =>
-        EosApi.Api.post('/v1/history/get_controlled_accounts', {
+        EosApi.HistoryAPI().post('/v1/history/get_controlled_accounts', {
           controlling_account
         })
     };
@@ -65,13 +76,16 @@ class EosApi {
   static get currency() {
     return {
       balance: ({ code = 'eosio.token', account, symbol }) =>
-        EosApi.Api.post('/v1/chain/get_currency_balance', {
+        EosApi.ChainAPI().post('/v1/chain/get_currency_balance', {
           code,
           account,
           symbol
         }),
       stats: ({ code = 'eosio.token', symbol = 'EOS' }) =>
-        EosApi.Api.post('/v1/chain/get_currency_stats', { code, symbol }),
+        EosApi.ChainAPI().post('/v1/chain/get_currency_stats', {
+          code,
+          symbol
+        }),
       precision: ({ account = 'eosio.token', symbol = 'EOS' }) => {
         if (symbol === 'EOS') {
           return 4;
@@ -85,20 +99,14 @@ class EosApi {
   static get transactions() {
     return {
       get: ({ id }) =>
-        (EosApi.isJungleNet
-          ? new Fetch().post(
-              `${JUNGLE_HISTORY_NET}/v1/history/get_transaction`,
-              { id }
-            )
-          : EosApi.Api.post('/v1/history/get_transaction', { id })
-        ).then(res => res.data),
+        EosApi.HistoryAPI().post('/v1/history/get_transaction', { id }),
       getRequiredKeys: ({ transaction, available_keys }) =>
-        EosApi.Api.post('/v1/chain/get_required_keys', {
+        EosApi.ChainAPI().post('/v1/chain/get_required_keys', {
           transaction,
           available_keys
         }),
       gets: ({ scope, code, table, json, lower_bound, upper_bound, limit }) =>
-        EosApi.Api.post('/v1/chain/get_table_rows', {
+        EosApi.ChainAPI().post('/v1/chain/get_table_rows', {
           scope,
           code,
           table,
@@ -307,7 +315,7 @@ class EosApi {
   static get actions() {
     return {
       get: ({ pos, offset, account_name }) =>
-        EosApi.Api.post('/v1/history/get_actions', {
+        EosApi.HistoryAPI().post('/v1/history/get_actions', {
           pos,
           offset,
           account_name
@@ -323,29 +331,24 @@ class EosApi {
           pos = -1;
         }
 
-        return EosApi.isJungleNet
-          ? new Fetch().post(`${JUNGLE_HISTORY_NET}/v1/history/get_actions`, {
-              pos: pos || latestSeq - page * offset,
-              offset,
-              account_name
-            })
-          : EosApi.Api.post('/v1/history/get_actions', {
-              pos: pos || latestSeq - page * offset,
-              offset,
-              account_name
-            });
+        return EosApi.HistoryAPI().post('/v1/history/get_actions', {
+          pos: pos || latestSeq - page * offset,
+          offset,
+          account_name
+        });
       }
     };
   }
   get producers() {
     return {
-      get: ({ id }) => EosApi.Api.post('/v1/history/get_transaction', { id })
+      get: ({ id }) =>
+        EosApi.HistoryAPI().post('/v1/history/get_transaction', { id })
     };
   }
   static get code() {
     return {
       get: ({ account_name }) =>
-        EosApi.Api.post('/v1/chain/get_code', {
+        EosApi.ChainAPI().post('/v1/chain/get_code', {
           account_name,
           code_as_wasm: true
         })
@@ -354,25 +357,22 @@ class EosApi {
   static get abi() {
     return {
       get: ({ account_name }) =>
-        EosApi.Api.post('/v1/chain/get_abi', { account_name })
+        EosApi.ChainAPI().post('/v1/chain/get_abi', { account_name })
     };
   }
   static get blocks() {
     return {
       get: ({ block_num_or_id }) =>
-        EosApi.Api.post('/v1/chain/block', { block_num_or_id }).then(
-          res => res.data
-        ),
+        EosApi.ChainAPI().post('/v1/chain/block', { block_num_or_id }),
       getHeaderState: ({ block_num_or_id }) =>
-        EosApi.Api.post('/v1/chain/get_block_header_state', {
+        EosApi.ChainAPI().post('/v1/chain/get_block_header_state', {
           block_num_or_id
-        }).then(res => res.data)
+        })
     };
   }
   static get info() {
     return {
-      get: () => EosApi.Api.post('/v1/chain/get_info', {}),
-      getBy: url => new Fetch({ baseURL: url }).post('/v1/chain/get_info', {})
+      get: url => EosApi.ChainAPI(url).post('/v1/chain/get_info', {})
     };
   }
   static get Key() {
