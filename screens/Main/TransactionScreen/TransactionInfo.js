@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { FlatList, View } from 'react-native';
 import { observable, computed } from 'mobx';
 import { observer, inject } from 'mobx-react';
-import { Caption, List } from 'react-native-paper';
+import { Caption, List, Text, TouchableRipple } from 'react-native-paper';
 import { withNavigation } from 'react-navigation';
 import moment from 'moment';
 
@@ -76,6 +76,19 @@ export class TransactionInfo extends Component {
   render() {
     const { actions, fetched } = this.props.accountStore;
 
+    /** example
+     *  {
+     *    2018-10-11: [
+     *       ...actions.
+     *    ],
+     *  };
+     */
+    const groupedActions = actions.reduce((pv, action) => {
+      const time = moment(action.block_time).format('MM/DD');
+
+      return { ...pv, [time]: pv[time] ? [...pv[time], action] : [action] };
+    }, {});
+
     if (!fetched) {
       return <PageIndicator />;
     }
@@ -86,30 +99,53 @@ export class TransactionInfo extends Component {
 
     return (
       <FlatList
-        keyExtractor={item => `${item.global_action_seq}`}
-        data={actions}
+        keyExtractor={time => time}
+        data={Object.keys(groupedActions)}
         onEndReachedThreshold={0.5}
         refreshing={this.refreshing}
         onRefresh={this.onRefresh}
         onEndReached={this.onEndReached}
         ListFooterComponent={this.renderFooter}
-        renderItem={({
-          item: { block_time, action_trace, global_action_seq }
-        }) => (
-          <List.Item
-            title={action_trace.act.name}
-            description={action_trace.act.account}
-            right={() => (
-              <Caption style={{ alignSelf: 'center' }}>
-                {moment(block_time).fromNow()}
-              </Caption>
+        renderItem={({ item: time }) => (
+          <List.Section title={time}>
+            {groupedActions[time].map(
+              ({ account_action_seq, action_trace, block_time }) => (
+                <TouchableRipple
+                  key={account_action_seq}
+                  style={{ paddingHorizontal: 15, paddingVertical: 10 }}
+                  onPress={() =>
+                    this.props.navigation.navigate('TransactionDetail', {
+                      txId: action_trace.trx_id
+                    })
+                  }
+                >
+                  <View style={{ flexDirection: 'row' }}>
+                    <View style={{ flex: 1 }}>
+                      <View style={{ flexDirection: 'row' }}>
+                        <Text style={{ marginRight: 7, fontSize: 17 }}>
+                          {action_trace.act.name}
+                        </Text>
+                        <Caption>{action_trace.act.account}</Caption>
+                      </View>
+
+                      <Caption numberOfLines={2}>
+                        {JSON.stringify(action_trace.act.data)}
+                      </Caption>
+                    </View>
+                    <Text
+                      style={{
+                        alignSelf: 'center',
+                        paddingLeft: 15,
+                        fontSize: 13
+                      }}
+                    >
+                      {moment(block_time).format('hh:mm')}
+                    </Text>
+                  </View>
+                </TouchableRipple>
+              )
             )}
-            onPress={() =>
-              this.props.navigation.navigate('TransactionDetail', {
-                txId: action_trace.trx_id
-              })
-            }
-          />
+          </List.Section>
         )}
       />
     );
