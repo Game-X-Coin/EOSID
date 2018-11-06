@@ -33,16 +33,28 @@ export class AccountService {
     // encrypt private key
     const encryptedPrivateKey = AccountService.encryptKey(privateKey, pincode);
 
-    // create new account instance
-    const newAccount = new AccountModel({
-      ...accountInfo,
-      encryptedPrivateKey
+    let account = await AccountRepo.findOne({ name: accountInfo.name });
+
+    accountInfo.permissions.forEach(permission => {
+      if (!account) {
+        // create new account instance
+        account = new AccountModel({
+          ...accountInfo,
+          permission,
+          encryptedPrivateKey
+        });
+      } else {
+        const foundKey = AccountService.getKey(account, permission);
+        if (foundKey) {
+          return Promise.reject(AccountError.DuplicateKey);
+        }
+        const { publicKey } = accountInfo;
+        const key = { publicKey, encryptedPrivateKey, permission };
+        account.keys = AccountService.setKey(account.keys, key);
+      }
     });
-
     // save
-    await AccountRepo.save(newAccount);
-
-    return newAccount;
+    return await AccountRepo.save(account);
   }
 
   static async removeAccount(accountId) {
@@ -55,12 +67,39 @@ export class AccountService {
     await AccountRepo.remove(findAccount);
   }
 
-  static encryptKey(encryptedPrivateKey, pincode) {
-    return AES.encrypt(encryptedPrivateKey, pincode).toString();
+  static encryptKey(encryptedPrivateKey, pinCode) {
+    return AES.encrypt(encryptedPrivateKey, pinCode).toString();
   }
 
-  static decryptKey(encryptedPrivateKey, pincode) {
-    return AES.decrypt(encryptedPrivateKey, pincode).toString(enc.Utf8);
+  static decryptKey(encryptedPrivateKey, pinCode) {
+    return AES.decrypt(encryptedPrivateKey, pinCode).toString(enc.Utf8);
+  }
+
+  static getParsingKey(key) {
+    key = key.replace(/\|/g, ',');
+    return JSON.parse(key);
+  }
+  static getKey(account, permission = 'active') {
+    let foundKey = null;
+    account.keys.every(key => {
+      key = AccountService.getParsingKey(key);
+      if (key.permission === permission) {
+        foundKey = key;
+        return false;
+      }
+    });
+
+    return foundKey;
+  }
+
+  static setKey(keys, key) {
+    if (!keys) {
+      keys = [];
+    }
+    key = JSON.stringify(key);
+    key = key.replace(/,/g, '|');
+    keys.push(key);
+    return keys;
   }
 
   static async transfer({
@@ -88,12 +127,12 @@ export class AccountService {
     isStaking,
     ...data
   }) {
-    // decrypt privatekey
+    // decrypt private key
     const privateKey = AccountService.decryptKey(encryptedPrivateKey, pincode);
 
     const transactionFunction = isStaking
       ? api.transactions.stake
-      : api.transactions.unstake;
+      : api.transactions.unStake;
 
     const params = { ...data, privateKey, pincode };
 
@@ -101,7 +140,7 @@ export class AccountService {
   }
 
   static sign({ pincode, encryptedPrivateKey, data }) {
-    // decrypt privatekey
+    // decrypt private key
     const privateKey = AccountService.decryptKey(encryptedPrivateKey, pincode);
 
     return api.Sign.get({ privateKey, data });

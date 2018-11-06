@@ -1,4 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm-expo/browser';
+import { AccountService } from '../services';
 
 export const ACCOUNT_KEY = 'Account';
 
@@ -37,6 +38,14 @@ export class AccountError {
       }
     });
   }
+
+  static get DuplicateKey() {
+    return new AccountError({
+      errors: {
+        privateKey: 'Already Imported Key'
+      }
+    });
+  }
 }
 
 // define model
@@ -49,23 +58,28 @@ export class AccountModel {
   name = '';
 
   @Column('varchar')
-  publicKey = '';
-
-  @Column('varchar')
-  encryptedPrivateKey = '';
-
-  @Column('varchar')
   networkId = '';
+
+  @Column('simple-array')
+  keys = [];
 
   constructor(data) {
     if (data) {
-      const { id, name, publicKey, encryptedPrivateKey, networkId } = data;
+      const {
+        id,
+        name,
+        publicKey,
+        encryptedPrivateKey,
+        networkId,
+        permission
+      } = data;
 
       this.id = id;
       this.name = name;
-      this.publicKey = publicKey;
-      this.encryptedPrivateKey = encryptedPrivateKey;
       this.networkId = networkId;
+
+      const key = { publicKey, encryptedPrivateKey, permission };
+      this.keys = AccountService.setKey(this.keys, key);
     }
   }
 

@@ -44,26 +44,35 @@ export class PermissionRequestInfo extends Component {
 
     this.state = {
       params: {},
-      app: {}
+      app: {},
+      currentPermission: 'active'
     };
   }
 
   componentDidMount() {
-    const { navigation } = this.props;
-    const { params } = navigation.state;
+    const { params } = this.props.navigation.state;
 
-    const app = this.getApp(parseFloat(params.appId)) || {};
+    const app = this.getApp(params.appId) || {};
 
     this.setState({ params, app });
   }
 
   showAccountDialog = () => (this.accountDialogVisible = true);
   hideAccountDialog = () => (this.accountDialogVisible = false);
-  changeAccount = async account => {
+  changeAccount = async (account, permission = 'active') => {
+    const {
+      accountStore: { currentAccount }
+    } = this.props;
+    const { currentPermission } = this.state;
     this.hideAccountDialog();
 
     this.loadAccount = true;
-    await this.props.accountStore.changeCurrentAccount(account.id);
+    if (currentAccount.id !== account.id) {
+      await this.props.accountStore.changeCurrentAccount(account.id);
+    }
+    if (currentPermission !== permission) {
+      this.setState({ currentPermission: permission });
+    }
     this.loadAccount = false;
   };
 
@@ -75,6 +84,8 @@ export class PermissionRequestInfo extends Component {
     } = this.props;
 
     const { params, app } = this.state;
+    const permission = params.permission || 'active';
+    const key = AccountService.getKey(currentAccount, permission);
 
     navigation.navigate('ConfirmPin', {
       pinProps: {
@@ -84,14 +95,15 @@ export class PermissionRequestInfo extends Component {
       cb() {
         const signature = AccountService.sign({
           pincode: pincodeStore.accountPincode,
-          encryptedPrivateKey: currentAccount.encryptedPrivateKey,
+          encryptedPrivateKey: key.encryptedPrivateKey,
           data: params.q
         });
 
         const result = {
           signature,
           account: currentAccount.name,
-          publicKey: currentAccount.publicKey
+          publicKey: key.publicKey,
+          permission
         };
 
         if (params.redirectURL) {
@@ -114,7 +126,7 @@ export class PermissionRequestInfo extends Component {
   render() {
     const { accountDialogVisible, loadAccount } = this;
     const { accounts, currentAccount } = this.props.accountStore;
-    const { params, app } = this.state;
+    const { params, app, currentPermission } = this.state;
 
     const RenderRequest = () => {
       const requestTypes = {
@@ -134,20 +146,31 @@ export class PermissionRequestInfo extends Component {
         >
           <Dialog.Title>Change Account</Dialog.Title>
           <Dialog.Content>
-            {accounts.map(account => (
-              <List.Item
-                key={account.id}
-                title={account.name}
-                right={() => (
-                  <RadioButton
-                    status={
-                      account.id === currentAccount.id ? 'checked' : 'unchecked'
-                    }
+            {accounts.map(account =>
+              account.keys.map(key => {
+                key = AccountService.getParsingKey(key);
+                return (
+                  <List.Item
+                    key={account.id}
+                    title={`${account.name}@${key.permission}`}
+                    right={() => (
+                      <RadioButton
+                        status={
+                          account.id === currentAccount.id &&
+                          key.permission === currentPermission
+                            ? 'checked'
+                            : 'unchecked'
+                        }
+                        onPress={() =>
+                          this.changeAccount(account, key.permission)
+                        }
+                      />
+                    )}
+                    onPress={() => this.changeAccount(account, key.permission)}
                   />
-                )}
-                onPress={() => this.changeAccount(account)}
-              />
-            ))}
+                );
+              })
+            )}
           </Dialog.Content>
         </Dialog>
       </Portal>
@@ -209,7 +232,10 @@ export class PermissionRequestInfo extends Component {
             >
               <View style={{ flex: 1 }}>
                 <Caption>Access Account</Caption>
-                <Text>{currentAccount && currentAccount.name}</Text>
+                <Text>
+                  {currentAccount &&
+                    `${currentAccount.name}@${currentPermission}`}
+                </Text>
               </View>
 
               <Button mode="contained" compact onPress={this.showAccountDialog}>
