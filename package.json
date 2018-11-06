@@ -24,7 +24,7 @@
     "ios": "expo start --ios",
     "build:android": "expo build:android",
     "build:ios": "expo build:ios",
-    "test": "jest",
+    "test": "jest --u",
     "eject": "expo eject",
     "lint-js": "eslint --ignore-path .gitignore --ignore-pattern \"!**/.*\" ."
   },
