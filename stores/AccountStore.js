@@ -75,7 +75,10 @@ class Store {
       ...accountInfo,
       pincode: PincodeStore.accountPincode
     }).then(async account => {
-      await this.setAccounts([...this.accounts, account]);
+      //remove duplicate entity
+      this.accounts = this.accounts.filter(entity => entity.id !== account.id);
+      this.accounts.push(account);
+      await this.setAccounts(this.accounts);
       await this.changeCurrentAccount(account.id);
       this.getAccountInfo();
     });
