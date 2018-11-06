@@ -10,7 +10,16 @@ export class WelcomeScreen extends Component {
   componentDidMount() {
     const { navigation, settingsStore } = this.props;
 
-    if (settingsStore.initialized) {
+    // app pincode is enabled
+    if (settingsStore.settings.appPincodeEnabled) {
+      navigation.navigate('ConfirmAppPin', {
+        cantBack: true,
+        cb: () => {
+          navigation.navigate('Account');
+        }
+      });
+      // app already initialized
+    } else if (settingsStore.initialized) {
       navigation.navigate('Account');
     }
   }
