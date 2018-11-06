@@ -41,21 +41,24 @@ export class NewPincode extends Component {
 
   render() {
     const { isSetMode } = this;
-    const { backAction = () => null } = this.props;
+    const {
+      description = 'Set password to secure your account.',
+      backAction
+    } = this.props;
 
     const title = isSetMode ? 'Set Password' : 'Confirm Password';
 
     return (
       <React.Fragment>
         <Appbar.Header style={{ backgroundColor: 'transparent' }} dark>
-          <Appbar.BackAction onPress={backAction} />
+          {backAction && <Appbar.BackAction onPress={backAction} />}
           <Appbar.Content title={title} />
         </Appbar.Header>
 
         {isSetMode ? (
           <Pincode
             key="set"
-            description="Set password to secure your account."
+            description={description}
             disabled={this.disabled}
             onEnter={v => this.setPincode(v)}
           />

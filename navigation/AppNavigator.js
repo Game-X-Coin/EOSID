@@ -1,8 +1,8 @@
 import { createSwitchNavigator } from 'react-navigation';
 
-import { AuthStackNavigator, MainStackNavigator } from './navigators';
+import { AuthSwitchNavigator, MainStackNavigator } from './navigators';
 
 export default createSwitchNavigator({
-  Auth: AuthStackNavigator,
+  Auth: AuthSwitchNavigator,
   Main: MainStackNavigator
 });
