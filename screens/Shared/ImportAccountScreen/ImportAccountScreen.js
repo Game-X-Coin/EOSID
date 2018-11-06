@@ -92,8 +92,11 @@ import { DialogIndicator } from '../../../components/Indicator';
           url: network.chainURL
         });
         const permissions = accountInfo.permissions;
-        const permission = permissions.find(permission =>
+        const foundPermissions = permissions.filter(permission =>
           permission.required_auth.keys.find(key => key.key === publicKey)
+        );
+        const permissionNames = foundPermissions.map(
+          permission => permission.perm_name
         );
 
         setValues({
@@ -107,7 +110,7 @@ import { DialogIndicator } from '../../../components/Indicator';
             privateKey: values.privateKey,
             networkId: values.networkId,
             publicKey,
-            permission: permission.perm_name
+            permissions: permissionNames
           });
 
           isSignUp ? navigation.navigate('Account') : navigation.goBack(null);
@@ -159,8 +162,11 @@ export class ImportAccountScreen extends Component {
       url: network.chainURL
     });
     const permissions = accountInfo.permissions;
-    const permission = permissions.find(permission =>
+    const foundPermissions = permissions.filter(permission =>
       permission.required_auth.keys.find(key => key.key === publicKey)
+    );
+    const permissionNames = foundPermissions.map(
+      permission => permission.perm_name
     );
 
     const addAccount = async () => {
@@ -168,7 +174,7 @@ export class ImportAccountScreen extends Component {
         ...values,
         name,
         publicKey,
-        permission: permission.perm_name
+        permissions: permissionNames
       });
 
       this.moveScreen();

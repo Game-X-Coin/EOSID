@@ -157,32 +157,36 @@ class Store {
   }
 
   @action
-  async transfer(formData) {
-    const { id, name, encryptedPrivateKey } = this.currentAccount;
+  async transfer(params) {
+    const { id, name } = this.currentAccount;
+    const { permission = 'active' } = params;
+    const key = AccountService.getKey(this.currentAccount, permission);
 
     return AccountService.transfer({
-      ...formData,
+      ...params,
       sender: name,
-      encryptedPrivateKey,
+      encryptedPrivateKey: key.encryptedPrivateKey,
       pincode: PincodeStore.accountPincode
     }).then(async tx => {
       // fetch lastets tokens
       await this.getTokens();
       // log transfer
-      TransferLogService.addTransferLog({ ...formData, accountId: id });
+      TransferLogService.addTransferLog({ ...params, accountId: id });
 
       return tx;
     });
   }
 
   @action
-  async manageResource(data) {
-    const { name, encryptedPrivateKey } = this.currentAccount;
+  async manageResource(params) {
+    const { name } = this.currentAccount;
+    const { permission = 'active' } = params;
+    const key = AccountService.getKey(this.currentAccount, permission);
 
     return AccountService.manageResource({
-      ...data,
+      ...params,
       sender: name,
-      encryptedPrivateKey,
+      encryptedPrivateKey: key.encryptedPrivateKey,
       pincode: PincodeStore.accountPincode
     }).then(async tx => {
       await this.getInfo();

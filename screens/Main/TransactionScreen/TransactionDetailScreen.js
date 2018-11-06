@@ -28,8 +28,6 @@ export class TransactionDetailScreen extends Component {
     const txId = state.params.txId;
     const transaction = await eos.transactions.get({ id: txId });
 
-    console.log(transaction);
-
     this.setState({ fetched: true, info: transaction });
   }
 
@@ -125,7 +123,7 @@ export class TransactionDetailScreen extends Component {
 
                   {fetched &&
                     info &&
-                    info.trx.trx && 
+                    info.trx.trx &&
                     info.trx.trx.actions.map((action, i) => (
                       <View key={i}>
                         <View style={{ flexDirection: 'row', marginBottom: 5 }}>
