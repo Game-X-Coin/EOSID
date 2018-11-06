@@ -13,7 +13,7 @@ import {
 } from './stores';
 
 // if you want to show error in development
-Sentry.enableInExpoDevelopment = true;
+// Sentry.enableInExpoDevelopment = true;
 
 // initialize sentry
 Sentry.config(
