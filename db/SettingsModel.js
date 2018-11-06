@@ -10,11 +10,6 @@ export class SettingsModel {
   @Column('varchar')
   accountId = '';
 
-  /**
-   * Store integer instead of boolean
-   * sqlite does not support boolean type.
-   * see https://www.sqlite.org/datatype3.html
-   */
   @Column('boolean')
   accountPincodeEnabled = false;
 
