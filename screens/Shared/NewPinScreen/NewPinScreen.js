@@ -11,11 +11,10 @@ export class NewPinScreen extends Component {
 
     try {
       await pincodeStore.saveAccountPincode(pincode);
-    } catch (error) {
-      console.log(error);
-    } finally {
       navigation.state.params && navigation.state.params.cb();
       navigation.goBack(null);
+    } catch (error) {
+      console.log(error);
     }
   };
 

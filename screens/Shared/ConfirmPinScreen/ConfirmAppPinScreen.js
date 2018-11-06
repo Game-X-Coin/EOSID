@@ -5,31 +5,33 @@ import { ConfirmPincode } from '../../../components/Pincode';
 
 @inject('pincodeStore')
 @observer
-export class ConfirmPinScreen extends Component {
+export class ConfirmAppPinScreen extends Component {
   confirmPin = async (pincode, { setFailure }) => {
     const { pincodeStore, navigation } = this.props;
 
     try {
-      await pincodeStore.validateAccountPincode(pincode);
+      await pincodeStore.validateAppPincode(pincode);
+      navigation.goBack(null);
+
+      try {
+        navigation.state.params && navigation.state.params.cb();
+      } catch (error) {
+        console.log(error);
+      }
     } catch (error) {
       setFailure();
-    } finally {
-      navigation.state.params && navigation.state.params.cb();
-      navigation.goBack(null);
     }
   };
 
   render() {
     const { navigation } = this.props;
-    const pinProps = navigation.state.params
-      ? navigation.state.params.pinProps
-      : {};
+    const { params } = navigation.state || {};
 
     return (
       <ConfirmPincode
+        description="Confirm your app password."
         onEnter={this.confirmPin}
-        backAction={() => this.props.navigation.goBack(null)}
-        {...pinProps}
+        backAction={params.cantBack ? null : () => navigation.goBack(null)}
       />
     );
   }
