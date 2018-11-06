@@ -1,2 +1,2 @@
-export * from './AuthStackNavigator';
+export * from './AuthSwitchNavigator';
 export * from './MainStackNavigator';

@@ -16,13 +16,18 @@ import {
   TransferScreen,
   TransferAmountScreen,
   TransferResultScreen,
-  ConfirmPinScreen,
   PermissionRequestScreen,
-  ManageResourceScreen,
-  NewPinScreen
+  ManageResourceScreen
 } from '../../screens/Main';
 
-import { ImportAccountScreen, ShowErrorScreen } from '../../screens/Shared';
+import {
+  ImportAccountScreen,
+  ShowErrorScreen,
+  ConfirmPinScreen,
+  ConfirmAppPinScreen,
+  NewPinScreen,
+  NewAppPinScreen
+} from '../../screens/Shared';
 
 // detail screens
 const DetailScreens = {
@@ -40,8 +45,10 @@ const DetailScreens = {
   TransactionDetail: TransactionDetailScreen,
   // confirm pincode
   ConfirmPin: ConfirmPinScreen,
+  ConfirmAppPin: ConfirmAppPinScreen,
   // new pincode
   NewPin: NewPinScreen,
+  NewAppPin: NewAppPinScreen,
   // confirm dapp sign
   PermissionRequest: PermissionRequestScreen,
   // show error
