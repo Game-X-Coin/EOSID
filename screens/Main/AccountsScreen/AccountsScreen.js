@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { SafeAreaView, View } from 'react-native';
+import { SafeAreaView } from 'react-native';
 import { Appbar, List, Button, RadioButton } from 'react-native-paper';
 
 import { ScrollView } from '../../../components/View';
@@ -12,8 +12,10 @@ import HomeStyle from '../../../styles/HomeStyle';
 export class AccountsScreen extends Component {
   moveScreen = routeName => this.props.navigation.navigate(routeName);
 
-  changeUserAccount = accoundId =>
-    this.props.accountStore.changeUserAccount(accoundId);
+  changeAccount = accoundId => {
+    this.props.accountStore.changeCurrentAccount(accoundId);
+    this.moveScreen('Account');
+  };
 
   render() {
     const { accountStore, networkStore, navigation } = this.props;
@@ -49,7 +51,7 @@ export class AccountsScreen extends Component {
                     }
                   />
                 )}
-                onPress={() => this.changeUserAccount(id)}
+                onPress={() => this.changeAccount(id)}
               />
             ))}
           </List.Section>

@@ -22,6 +22,9 @@ class Store {
   actions = [];
 
   @observable
+  lastestActionSeq = 0;
+
+  @observable
   fetched = false;
 
   findAccount(accountName) {
@@ -110,7 +113,7 @@ class Store {
       return;
     }
 
-    await Promise.all([this.getInfo(), this.getTokens()], this.getActions());
+    await Promise.all([this.getInfo(), this.getTokens(), this.getActions()]);
 
     this.fetched = true;
   }
@@ -136,27 +139,32 @@ class Store {
     };
   }
 
-  async getActions() {
+  async getActions(page = 1) {
     const account = this.currentAccount;
 
-    const latestActions =
-      (
-        (await api.actions.latestActions({
-          account_name: account.name,
-          offset: 1
-        })) || {}
-      ).actions || [];
-    let seq = 0;
-    if (latestActions.length) {
-      seq = latestActions[0].account_action_seq;
-    }
+    const { actions: lastestActions = [] } =
+      (await api.actions.getsLastest({
+        account_name: account.name
+      })) || {};
+
+    const lastestSeq = lastestActions.length
+      ? lastestActions[0].account_action_seq
+      : 0;
 
     const { actions = [] } = await api.actions.gets({
       account_name: account.name,
-      latestSeq: seq
+      lastestSeq,
+      page
     });
 
-    this.actions = actions.reverse();
+    // when refresh actions
+    if (page === 1) {
+      this.actions = actions.reverse();
+    } else {
+      this.actions = [...this.actions, ...actions.reverse()];
+    }
+
+    this.lastestActionSeq = lastestSeq;
   }
 
   @action

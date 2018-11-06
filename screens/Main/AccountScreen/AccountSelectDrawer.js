@@ -13,7 +13,7 @@ export class AccountSelectDrawer extends Component {
 
   changeAccount(accountId) {
     this.props.onHide();
-    this.props.accountStore.changeUserAccount(accountId);
+    this.props.accountStore.changeCurrentAccount(accountId);
   }
 
   moveScreen() {
