@@ -146,7 +146,7 @@ class EosApi {
         return data;
       },
       validateAuthorization: params => {
-        let { actor } = params;
+        let { actor, permission = 'active' } = params;
 
         if (!actor) {
           const foundAccount = AccountStore.findAccount();
@@ -154,7 +154,7 @@ class EosApi {
         }
 
         const authorization = [];
-        authorization.push({ actor, permission: 'active' });
+        authorization.push({ actor, permission });
         return authorization;
       },
       transaction: async ({
