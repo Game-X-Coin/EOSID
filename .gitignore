@@ -20,3 +20,5 @@ yarn-error.log*
 
 # misc
 .env
+
+__snapshots__
