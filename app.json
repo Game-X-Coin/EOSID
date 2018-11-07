@@ -24,31 +24,27 @@
     },
     "android": {
       "package": "io.gamexcoin.eosid",
-      "intentFilters": [
-        {
-          "action": "VIEW",
-          "autoVerify": true,
-          "data": {
-            "scheme": "eosid",
-            "host": "eosid.gamexcoin.io",
-            "pathPrefix": "/"
-          },
-          "category": ["BROWSABLE", "DEFAULT"]
-        }
-      ]
+      "intentFilters": [{
+        "action": "VIEW",
+        "autoVerify": true,
+        "data": {
+          "scheme": "eosid",
+          "host": "eosid.gamexcoin.io",
+          "pathPrefix": "/"
+        },
+        "category": ["BROWSABLE", "DEFAULT"]
+      }]
     },
     "scheme": "eosid",
     "hooks": {
-      "postPublish": [
-        {
-          "file": "sentry-expo/upload-sourcemaps",
-          "config": {
-            "organization": "gamexcoin",
-            "project": "eosid",
-            "authToken": "your auth token - https://sentry.io/settings/account/api/auth-tokens"
-          }
+      "postPublish": [{
+        "file": "sentry-expo/upload-sourcemaps",
+        "config": {
+          "organization": "gamexcoin",
+          "project": "eosid",
+          "authToken": "your auth token - https://sentry.io/settings/account/api/auth-tokens"
         }
-      ]
+      }]
     }
   }
 }
