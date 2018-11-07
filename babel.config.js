@@ -1,0 +1,14 @@
+module.exports = api => {
+  api.cache(true);
+  return {
+    presets: ['babel-preset-expo'],
+    env: {
+      development: {
+        plugins: ['transform-react-jsx-source']
+      },
+      production: {
+        plugins: ['react-native-paper/babel']
+      }
+    }
+  };
+};
