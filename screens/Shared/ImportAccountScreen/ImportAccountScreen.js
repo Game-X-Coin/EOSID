@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { observable } from 'mobx';
 import { observer, inject } from 'mobx-react';
 import { SafeAreaView, View, Keyboard } from 'react-native';
 import {
@@ -29,10 +30,6 @@ import { DialogIndicator } from '../../../components/Indicator';
 @inject('settingsStore', 'networkStore', 'accountStore')
 @withFormik({
   mapPropsToValues: ({ networkStore }) => ({
-    // select account
-    showDialog: false,
-    // loading
-    showLoadingDialog: false,
     accounts: [],
     // form
     privateKey: '',
@@ -51,31 +48,32 @@ import { DialogIndicator } from '../../../components/Indicator';
         ),
       networkId: Yup.string().required(RequiredFieldErrors.networkId)
     });
-  },
-  handleSubmit: async (
-    values,
-    {
-      props: {
-        settingsStore,
-        networkStore: { allNetworks },
-        accountStore,
-        navigation
-      },
-      setSubmitting,
-      setValues,
+  }
+})
+@observer
+export class ImportAccountScreen extends Component {
+  @observable
+  showDialog = false;
+
+  @observable
+  showLoadingDialog = false;
+
+  async handleSubmit() {
+    const {
+      networkStore: { allNetworks },
+      values,
       setFieldValue,
       setErrors
-    }
-  ) => {
-    const { isSignUp } = navigation.state.params || {};
-
+    } = this.props;
     // avoid modal hiding
     Keyboard.dismiss();
 
+    // private to public
     const publicKey = api.Key.privateToPublic({ wif: values.privateKey });
+    setFieldValue('publicKey', publicKey);
 
     // show loading dialog
-    setFieldValue('showLoadingDialog', true);
+    this.toggleLoadingDialog();
 
     try {
       const network = allNetworks.find(({ id }) => id === values.networkId);
@@ -86,104 +84,76 @@ import { DialogIndicator } from '../../../components/Indicator';
 
       // key has single account
       if (accounts.length === 1) {
-        const accountName = accounts[0];
-        const accountInfo = await api.accounts.get({
-          account_name: accountName,
-          url: network.chainURL
-        });
-        const permissions = accountInfo.permissions;
-        const foundPermissions = permissions.filter(permission =>
-          permission.required_auth.keys.find(key => key.key === publicKey)
-        );
-        const permissionNames = foundPermissions.map(
-          permission => permission.perm_name
-        );
-
-        setValues({
-          ...values,
-          showLoadingDialog: false
-        });
-
-        const addAccount = async () => {
-          await accountStore.addAccount({
-            name: accountName,
-            privateKey: values.privateKey,
-            networkId: values.networkId,
-            publicKey,
-            permissions: permissionNames
-          });
-
-          isSignUp ? navigation.navigate('Account') : navigation.goBack(null);
-        };
-
-        // new account pincode
-        if (!settingsStore.settings.accountPincodeEnabled) {
-          navigation.navigate('NewPin', {
-            async cb() {
-              await addAccount();
-            }
-          });
-        } else {
-          await addAccount();
-        }
+        this.importAccount(accounts[0]);
       } else {
-        setValues({
-          ...values,
-          showDialog: true,
-          showLoadingDialog: false,
-          accounts,
-          publicKey
-        });
+        setFieldValue('accounts', accounts);
+        this.toggleDialog();
+        this.toggleLoadingDialog();
       }
     } catch (error) {
       setErrors({ message: error.message, ...error.errors });
-      setSubmitting(false);
+      this.toggleLoadingDialog();
     }
   }
-})
-@observer
-export class ImportAccountScreen extends Component {
-  async importAccount(name) {
+
+  async importAccount(accountName) {
     const {
-      networkStore: { allNetworks },
-      settingsStore,
       accountStore,
+      settingsStore: { settings },
+      networkStore: { allNetworks },
       navigation,
-      values
+      values,
+      setErrors
     } = this.props;
+    const { isSignUp } = navigation.state.params || {};
 
-    this.hideDialogs();
-
-    const publicKey = api.Key.privateToPublic({ wif: values.privateKey });
     const network = allNetworks.find(({ id }) => id === values.networkId);
 
-    const accountInfo = await api.accounts.get({
-      account_name: name,
-      url: network.chainURL
-    });
-    const permissions = accountInfo.permissions;
-    const foundPermissions = permissions.filter(permission =>
-      permission.required_auth.keys.find(key => key.key === publicKey)
-    );
-    const permissionNames = foundPermissions.map(
-      permission => permission.perm_name
-    );
-
     const addAccount = async () => {
-      await accountStore.addAccount({
-        ...values,
-        name,
-        publicKey,
-        permissions: permissionNames
+      // show loading
+      this.toggleLoadingDialog();
+
+      const { permissions } = await api.accounts.get({
+        account_name: accountName,
+        url: network.chainURL
       });
 
-      this.moveScreen();
+      // find included permissions by publicKey
+      const foundPerms = permissions
+        .filter(p =>
+          p.required_auth.keys.find(key => key.key === values.publicKey)
+        )
+        .map(p => p.perm_name);
+
+      // add account
+      try {
+        await accountStore.addAccount({
+          name: accountName,
+          publicKey: values.publicKey,
+          privateKey: values.privateKey,
+          networkId: values.networkId,
+          permissions: foundPerms
+        });
+      } catch (error) {
+        setErrors({ importError: true, ...error.errors });
+        this.hideDialogs();
+        return;
+      }
+
+      // hide loading
+      this.toggleLoadingDialog();
+
+      // navigate
+      isSignUp ? navigation.navigate('Account') : navigation.goBack(null);
     };
 
+    // hide dialogs before navigate
+    this.hideDialogs();
+
     // new account pincode
-    if (!settingsStore.settings.accountPincodeEnabled) {
+    if (!settings.accountPincodeEnabled) {
       navigation.navigate('NewPin', {
-        cb: async () => {
+        async cb() {
           await addAccount();
         }
       });
@@ -192,16 +162,17 @@ export class ImportAccountScreen extends Component {
     }
   }
 
-  hideDialogs() {
-    this.props.setFieldValue('showLoadingDialog', false);
-    this.props.setFieldValue('showDialog', false);
+  toggleDialog() {
+    this.showDialog = !this.showDialog;
   }
 
-  moveScreen() {
-    const { navigation } = this.props;
-    const { isSignUp } = navigation.state.params || {};
+  toggleLoadingDialog() {
+    this.showLoadingDialog = !this.showLoadingDialog;
+  }
 
-    isSignUp ? navigation.navigate('Account') : navigation.goBack(null);
+  hideDialogs() {
+    this.showDialog = false;
+    this.showLoadingDialog = false;
   }
 
   render() {
@@ -214,7 +185,7 @@ export class ImportAccountScreen extends Component {
       touched,
       setFieldValue,
       setFieldTouched,
-      handleSubmit
+      isValid
     } = this.props;
 
     const isSignUp =
@@ -227,10 +198,7 @@ export class ImportAccountScreen extends Component {
 
     const SelectAccountDialog = () => (
       <Portal>
-        <Dialog
-          visible={values.showDialog}
-          onDismiss={() => this.hideDialogs()}
-        >
+        <Dialog visible={this.showDialog} onDismiss={() => this.hideDialogs()}>
           <Dialog.Title>Select account</Dialog.Title>
           <Dialog.Content>
             {values.accounts.map(account => (
@@ -257,7 +225,7 @@ export class ImportAccountScreen extends Component {
 
         {/* Import loading */}
         <DialogIndicator
-          visible={values.showLoadingDialog}
+          visible={this.showLoadingDialog}
           title="Preparing to import account..."
         />
 
@@ -316,7 +284,9 @@ export class ImportAccountScreen extends Component {
             <Button
               mode="contained"
               style={{ flex: 2, padding: 5, borderRadius: 0 }}
-              onPress={handleSubmit}
+              // keep enable button when import failed
+              disabled={!isValid && !errors.importError}
+              onPress={() => this.handleSubmit()}
             >
               Import
             </Button>
