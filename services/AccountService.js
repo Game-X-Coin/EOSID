@@ -84,8 +84,8 @@ export class AccountService {
     await AccountRepo.remove(findAccount);
   }
 
-  static encryptKey(encryptedPrivateKey, pinCode) {
-    return AES.encrypt(encryptedPrivateKey, pinCode).toString();
+  static encryptKey(privateKey, pinCode) {
+    return AES.encrypt(privateKey, pinCode).toString();
   }
 
   static decryptKey(encryptedPrivateKey, pinCode) {
@@ -93,15 +93,16 @@ export class AccountService {
   }
 
   static getParsingKey(key) {
-    key = key.replace(/\|/g, ',');
+    key = key.replace(/[|]/g, ',');
     return JSON.parse(key);
   }
+
   static getKey(account, permission = 'active') {
     const foundKey = account.keys.find(
       key => AccountService.getParsingKey(key).permission === permission
     );
 
-    return foundKey;
+    return AccountService.getParsingKey(foundKey);
   }
 
   static setKey(keys, key) {
