@@ -27,32 +27,49 @@ export class AccountService {
     return account_names;
   }
 
-  static async addAccount({ pincode, privateKey, ...accountInfo }) {
+  static async addAccount({
+    pincode,
+    privateKey,
+    permissions,
+    publicKey,
+    name,
+    ...accountInfo
+  }) {
     const AccountRepo = getRepository(AccountModel);
 
     // encrypt private key
     const encryptedPrivateKey = AccountService.encryptKey(privateKey, pincode);
 
-    let account = await AccountRepo.findOne({ name: accountInfo.name });
+    let account = await AccountRepo.findOne({ name });
 
-    accountInfo.permissions.forEach(permission => {
-      if (!account) {
-        // create new account instance
-        account = new AccountModel({
-          ...accountInfo,
-          permission,
-          encryptedPrivateKey
-        });
-      } else {
-        const foundKey = AccountService.getKey(account, permission);
-        if (foundKey) {
-          return Promise.reject(AccountError.DuplicateKey);
-        }
-        const { publicKey } = accountInfo;
-        const key = { publicKey, encryptedPrivateKey, permission };
-        account.keys = AccountService.setKey(account.keys, key);
-      }
-    });
+    if (!account) {
+      // create new account instance
+      account = new AccountModel({
+        ...accountInfo,
+        name,
+        publicKey,
+        encryptedPrivateKey,
+        permission: permissions[0]
+      });
+
+      // check duplicated permission in account
+    } else if (
+      permissions.find(permission => AccountService.getKey(account, permission))
+    ) {
+      return Promise.reject(AccountError.DuplicatedKey);
+    }
+
+    // update account permissions
+    account.keys = permissions.reduce((pv, permission) => {
+      const key = {
+        publicKey,
+        encryptedPrivateKey,
+        permission
+      };
+
+      return AccountService.setKey(pv, key);
+    }, []);
+
     // save
     return await AccountRepo.save(account);
   }
@@ -80,14 +97,9 @@ export class AccountService {
     return JSON.parse(key);
   }
   static getKey(account, permission = 'active') {
-    let foundKey = null;
-    account.keys.every(key => {
-      key = AccountService.getParsingKey(key);
-      if (key.permission === permission) {
-        foundKey = key;
-        return false;
-      }
-    });
+    const foundKey = account.keys.find(
+      key => AccountService.getParsingKey(key).permission === permission
+    );
 
     return foundKey;
   }
