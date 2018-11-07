@@ -11,17 +11,24 @@ class Store {
   appPincode = '';
 
   @action
+  async getPincodes() {
+    const [appPincode, accountPincode] = await Promise.all([
+      PincodeService.getPincode('app'),
+      PincodeService.getPincode('account')
+    ]);
+
+    this.appPincode = appPincode;
+    this.accountPincode = accountPincode;
+  }
+
+  @action
   async validateAppPincode(pincode) {
-    return PincodeService.validatePincode(pincode, 'app').then(() => {
-      this.appPincode = pincode;
-    });
+    return PincodeService.validatePincode(pincode, 'app');
   }
 
   @action
   async validateAccountPincode(pincode) {
-    return PincodeService.validatePincode(pincode, 'account').then(() => {
-      this.accountPincode = pincode;
-    });
+    return PincodeService.validatePincode(pincode, 'account');
   }
 
   @action
