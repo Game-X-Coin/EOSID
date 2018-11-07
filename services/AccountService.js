@@ -98,11 +98,16 @@ export class AccountService {
   }
 
   static getKey(account, permission = 'active') {
-    const foundKey = account.keys.find(
-      key => AccountService.getParsingKey(key).permission === permission
+    let foundKey;
+    account.keys.some(
+      key =>
+        (foundKey = AccountService.permissionCheck(
+          AccountService.getParsingKey(key),
+          permission
+        ))
     );
 
-    return AccountService.getParsingKey(foundKey);
+    return foundKey;
   }
 
   static setKey(keys, key) {
