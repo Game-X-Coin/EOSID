@@ -34,15 +34,15 @@ export class AccountError {
   static get AccountNotAvailable() {
     return new AccountError({
       errors: {
-        privateKey: 'Account is not available'
+        privateKey: 'No account found on the network you selected.'
       }
     });
   }
 
-  static get DuplicateKey() {
+  static get DuplicatedKey() {
     return new AccountError({
       errors: {
-        privateKey: 'Already Imported Key'
+        privateKey: 'Same key already imported'
       }
     });
   }
