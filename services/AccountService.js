@@ -97,6 +97,10 @@ export class AccountService {
     return JSON.parse(key);
   }
 
+  static permissionCheck(key, permission) {
+    return key.permission === permission ? key : false;
+  }
+
   static getKey(account, permission = 'active') {
     let foundKey;
     account.keys.some(
