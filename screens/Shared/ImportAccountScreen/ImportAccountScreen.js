@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observable } from 'mobx';
 import { observer, inject } from 'mobx-react';
-import { SafeAreaView, View, Keyboard } from 'react-native';
+import { View, Keyboard } from 'react-native';
 import {
   Appbar,
   Button,
@@ -214,7 +214,7 @@ export class ImportAccountScreen extends Component {
     );
 
     return (
-      <SafeAreaView style={HomeStyle.container}>
+      <View style={HomeStyle.container}>
         <Appbar.Header>
           <Appbar.BackAction onPress={() => navigation.goBack(null)} />
           <Appbar.Content title="Import account" />
@@ -292,7 +292,7 @@ export class ImportAccountScreen extends Component {
             </Button>
           </View>
         </KeyboardAvoidingView>
-      </SafeAreaView>
+      </View>
     );
   }
 }

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { SafeAreaView, View } from 'react-native';
+import { View } from 'react-native';
 import { createMaterialTopTabNavigator } from 'react-navigation';
 import { Appbar } from 'react-native-paper';
 
@@ -26,13 +26,11 @@ class ManageResourceScreen extends Component {
 
     return (
       <View style={HomeStyle.container}>
-        <SafeAreaView style={HomeStyle.container}>
-          <Appbar.Header style={{ elevation: 0 }}>
-            <Appbar.BackAction onPress={() => navigation.goBack(null)} />
-            <Appbar.Content title="Manage Resource" />
-          </Appbar.Header>
-          <TopTabNavigator navigation={navigation} />
-        </SafeAreaView>
+        <Appbar.Header style={{ elevation: 0 }}>
+          <Appbar.BackAction onPress={() => navigation.goBack(null)} />
+          <Appbar.Content title="Manage Resource" />
+        </Appbar.Header>
+        <TopTabNavigator navigation={navigation} />
       </View>
     );
   }
