@@ -2,7 +2,7 @@ const tintColor = '#2f95dc';
 const mainBackgroundColor = '#fff';
 
 export const Theme = {
-  primary: '#6200ee',
+  primary: '#000000',
   tintColor,
   mainBackgroundColor,
   tabIconDefault: '#ccc',
