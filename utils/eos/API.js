@@ -131,7 +131,7 @@ class EosApi {
         const struct = result.abi.structs.find(struct => struct.name === name);
 
         if (!struct) {
-          throw new Error('action and code not match');
+          throw new Error('not found struct to contract code');
         }
 
         const data = {};
