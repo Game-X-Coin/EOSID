@@ -104,11 +104,7 @@ export class AccountService {
   static getKey(account, permission = 'active') {
     let foundKey;
     account.keys.some(
-      key =>
-        (foundKey = AccountService.permissionCheck(
-          AccountService.getParsingKey(key),
-          permission
-        ))
+      key => (foundKey = key.permission === permission ? key : false)
     );
 
     return foundKey;
