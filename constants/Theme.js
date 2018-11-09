@@ -3,6 +3,7 @@ const mainBackgroundColor = '#fff';
 
 export const Theme = {
   primary: '#000000',
+  accent: 'gray',
   tintColor,
   mainBackgroundColor,
   tabIconDefault: '#ccc',

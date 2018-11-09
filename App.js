@@ -27,8 +27,7 @@ const theme = {
   colors: {
     ...DefaultTheme.colors,
     ...Theme
-  },
-  dark: true
+  }
 };
 
 export default class App extends Component {
