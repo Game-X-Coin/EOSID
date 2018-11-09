@@ -99,9 +99,11 @@ export class AccountService {
 
   static getKey(account, permission = 'active') {
     let foundKey;
-    account.keys.some(
-      key => (foundKey = key.permission === permission ? key : false)
-    );
+    account.keys.some(key => {
+      const parsedKey = AccountService.getParsingKey(key);
+      return (foundKey =
+        parsedKey.permission === permission ? parsedKey : false);
+    });
 
     return foundKey;
   }
