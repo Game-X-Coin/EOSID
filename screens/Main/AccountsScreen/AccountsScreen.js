@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { SafeAreaView } from 'react-native';
+import { View } from 'react-native';
 import { Appbar, List, Button, RadioButton } from 'react-native-paper';
 
 import { ScrollView } from '../../../components/View';
@@ -23,7 +23,7 @@ export class AccountsScreen extends Component {
     const { allNetworks } = networkStore;
 
     return (
-      <SafeAreaView style={HomeStyle.container}>
+      <View style={HomeStyle.container}>
         <Appbar.Header>
           <Appbar.BackAction onPress={() => navigation.goBack(null)} />
           <Appbar.Content title="Accounts" />
@@ -64,7 +64,7 @@ export class AccountsScreen extends Component {
         >
           Import account
         </Button>
-      </SafeAreaView>
+      </View>
     );
   }
 }

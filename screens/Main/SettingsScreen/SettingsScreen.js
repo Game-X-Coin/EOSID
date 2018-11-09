@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observable } from 'mobx';
 import { observer, inject } from 'mobx-react';
-import { SafeAreaView, ScrollView, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import {
   Appbar,
   Caption,
@@ -104,46 +104,44 @@ export class SettingsScreen extends Component {
 
     return (
       <View style={HomeStyle.container}>
-        <SafeAreaView style={HomeStyle.container}>
-          <Appbar.Header>
-            <Appbar.Content title="Settings" />
-          </Appbar.Header>
-          <ScrollView style={HomeStyle.container}>
-            <Section title="User Settings">
-              <Item
-                title="Accounts"
-                description={currentAccount && currentAccount.name}
-                onPress={() => this.moveScreen('Accounts')}
+        <Appbar.Header>
+          <Appbar.Content title="Settings" />
+        </Appbar.Header>
+        <ScrollView style={HomeStyle.container}>
+          <Section title="User Settings">
+            <Item
+              title="Accounts"
+              description={currentAccount && currentAccount.name}
+              onPress={() => this.moveScreen('Accounts')}
+            />
+          </Section>
+          <Section title="App Settings">
+            <Item
+              title="Networks"
+              onPress={() => this.moveScreen('SettingsNetwork')}
+            />
+            <Item title="Language" />
+            <Item title="App Pincode" onPress={this.toggleAppPincode}>
+              <Switch
+                value={this.appPincodeEnabled}
+                onValueChange={this.toggleAppPincode}
               />
-            </Section>
-            <Section title="App Settings">
-              <Item
-                title="Networks"
-                onPress={() => this.moveScreen('SettingsNetwork')}
-              />
-              <Item title="Language" />
-              <Item title="App Pincode" onPress={this.toggleAppPincode}>
-                <Switch
-                  value={this.appPincodeEnabled}
-                  onValueChange={this.toggleAppPincode}
-                />
-              </Item>
-            </Section>
-            <Section title="App Info">
-              <Item title="Support" />
-            </Section>
+            </Item>
+          </Section>
+          <Section title="App Info">
+            <Item title="Support" />
+          </Section>
 
-            {settings.appPincodeEnabled && (
-              <Button
-                style={{ padding: 5, marginTop: 15 }}
-                color={Colors.red500}
-                onPress={this.signOut}
-              >
-                Sign out
-              </Button>
-            )}
-          </ScrollView>
-        </SafeAreaView>
+          {settings.appPincodeEnabled && (
+            <Button
+              style={{ padding: 5, marginTop: 15 }}
+              color={Colors.red500}
+              onPress={this.signOut}
+            >
+              Sign out
+            </Button>
+          )}
+        </ScrollView>
       </View>
     );
   }

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { SafeAreaView, View } from 'react-native';
+import { View } from 'react-native';
 import { Appbar, Button } from 'react-native-paper';
 import { TextField } from 'react-native-material-textfield';
 import { Dropdown } from 'react-native-material-dropdown';
@@ -113,7 +113,7 @@ export class TransferAmountScreen extends Component {
     }));
 
     return (
-      <SafeAreaView style={HomeStyle.container}>
+      <View style={HomeStyle.container}>
         <Appbar.Header>
           <Appbar.BackAction onPress={() => navigation.goBack(null)} />
           <Appbar.Content title="Transfer" />
@@ -184,7 +184,7 @@ export class TransferAmountScreen extends Component {
             Transfer
           </Button>
         </KeyboardAvoidingView>
-      </SafeAreaView>
+      </View>
     );
   }
 }

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observable } from 'mobx';
 import { observer, inject } from 'mobx-react';
-import { SafeAreaView, View } from 'react-native';
+import { View } from 'react-native';
 import {
   Appbar,
   Button,
@@ -135,7 +135,7 @@ export class TransferScreen extends Component {
     const { receiver, loading, error } = this;
 
     return (
-      <SafeAreaView style={HomeStyle.container}>
+      <View style={HomeStyle.container}>
         <Appbar.Header>
           <Appbar.BackAction onPress={() => navigation.goBack(null)} />
           <Appbar.Content title="Receiver" />
@@ -181,7 +181,7 @@ export class TransferScreen extends Component {
             />
           </ScrollView>
         </KeyboardAvoidingView>
-      </SafeAreaView>
+      </View>
     );
   }
 }

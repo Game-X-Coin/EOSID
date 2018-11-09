@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { SafeAreaView } from 'react-native';
+import { View } from 'react-native';
 import { Appbar } from 'react-native-paper';
 
 import { AccountInfo } from './AccountInfo';
@@ -17,7 +17,7 @@ export class AccountScreen extends Component {
     const { currentAccount } = this.props.accountStore;
 
     return (
-      <SafeAreaView style={HomeStyle.container}>
+      <View style={HomeStyle.container}>
         {!currentAccount && (
           <Appbar.Header>
             <Appbar.Content title="Account" />
@@ -29,7 +29,7 @@ export class AccountScreen extends Component {
         )}
 
         {currentAccount ? <AccountInfo /> : <AccountEmptyState />}
-      </SafeAreaView>
+      </View>
     );
   }
 }

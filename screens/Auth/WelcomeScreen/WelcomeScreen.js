@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { View, SafeAreaView } from 'react-native';
+import { View } from 'react-native';
 import { Button, Text, Title } from 'react-native-paper';
 import { Logo } from '../../../components/SVG';
 
@@ -33,7 +33,7 @@ export class WelcomeScreen extends Component {
 
   render() {
     return (
-      <SafeAreaView style={{ flex: 1 }}>
+      <View style={{ flex: 1 }}>
         <View
           style={{
             flex: 1,
@@ -63,7 +63,7 @@ export class WelcomeScreen extends Component {
             Start EOSID
           </Button>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 }
