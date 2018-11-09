@@ -141,7 +141,14 @@ class EosApi {
               `${field.name} is required, ${field.name} parameter missing`
             );
           }
-          data[field.name] = params[field.name];
+          if (field.type === 'extended_asset') {
+            data[field.name] = {
+              quantity: params[field.name],
+              contract: account
+            };
+          } else {
+            data[field.name] = params[field.name];
+          }
         });
         return data;
       },
