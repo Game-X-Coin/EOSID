@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { SafeAreaView, Keyboard } from 'react-native';
+import { View, Keyboard } from 'react-native';
 import { Appbar, Button } from 'react-native-paper';
 import { TextField } from 'react-native-material-textfield';
 import { withFormik } from 'formik';
@@ -77,7 +77,7 @@ export class AddNetworkScreen extends Component {
     } = this.props;
 
     return (
-      <SafeAreaView style={HomeStyle.container}>
+      <View style={HomeStyle.container}>
         <Appbar.Header>
           <Appbar.BackAction onPress={() => navigation.goBack(null)} />
           <Appbar.Content title="Add Network" />
@@ -121,7 +121,7 @@ export class AddNetworkScreen extends Component {
             Add network
           </Button>
         </KeyboardAvoidingView>
-      </SafeAreaView>
+      </View>
     );
   }
 }

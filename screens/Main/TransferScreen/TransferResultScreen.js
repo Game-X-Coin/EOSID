@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { SafeAreaView, View } from 'react-native';
+import { View } from 'react-native';
 import { Colors, Button, Text, Appbar } from 'react-native-paper';
 import { TextField } from 'react-native-material-textfield';
 
@@ -55,7 +55,7 @@ export class TransferResultScreen extends Component {
     }
 
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: Theme.primary }}>
+      <View style={{ flex: 1, backgroundColor: Theme.primary }}>
         <Appbar.Header dark style={{ backgroundColor: 'transparent' }}>
           <Appbar.Action icon="close" onPress={() => this.confirm()} />
           <Appbar.Content title="Transfer Result" />
@@ -112,7 +112,7 @@ export class TransferResultScreen extends Component {
         >
           Close
         </Button>
-      </SafeAreaView>
+      </View>
     );
   }
 }

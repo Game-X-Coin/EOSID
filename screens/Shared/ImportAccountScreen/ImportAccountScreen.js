@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observable } from 'mobx';
 import { observer, inject } from 'mobx-react';
-import { SafeAreaView, View, Keyboard } from 'react-native';
+import { View, Keyboard } from 'react-native';
 import {
   Appbar,
   Button,
@@ -52,11 +52,10 @@ import { DialogIndicator } from '../../../components/Indicator';
 })
 @observer
 export class ImportAccountScreen extends Component {
-  @observable
-  showDialog = false;
-
-  @observable
-  showLoadingDialog = false;
+  state = {
+    showDialog: false,
+    showLoadingDialog: false
+  };
 
   async handleSubmit() {
     const {
@@ -163,16 +162,22 @@ export class ImportAccountScreen extends Component {
   }
 
   toggleDialog() {
-    this.showDialog = !this.showDialog;
+    this.setState({
+      showDialog: !this.state.showDialog
+    });
   }
 
   toggleLoadingDialog() {
-    this.showLoadingDialog = !this.showLoadingDialog;
+    this.setState({
+      showLoadingDialog: !this.state.showLoadingDialog
+    });
   }
 
   hideDialogs() {
-    this.showDialog = false;
-    this.showLoadingDialog = false;
+    this.setState({
+      showDialog: false,
+      showLoadingDialog: false
+    });
   }
 
   render() {
@@ -187,6 +192,7 @@ export class ImportAccountScreen extends Component {
       setFieldTouched,
       isValid
     } = this.props;
+    const { showDialog, showLoadingDialog } = this.state;
 
     const isSignUp =
       navigation.state.params && navigation.state.params.isSignUp;
@@ -198,7 +204,7 @@ export class ImportAccountScreen extends Component {
 
     const SelectAccountDialog = () => (
       <Portal>
-        <Dialog visible={this.showDialog} onDismiss={() => this.hideDialogs()}>
+        <Dialog visible={showDialog} onDismiss={() => this.hideDialogs()}>
           <Dialog.Title>Select account</Dialog.Title>
           <Dialog.Content>
             {values.accounts.map(account => (
@@ -214,7 +220,7 @@ export class ImportAccountScreen extends Component {
     );
 
     return (
-      <SafeAreaView style={HomeStyle.container}>
+      <View style={HomeStyle.container}>
         <Appbar.Header>
           <Appbar.BackAction onPress={() => navigation.goBack(null)} />
           <Appbar.Content title="Import account" />
@@ -225,7 +231,7 @@ export class ImportAccountScreen extends Component {
 
         {/* Import loading */}
         <DialogIndicator
-          visible={this.showLoadingDialog}
+          visible={showLoadingDialog}
           title="Preparing to import account..."
         />
 
@@ -292,7 +298,7 @@ export class ImportAccountScreen extends Component {
             </Button>
           </View>
         </KeyboardAvoidingView>
-      </SafeAreaView>
+      </View>
     );
   }
 }

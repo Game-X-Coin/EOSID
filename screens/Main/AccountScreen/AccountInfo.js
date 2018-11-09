@@ -157,7 +157,7 @@ export class AccountInfo extends Component {
 
         <ScrollView refreshing={this.refreshing} onRefresh={this.onRefresh}>
           <LinearGradient
-            colors={['#3023ae', '#c86dd7']}
+            colors={['#777777', '#000000']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
           >

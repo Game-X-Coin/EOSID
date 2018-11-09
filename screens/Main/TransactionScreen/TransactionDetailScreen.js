@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { SafeAreaView, ScrollView, Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import { Appbar, Divider, Caption } from 'react-native-paper';
 import moment from 'moment';
 
@@ -59,86 +59,79 @@ export class TransactionDetailScreen extends Component {
 
     return (
       <View style={HomeStyle.container}>
-        <SafeAreaView style={HomeStyle.container}>
-          <Appbar.Header>
-            <Appbar.BackAction onPress={() => navigation.goBack(null)} />
-            <Appbar.Content title="Transaction Detail" />
-          </Appbar.Header>
+        <Appbar.Header>
+          <Appbar.BackAction onPress={() => navigation.goBack(null)} />
+          <Appbar.Content title="Transaction Detail" />
+        </Appbar.Header>
 
-          {!fetched ? (
-            <PageIndicator />
-          ) : (
-            <ScrollView style={{ flex: 1 }}>
-              <View style={{ padding: 20 }}>
-                <Item
-                  title="Transaction ID"
-                  description={navigation.state.params.txId}
-                />
+        {!fetched ? (
+          <PageIndicator />
+        ) : (
+          <ScrollView style={{ flex: 1 }}>
+            <View style={{ padding: 20 }}>
+              <Item
+                title="Transaction ID"
+                description={navigation.state.params.txId}
+              />
 
-                <Item title="Transaction Status">
-                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <Badge
-                      title={info && info.trx.receipt.status}
-                      color="#2185d0"
-                    />
-                    <Badge
-                      title={
-                        info && info.last_irreversible_block
-                          ? 'irreversible'
-                          : 'reversible'
-                      }
-                      color="#21ba45"
-                    />
-                  </View>
-                </Item>
-                <Item
-                  title="CPU Usage"
-                  description={`${info && info.trx.receipt.cpu_usage_us} us`}
-                />
-                <Item
-                  title="Net Usage"
-                  description={`${info &&
-                    info.trx.receipt.net_usage_words} words`}
-                />
-                <Item
-                  title="Block Number"
-                  description={info && info.block_num}
-                />
-                <Item
-                  title="Block Time"
-                  description={
-                    info &&
-                    `${moment(info.block_time).format('lll')} (${moment(
-                      info.block_time
-                    ).fromNow()})`
-                  }
-                />
-
-                <Divider style={{ marginVertical: 10 }} />
-
-                <View>
-                  <Text style={{ fontSize: 18, marginBottom: 10 }}>
-                    Actions
-                  </Text>
-
-                  {fetched &&
-                    info &&
-                    info.trx.trx &&
-                    info.trx.trx.actions.map((action, i) => (
-                      <View key={i}>
-                        <View style={{ flexDirection: 'row', marginBottom: 5 }}>
-                          <Text style={{ marginRight: 5 }}>{action.name}</Text>
-                          <Caption>by {action.account}</Caption>
-                        </View>
-
-                        <Caption>{JSON.stringify(action.data)}</Caption>
-                      </View>
-                    ))}
+              <Item title="Transaction Status">
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <Badge
+                    title={info && info.trx.receipt.status}
+                    color="#2185d0"
+                  />
+                  <Badge
+                    title={
+                      info && info.last_irreversible_block
+                        ? 'irreversible'
+                        : 'reversible'
+                    }
+                    color="#21ba45"
+                  />
                 </View>
+              </Item>
+              <Item
+                title="CPU Usage"
+                description={`${info && info.trx.receipt.cpu_usage_us} us`}
+              />
+              <Item
+                title="Net Usage"
+                description={`${info &&
+                  info.trx.receipt.net_usage_words} words`}
+              />
+              <Item title="Block Number" description={info && info.block_num} />
+              <Item
+                title="Block Time"
+                description={
+                  info &&
+                  `${moment(info.block_time).format('lll')} (${moment(
+                    info.block_time
+                  ).fromNow()})`
+                }
+              />
+
+              <Divider style={{ marginVertical: 10 }} />
+
+              <View>
+                <Text style={{ fontSize: 18, marginBottom: 10 }}>Actions</Text>
+
+                {fetched &&
+                  info &&
+                  info.trx.trx &&
+                  info.trx.trx.actions.map((action, i) => (
+                    <View key={i}>
+                      <View style={{ flexDirection: 'row', marginBottom: 5 }}>
+                        <Text style={{ marginRight: 5 }}>{action.name}</Text>
+                        <Caption>by {action.account}</Caption>
+                      </View>
+
+                      <Caption>{JSON.stringify(action.data)}</Caption>
+                    </View>
+                  ))}
               </View>
-            </ScrollView>
-          )}
-        </SafeAreaView>
+            </View>
+          </ScrollView>
+        )}
       </View>
     );
   }
