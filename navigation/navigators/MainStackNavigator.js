@@ -29,6 +29,8 @@ import {
   NewAppPinScreen
 } from '../../screens/Shared';
 
+import { Theme } from '../../constants';
+
 // detail screens
 const DetailScreens = {
   // accounts
@@ -70,7 +72,6 @@ const MainTabNavigator = createMaterialBottomTabNavigator(
     Settings: SettingsScreen
   },
   {
-    shifting: true,
     navigationOptions: ({ navigation }) => ({
       tabBarIcon: ({ tintColor }) => {
         const { routeName } = navigation.state;
@@ -83,7 +84,13 @@ const MainTabNavigator = createMaterialBottomTabNavigator(
           />
         );
       }
-    })
+    }),
+    shifting: true,
+    activeColor: Theme.activeColor,
+    inactiveColor: Theme.inActiveColor,
+    barStyle: {
+      backgroundColor: Theme.mainBackgroundColor
+    }
   }
 );
 
