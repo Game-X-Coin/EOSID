@@ -12,7 +12,7 @@ export const Theme = {
   innerPadding: 25,
   innerBorderRadius: 5,
   shadow: {
-    elevation: 5
+    elevation: 4
     /* ios shadow
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },

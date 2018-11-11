@@ -7,3 +7,4 @@ export * from './AccountsScreen';
 export * from './TransferScreen';
 export * from './PermissionRequestScreen';
 export * from './ManageResourceScreen';
+export * from './PermissionScreen';
