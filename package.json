@@ -45,7 +45,7 @@
     "react-native": "https://github.com/expo/react-native/archive/sdk-31.0.0.tar.gz",
     "react-native-material-dropdown": "^0.11.1",
     "react-native-material-textfield": "^0.12.0",
-    "react-native-paper": "2.1.3",
+    "react-native-paper": "^2.2.4",
     "react-native-sqlite-storage": "^3.3.5",
     "react-navigation": "^2.18.2",
     "react-navigation-material-bottom-tabs": "^0.4.0",
