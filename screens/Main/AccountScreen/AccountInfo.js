@@ -6,8 +6,6 @@ import { View, Image } from 'react-native';
 import { Title, Text, TouchableRipple, Appbar } from 'react-native-paper';
 import { Icon, Svg } from 'expo';
 
-import { ScrollView, BackgroundView } from '../../../components/View';
-
 import { AccountSelectDrawer } from './AccountSelectDrawer';
 import { Theme } from '../../../constants';
 import { SkeletonIndicator } from '../../../components/Indicator';
@@ -104,96 +102,57 @@ export class AccountInfo extends Component {
     );
 
     return (
-      <React.Fragment>
+      <View style={{ flex: 1 }}>
         {/* Drawer */}
         <AccountSelectDrawer
           visible={this.drawerVisible}
           onHide={() => this.hideDrawer()}
         />
 
-        <BackgroundView>
-          <CustomAppbar />
+        <CustomAppbar />
 
-          <View
-            style={{
-              marginTop: 35,
-              marginBottom: 25,
-              alignItems: 'center'
-            }}
-          >
-            {fetched ? (
-              <React.Fragment>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'flex-end',
-                    marginBottom: 5
-                  }}
-                >
-                  <Title style={{ fontSize: 35, lineHeight: 35 }}>
-                    {totalAsset.toFixed(4)}
-                  </Title>
-                  <Text style={{ marginLeft: 7, fontSize: 15, lineHeight: 35 }}>
-                    EOS
-                  </Text>
-                </View>
-                <Text>Total Balance</Text>
-              </React.Fragment>
-            ) : (
-              <BalanceIndicator />
-            )}
-          </View>
-
-          <View
-            style={{
-              flexDirection: 'row',
-              marginHorizontal: Theme.innerSpacing,
-              backgroundColor: Theme.mainBackgroundColor,
-              borderRadius: Theme.innerBorderRadius,
-              ...Theme.shadow
-            }}
-          >
-            <TouchableRipple
-              style={{ flex: 1, padding: Theme.innerPadding }}
-              onPress={() => this.moveScreen('Transfer')}
-            >
+        <View
+          style={{
+            marginTop: 35,
+            marginBottom: 25,
+            alignItems: 'center'
+          }}
+        >
+          {fetched ? (
+            <React.Fragment>
               <View
                 style={{
                   flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center'
+                  alignItems: 'flex-end',
+                  marginBottom: 5
                 }}
               >
-                <Icon.Ionicons
-                  name="md-arrow-up"
-                  color={Theme.secondary}
-                  size={30}
-                />
-                <Title style={{ marginLeft: 15, fontSize: 17 }}>Transfer</Title>
+                <Title style={{ fontSize: 35, lineHeight: 35 }}>
+                  {totalAsset.toFixed(4)}
+                </Title>
+                <Text style={{ marginLeft: 7, fontSize: 15, lineHeight: 35 }}>
+                  EOS
+                </Text>
               </View>
-            </TouchableRipple>
-            <View style={{ width: 1, backgroundColor: '#d8d8d8' }} />
-            <TouchableRipple style={{ flex: 1, padding: Theme.innerPadding }}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}
-              >
-                <Icon.Ionicons
-                  name="md-arrow-down"
-                  color={Theme.teritary}
-                  size={30}
-                />
-                <Title style={{ marginLeft: 15, fontSize: 17 }}>Receive</Title>
-              </View>
-            </TouchableRipple>
-          </View>
+              <Text>Total Balance</Text>
+            </React.Fragment>
+          ) : (
+            <BalanceIndicator />
+          )}
+        </View>
 
+        <View
+          style={{
+            flexDirection: 'row',
+            marginHorizontal: Theme.innerSpacing,
+            backgroundColor: Theme.mainBackgroundColor,
+            borderRadius: Theme.innerBorderRadius,
+            ...Theme.shadow
+          }}
+        >
           <TouchableRipple
-            style={{ margin: Theme.innerSpacing, padding: 15 }}
-            onPress={() => this.moveScreen('ManageResource')}
+            style={{ flex: 1, padding: Theme.innerPadding }}
+            onPress={() => this.moveScreen('Transfer')}
           >
             <View
               style={{
@@ -202,82 +161,118 @@ export class AccountInfo extends Component {
                 justifyContent: 'center'
               }}
             >
-              <Text style={{ marginRight: 15, fontSize: 17 }}>
-                Manage Resource
-              </Text>
-              <Icon.Ionicons name="ios-arrow-forward" size={17} />
+              <Icon.Ionicons
+                name="md-arrow-up"
+                color={Theme.secondary}
+                size={30}
+              />
+              <Title style={{ marginLeft: 15, fontSize: 17 }}>Transfer</Title>
             </View>
           </TouchableRipple>
+          <View style={{ width: 1, backgroundColor: '#d8d8d8' }} />
+          <TouchableRipple style={{ flex: 1, padding: Theme.innerPadding }}>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              <Icon.Ionicons
+                name="md-arrow-down"
+                color={Theme.teritary}
+                size={30}
+              />
+              <Title style={{ marginLeft: 15, fontSize: 17 }}>Receive</Title>
+            </View>
+          </TouchableRipple>
+        </View>
 
-          {/* Tokens */}
+        <TouchableRipple
+          style={{ margin: Theme.innerSpacing, padding: 15 }}
+          onPress={() => this.moveScreen('ManageResource')}
+        >
           <View
             style={{
-              flex: 1,
-              marginHorizontal: Theme.innerSpacing,
-              backgroundColor: Theme.mainBackgroundColor,
-              borderTopRadius: Theme.innerBorderRadius,
-              ...Theme.shadow
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center'
             }}
           >
-            <ScrollView>
-              <View
-                style={{
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  height: 50
-                }}
-              >
-                <View
-                  style={{
-                    marginBottom: 5,
-                    width: 25,
-                    height: 2,
-                    backgroundColor: '#d8d8d8'
-                  }}
-                />
-                <View
-                  style={{ width: 25, height: 2, backgroundColor: '#d8d8d8' }}
-                />
-              </View>
-
-              {fetched
-                ? Object.keys(tokens).map(symbol => (
-                    <TouchableRipple
-                      key={symbol}
-                      style={{
-                        paddingHorizontal: Theme.innerPadding
-                      }}
-                      onPress={() => this.moveScreen('Transfer', { symbol })}
-                    >
-                      <View
-                        style={{
-                          flexDirection: 'row',
-                          alignItems: 'center'
-                        }}
-                      >
-                        <Image
-                          style={{ marginRight: 15, width: 35, height: 35 }}
-                          source={{
-                            uri:
-                              'https://cdn.freebiesupply.com/logos/large/2x/eos-3-logo-png-transparent.png'
-                          }}
-                        />
-                        <Title
-                          style={{ flex: 1, paddingVertical: 15, fontSize: 17 }}
-                        >
-                          {symbol}
-                        </Title>
-                        <Title style={{ fontSize: 17 }}>{tokens[symbol]}</Title>
-                      </View>
-                    </TouchableRipple>
-                  ))
-                : Array.from({ length: 4 }, (v, key) => (
-                    <TokenIndicator key={key} />
-                  ))}
-            </ScrollView>
+            <Text style={{ marginRight: 15, fontSize: 17 }}>
+              Manage Resource
+            </Text>
+            <Icon.Ionicons name="ios-arrow-forward" size={17} />
           </View>
-        </BackgroundView>
-      </React.Fragment>
+        </TouchableRipple>
+
+        {/* Tokens */}
+        <View
+          style={{
+            flex: 1,
+            marginHorizontal: Theme.innerSpacing,
+            backgroundColor: Theme.mainBackgroundColor,
+            borderTopRadius: Theme.innerBorderRadius,
+            ...Theme.shadow
+          }}
+        >
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              height: 50
+            }}
+          >
+            <View
+              style={{
+                marginBottom: 5,
+                width: 25,
+                height: 2,
+                backgroundColor: '#d8d8d8'
+              }}
+            />
+            <View
+              style={{ width: 25, height: 2, backgroundColor: '#d8d8d8' }}
+            />
+          </View>
+          <View>
+            {fetched
+              ? Object.keys(tokens).map(symbol => (
+                  <TouchableRipple
+                    key={symbol}
+                    style={{
+                      paddingHorizontal: Theme.innerPadding
+                    }}
+                    onPress={() => this.moveScreen('Transfer', { symbol })}
+                  >
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center'
+                      }}
+                    >
+                      <Image
+                        style={{ marginRight: 15, width: 35, height: 35 }}
+                        source={{
+                          uri:
+                            'https://cdn.freebiesupply.com/logos/large/2x/eos-3-logo-png-transparent.png'
+                        }}
+                      />
+                      <Title
+                        style={{ flex: 1, paddingVertical: 15, fontSize: 17 }}
+                      >
+                        {symbol}
+                      </Title>
+                      <Title style={{ fontSize: 17 }}>{tokens[symbol]}</Title>
+                    </View>
+                  </TouchableRipple>
+                ))
+              : Array.from({ length: 4 }, (v, key) => (
+                  <TokenIndicator key={key} />
+                ))}
+          </View>
+        </View>
+      </View>
     );
   }
 }

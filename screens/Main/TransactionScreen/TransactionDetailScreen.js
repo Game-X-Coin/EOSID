@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { ScrollView, Text, View } from 'react-native';
-import { Appbar, Divider, Caption } from 'react-native-paper';
+import { View } from 'react-native';
+import { Appbar, Divider, Caption, Text } from 'react-native-paper';
 import moment from 'moment';
 
-import HomeStyle from '../../../styles/HomeStyle';
 import { PageIndicator } from '../../../components/Indicator';
+import { BackgroundView, ScrollView } from '../../../components/View';
+import { Theme } from '../../../constants';
 
 @inject('networkStore')
 @observer
@@ -58,8 +59,8 @@ export class TransactionDetailScreen extends Component {
     );
 
     return (
-      <View style={HomeStyle.container}>
-        <Appbar.Header>
+      <BackgroundView>
+        <Appbar.Header style={{ backgroundColor: Theme.headerBackgroundColor }}>
           <Appbar.BackAction onPress={() => navigation.goBack(null)} />
           <Appbar.Content title="Transaction Detail" />
         </Appbar.Header>
@@ -132,7 +133,7 @@ export class TransactionDetailScreen extends Component {
             </View>
           </ScrollView>
         )}
-      </View>
+      </BackgroundView>
     );
   }
 }

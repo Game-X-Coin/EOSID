@@ -1,11 +1,9 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { View } from 'react-native';
 import { Appbar, List, Button } from 'react-native-paper';
 
-import { ScrollView } from '../../../components/View';
-
-import HomeStyle from '../../../styles/HomeStyle';
+import { ScrollView, BackgroundView } from '../../../components/View';
+import { Theme } from '../../../constants';
 
 @inject('networkStore')
 @observer
@@ -17,14 +15,10 @@ export class NetworkScreen extends Component {
     const { defaultNetworks, customNetworks } = networkStore;
 
     return (
-      <View style={HomeStyle.container}>
-        <Appbar.Header>
+      <BackgroundView>
+        <Appbar.Header style={{ backgroundColor: Theme.headerBackgroundColor }}>
           <Appbar.BackAction onPress={() => navigation.goBack(null)} />
           <Appbar.Content title="Networks" />
-          <Appbar.Action
-            icon="add"
-            onPress={() => this.moveScreen('AddNetwork')}
-          />
         </Appbar.Header>
 
         <ScrollView>
@@ -49,7 +43,7 @@ export class NetworkScreen extends Component {
         >
           Add custom network
         </Button>
-      </View>
+      </BackgroundView>
     );
   }
 }

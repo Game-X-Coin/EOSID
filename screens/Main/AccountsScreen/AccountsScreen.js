@@ -46,7 +46,7 @@ export class AccountsScreen extends Component {
 
     return (
       <BackgroundView>
-        <Appbar.Header style={{ backgroundColor: 'transparent' }}>
+        <Appbar.Header style={{ backgroundColor: Theme.headerBackgroundColor }}>
           <Appbar.BackAction onPress={() => navigation.goBack(null)} />
           <Appbar.Content title="Accounts" />
         </Appbar.Header>

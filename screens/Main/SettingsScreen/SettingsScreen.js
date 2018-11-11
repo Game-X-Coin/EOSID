@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observable } from 'mobx';
 import { observer, inject } from 'mobx-react';
-import { ScrollView, View } from 'react-native';
+import { View } from 'react-native';
 import {
   Appbar,
   Caption,
@@ -13,7 +13,8 @@ import {
 } from 'react-native-paper';
 import { Icon } from 'expo';
 
-import HomeStyle from '../../../styles/HomeStyle';
+import { Theme } from '../../../constants';
+import { BackgroundView, ScrollView } from '../../../components/View';
 
 const Section = ({ title, children }) => (
   <View>
@@ -103,11 +104,11 @@ export class SettingsScreen extends Component {
     const { settings } = this.props.settingsStore;
 
     return (
-      <View style={HomeStyle.container}>
-        <Appbar.Header>
+      <BackgroundView>
+        <Appbar.Header style={{ backgroundColor: Theme.headerBackgroundColor }}>
           <Appbar.Content title="Settings" />
         </Appbar.Header>
-        <ScrollView style={HomeStyle.container}>
+        <ScrollView>
           <Section title="User Settings">
             <Item
               title="Accounts"
@@ -142,7 +143,7 @@ export class SettingsScreen extends Component {
             </Button>
           )}
         </ScrollView>
-      </View>
+      </BackgroundView>
     );
   }
 }
