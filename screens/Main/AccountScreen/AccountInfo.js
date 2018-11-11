@@ -98,7 +98,7 @@ export class AccountInfo extends Component {
         <Appbar.Action
           color="#bababa"
           icon="vpn-key"
-          // onPress={() => this.moveScreen('ImportAccount')}
+          onPress={() => this.moveScreen('Permission')}
         />
       </Appbar.Header>
     );
@@ -153,7 +153,10 @@ export class AccountInfo extends Component {
               ...Theme.shadow
             }}
           >
-            <TouchableRipple style={{ flex: 1, padding: Theme.innerPadding }}>
+            <TouchableRipple
+              style={{ flex: 1, padding: Theme.innerPadding }}
+              onPress={() => this.moveScreen('Transfer')}
+            >
               <View
                 style={{
                   flexDirection: 'row',
