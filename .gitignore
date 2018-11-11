@@ -18,6 +18,9 @@ yarn-error.log*
 # mac
 .DS_Store
 
+# ubuntu
+.idea
+
 # misc
 .env
 
