@@ -17,7 +17,8 @@ import {
   TransferAmountScreen,
   TransferResultScreen,
   PermissionRequestScreen,
-  ManageResourceScreen
+  ManageResourceScreen,
+  PermissionScreen
 } from '../../screens/Main';
 
 import {
@@ -39,6 +40,7 @@ const DetailScreens = {
   Transfer: TransferScreen,
   TransferAmount: TransferAmountScreen,
   TransferResult: TransferResultScreen,
+  Permission: PermissionScreen,
   // settings
   SettingsNetwork: SettingsNetworkScreen,
   AddNetwork: AddNetworkScreen,
