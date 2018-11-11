@@ -1,11 +1,18 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { View } from 'react-native';
-import { Appbar, List, Button, RadioButton } from 'react-native-paper';
+import { View, Alert } from 'react-native';
+import { Icon } from 'expo';
+import {
+  Appbar,
+  Text,
+  Button,
+  TouchableRipple,
+  Caption
+} from 'react-native-paper';
 
-import { ScrollView } from '../../../components/View';
+import { ScrollView, BackgroundView } from '../../../components/View';
 
-import HomeStyle from '../../../styles/HomeStyle';
+import { Theme } from '../../../constants';
 
 @inject('accountStore', 'networkStore')
 @observer
@@ -17,44 +24,61 @@ export class AccountsScreen extends Component {
     this.moveScreen('Account');
   };
 
+  confirmRemoveAccount = accoundId => {
+    Alert.alert(
+      'Confirm Remove Account',
+      'Are you sure you want to remove account?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Confirm', onPress: () => this.removeAccount(accoundId) }
+      ]
+    );
+  };
+
+  removeAccount = accoundId => {
+    this.props.accountStore.removeAccount(accoundId);
+  };
+
   render() {
     const { accountStore, networkStore, navigation } = this.props;
     const { accounts, currentAccount } = accountStore;
     const { allNetworks } = networkStore;
 
     return (
-      <View style={HomeStyle.container}>
-        <Appbar.Header>
+      <BackgroundView>
+        <Appbar.Header style={{ backgroundColor: 'transparent' }}>
           <Appbar.BackAction onPress={() => navigation.goBack(null)} />
           <Appbar.Content title="Accounts" />
-          <Appbar.Action
-            icon="add"
-            onPress={() => this.moveScreen('ImportAccount')}
-          />
         </Appbar.Header>
 
         <ScrollView>
-          <List.Section title="Select to change account">
-            {accounts.map(({ id, name, networkId }) => (
-              <List.Item
-                key={id}
-                title={name}
-                description={
-                  allNetworks.find(({ id }) => id === networkId).name
-                }
-                right={() => (
-                  <RadioButton
-                    status={
-                      name === (currentAccount && currentAccount.name)
-                        ? 'checked'
-                        : 'unchecked'
-                    }
+          {accounts.map(({ id, name, networkId }) => (
+            <TouchableRipple
+              key={id}
+              style={{
+                paddingHorizontal: Theme.innerPadding,
+                paddingVertical: 15
+              }}
+              onPress={() => this.changeAccount(id)}
+              onLongPress={() => this.confirmRemoveAccount(id)}
+            >
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <View style={{ flex: 1 }}>
+                  <Text>{name}</Text>
+                  <Caption>
+                    {allNetworks.find(({ id }) => id === networkId).name}
+                  </Caption>
+                </View>
+                {name === (currentAccount && currentAccount.name) && (
+                  <Icon.Ionicons
+                    name="md-checkmark"
+                    color={Theme.primary}
+                    size={25}
                   />
                 )}
-                onPress={() => this.changeAccount(id)}
-              />
-            ))}
-          </List.Section>
+              </View>
+            </TouchableRipple>
+          ))}
         </ScrollView>
 
         <Button
@@ -64,7 +88,7 @@ export class AccountsScreen extends Component {
         >
           Import account
         </Button>
-      </View>
+      </BackgroundView>
     );
   }
 }
