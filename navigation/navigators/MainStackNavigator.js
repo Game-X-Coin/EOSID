@@ -10,15 +10,15 @@ import {
   SettingsScreen,
   AddNetworkScreen,
   NetworkScreen as SettingsNetworkScreen,
-  TransactionScreen,
-  TransactionDetailScreen,
   AccountsScreen,
   TransferScreen,
   TransferAmountScreen,
   TransferResultScreen,
   PermissionRequestScreen,
   ManageResourceScreen,
-  PermissionScreen
+  PermissionScreen,
+  ActivityScreen,
+  ActivityDetailScreen
 } from '../../screens/Main';
 
 import {
@@ -45,8 +45,8 @@ const DetailScreens = {
   SettingsNetwork: SettingsNetworkScreen,
   AddNetwork: AddNetworkScreen,
   Accounts: AccountsScreen,
-  // tx
-  TransactionDetail: TransactionDetailScreen,
+  // activity
+  ActivityDetail: ActivityDetailScreen,
   // confirm pincode
   ConfirmPin: ConfirmPinScreen,
   ConfirmAppPin: ConfirmAppPinScreen,
@@ -62,7 +62,7 @@ const DetailScreens = {
 // for tab icons
 const iconMap = {
   Account: 'md-contact',
-  Transaction: 'md-filing',
+  Activity: 'md-filing',
   Settings: 'md-settings'
 };
 
@@ -70,7 +70,7 @@ const iconMap = {
 const MainTabNavigator = createMaterialBottomTabNavigator(
   {
     Account: AccountScreen,
-    Transaction: TransactionScreen,
+    Activity: ActivityScreen,
     Settings: SettingsScreen
   },
   {

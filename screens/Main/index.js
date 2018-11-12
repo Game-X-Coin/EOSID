@@ -2,7 +2,7 @@ export * from './SettingsScreen';
 export * from './NetworkScreen';
 export * from './AddNetworkScreen';
 export * from './AccountScreen';
-export * from './TransactionScreen';
+export * from './RecentActivityScreen';
 export * from './AccountsScreen';
 export * from './TransferScreen';
 export * from './PermissionRequestScreen';
