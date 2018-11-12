@@ -327,10 +327,10 @@ class EosApi {
   }
   static get actions() {
     return {
-      get: ({ pos, offset, account_name }) =>
+      get: ({ pos, account_name }) =>
         EosApi.HistoryAPI().post('/v1/history/get_actions', {
           pos,
-          offset,
+          offset: 0,
           account_name
         }),
       getsLastest: ({ account_name }) =>
