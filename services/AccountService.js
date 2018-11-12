@@ -84,6 +84,52 @@ export class AccountService {
     await AccountRepo.remove(findAccount);
   }
 
+  static async updateEncryptedKeys(prevPincode, newPincode) {
+    const AccountRepo = getRepository(AccountModel);
+    const accounts = await AccountRepo.find();
+
+    const updatedAccounts = accounts.map(account => {
+      const updatedKeys = account.keys.map(key => {
+        const {
+          encryptedPrivateKey,
+          ...parsedKeys
+        } = AccountService.getParsingKey(key);
+
+        const decryptedPrivateKey = AccountService.decryptKey(
+          encryptedPrivateKey,
+          prevPincode
+        );
+
+        // update private key
+        const updatedEncryptedPrivateKey = AccountService.encryptKey(
+          decryptedPrivateKey,
+          newPincode
+        );
+
+        const stringifiedKey = AccountService.stringifyKey({
+          ...parsedKeys,
+          encryptedPrivateKey: updatedEncryptedPrivateKey
+        });
+
+        return stringifiedKey;
+      });
+
+      return {
+        ...account,
+        keys: updatedKeys
+      };
+    });
+
+    // update keys in account repo
+    await Promise.all(
+      updatedAccounts.map(account =>
+        AccountRepo.update(account.id, { keys: account.keys })
+      )
+    );
+
+    return updatedAccounts;
+  }
+
   static encryptKey(privateKey, pinCode) {
     return AES.encrypt(privateKey, pinCode).toString();
   }
@@ -108,13 +154,19 @@ export class AccountService {
     return foundKey;
   }
 
+  static stringifyKey(key) {
+    const stringified = JSON.stringify(key);
+    const replaced = stringified.replace(/,/g, '|');
+
+    return replaced;
+  }
+
   static setKey(keys, key) {
     if (!keys) {
       keys = [];
     }
-    key = JSON.stringify(key);
-    key = key.replace(/,/g, '|');
-    keys.push(key);
+    const stringifiedKey = AccountService.stringifyKey(key);
+    keys.push(stringifiedKey);
     return keys;
   }
 

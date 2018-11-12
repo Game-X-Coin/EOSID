@@ -91,6 +91,15 @@ class Store {
   }
 
   @action
+  async updateEncryptedKeys(prevPincode, newPincode) {
+    return AccountService.updateEncryptedKeys(prevPincode, newPincode).then(
+      accounts => {
+        this.setAccounts(accounts);
+      }
+    );
+  }
+
+  @action
   async removeAccount(accountId) {
     return AccountService.removeAccount(accountId).then(_ => {
       const filterDeletedAccount = this.accounts.filter(

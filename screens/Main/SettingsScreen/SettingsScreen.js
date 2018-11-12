@@ -93,6 +93,23 @@ export class SettingsScreen extends Component {
     }
   };
 
+  changeAccountPincode = () => {
+    const { navigation } = this.props;
+
+    navigation.navigate('ConfirmPin', {
+      pinProps: {
+        description: 'Confirm password before change.'
+      },
+      cb: async () => {
+        navigation.navigate('NewPin', {
+          pinProps: {
+            description: 'Set password what you want to change.'
+          }
+        });
+      }
+    });
+  };
+
   signOut = () => {
     this.moveScreen('Auth');
   };
@@ -122,6 +139,13 @@ export class SettingsScreen extends Component {
               onPress={() => this.moveScreen('SettingsNetwork')}
             />
             <Item title="Language" />
+            {settings.accountPincodeEnabled && (
+              <Item
+                title="Account Pincode"
+                description="Change pincode"
+                onPress={this.changeAccountPincode}
+              />
+            )}
             <Item title="App Pincode" onPress={this.toggleAppPincode}>
               <Switch
                 value={this.appPincodeEnabled}
