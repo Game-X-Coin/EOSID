@@ -36,7 +36,16 @@ export class AccountsScreen extends Component {
   };
 
   removeAccount = accoundId => {
-    this.props.accountStore.removeAccount(accoundId);
+    const { navigation, accountStore } = this.props;
+
+    navigation.navigate('ConfirmPin', {
+      pinProps: {
+        description: 'Confirm password to remove account.'
+      },
+      cb: async () => {
+        accountStore.removeAccount(accoundId);
+      }
+    });
   };
 
   render() {
