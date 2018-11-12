@@ -6,6 +6,7 @@ export const Theme = {
   teritary: '#33ba20',
   activeColor: tintColor,
   inActiveColor: '#bababa',
+  headerBackgroundColor: 'transparent',
   mainBackgroundGradient: ['#fff', '#f8f9fa'],
   mainBackgroundColor: '#fff',
   innerSpacing: 25,

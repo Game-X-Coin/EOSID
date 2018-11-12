@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { observable } from 'mobx';
 import { observer, inject } from 'mobx-react';
 import { View, Keyboard } from 'react-native';
 import {
@@ -22,10 +21,14 @@ import { AccountService } from '../../../services';
 
 import api from '../../../utils/eos/API';
 
-import { ScrollView, KeyboardAvoidingView } from '../../../components/View';
+import {
+  ScrollView,
+  KeyboardAvoidingView,
+  BackgroundView
+} from '../../../components/View';
 
-import HomeStyle from '../../../styles/HomeStyle';
 import { DialogIndicator } from '../../../components/Indicator';
+import { Theme } from '../../../constants';
 
 @inject('settingsStore', 'networkStore', 'accountStore')
 @withFormik({
@@ -220,8 +223,8 @@ export class ImportAccountScreen extends Component {
     );
 
     return (
-      <View style={HomeStyle.container}>
-        <Appbar.Header>
+      <BackgroundView>
+        <Appbar.Header style={{ backgroundColor: Theme.headerBackgroundColor }}>
           <Appbar.BackAction onPress={() => navigation.goBack(null)} />
           <Appbar.Content title="Import account" />
         </Appbar.Header>
@@ -298,7 +301,7 @@ export class ImportAccountScreen extends Component {
             </Button>
           </View>
         </KeyboardAvoidingView>
-      </View>
+      </BackgroundView>
     );
   }
 }

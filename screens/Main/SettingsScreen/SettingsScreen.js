@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observable } from 'mobx';
 import { observer, inject } from 'mobx-react';
-import { ScrollView, View } from 'react-native';
+import { View } from 'react-native';
 import {
   Appbar,
   Caption,
@@ -13,7 +13,8 @@ import {
 } from 'react-native-paper';
 import { Icon } from 'expo';
 
-import HomeStyle from '../../../styles/HomeStyle';
+import { Theme } from '../../../constants';
+import { BackgroundView, ScrollView } from '../../../components/View';
 
 const Section = ({ title, children }) => (
   <View>
@@ -92,6 +93,23 @@ export class SettingsScreen extends Component {
     }
   };
 
+  changeAccountPincode = () => {
+    const { navigation } = this.props;
+
+    navigation.navigate('ConfirmPin', {
+      pinProps: {
+        description: 'Confirm password before change.'
+      },
+      cb: async () => {
+        navigation.navigate('NewPin', {
+          pinProps: {
+            description: 'Set password what you want to change.'
+          }
+        });
+      }
+    });
+  };
+
   signOut = () => {
     this.moveScreen('Auth');
   };
@@ -103,11 +121,11 @@ export class SettingsScreen extends Component {
     const { settings } = this.props.settingsStore;
 
     return (
-      <View style={HomeStyle.container}>
-        <Appbar.Header>
+      <BackgroundView>
+        <Appbar.Header style={{ backgroundColor: Theme.headerBackgroundColor }}>
           <Appbar.Content title="Settings" />
         </Appbar.Header>
-        <ScrollView style={HomeStyle.container}>
+        <ScrollView>
           <Section title="User Settings">
             <Item
               title="Accounts"
@@ -121,6 +139,13 @@ export class SettingsScreen extends Component {
               onPress={() => this.moveScreen('SettingsNetwork')}
             />
             <Item title="Language" />
+            {settings.accountPincodeEnabled && (
+              <Item
+                title="Account Pincode"
+                description="Change pincode"
+                onPress={this.changeAccountPincode}
+              />
+            )}
             <Item title="App Pincode" onPress={this.toggleAppPincode}>
               <Switch
                 value={this.appPincodeEnabled}
@@ -142,7 +167,7 @@ export class SettingsScreen extends Component {
             </Button>
           )}
         </ScrollView>
-      </View>
+      </BackgroundView>
     );
   }
 }

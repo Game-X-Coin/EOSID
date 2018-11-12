@@ -36,7 +36,16 @@ export class AccountsScreen extends Component {
   };
 
   removeAccount = accoundId => {
-    this.props.accountStore.removeAccount(accoundId);
+    const { navigation, accountStore } = this.props;
+
+    navigation.navigate('ConfirmPin', {
+      pinProps: {
+        description: 'Confirm password to remove account.'
+      },
+      cb: async () => {
+        accountStore.removeAccount(accoundId);
+      }
+    });
   };
 
   render() {
@@ -46,7 +55,7 @@ export class AccountsScreen extends Component {
 
     return (
       <BackgroundView>
-        <Appbar.Header style={{ backgroundColor: 'transparent' }}>
+        <Appbar.Header style={{ backgroundColor: Theme.headerBackgroundColor }}>
           <Appbar.BackAction onPress={() => navigation.goBack(null)} />
           <Appbar.Content title="Accounts" />
         </Appbar.Header>

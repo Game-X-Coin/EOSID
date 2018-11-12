@@ -41,15 +41,14 @@ export class AccountSelectDrawer extends Component {
     }) => (
       <TouchableRipple
         style={{
-          paddingHorizontal: 25,
-          paddingVertical: 20,
+          padding: 20,
           ...style
         }}
         onPress={onPress}
         onLongPress={onLongPress}
       >
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <Text style={{ flex: 1, fontSize: 18, color: dark && '#fff' }}>
+          <Text style={{ flex: 1, fontSize: 17, color: dark && '#fff' }}>
             {title}
           </Text>
           {right}
@@ -67,7 +66,7 @@ export class AccountSelectDrawer extends Component {
               left: 0,
               right: 0,
               marginVertical: 0,
-              backgroundColor: '#fff'
+              backgroundColor: Theme.mainBackgroundColor
             }}
           >
             <ScrollView>

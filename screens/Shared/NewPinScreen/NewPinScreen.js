@@ -8,10 +8,11 @@ import { NewPincode } from '../../../components/Pincode';
 export class NewPinScreen extends Component {
   newPin = async pincode => {
     const { pincodeStore, navigation } = this.props;
+    const { params } = navigation.state || {};
 
     try {
       await pincodeStore.saveAccountPincode(pincode);
-      navigation.state.params && navigation.state.params.cb();
+      params.cb && params.cb();
       navigation.goBack(null);
     } catch (error) {
       console.log(error);
@@ -19,10 +20,16 @@ export class NewPinScreen extends Component {
   };
 
   render() {
+    const { navigation } = this.props;
+    const pinProps = navigation.state.params
+      ? navigation.state.params.pinProps
+      : {};
+
     return (
       <NewPincode
         onEnter={this.newPin}
-        backAction={() => this.props.navigation.goBack(null)}
+        backAction={() => navigation.goBack(null)}
+        {...pinProps}
       />
     );
   }
