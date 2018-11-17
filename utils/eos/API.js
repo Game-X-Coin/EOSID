@@ -44,16 +44,17 @@ class EosApi {
     accountName,
     privateKey,
     pincode,
-    permission = 'active'
+    permission = 'active',
+    sign = true
   } = {}) {
     const network = NetworkStore.currentNetwork;
-    if (!privateKey && pincode) {
+    if (sign && !privateKey && pincode) {
       const account = AccountStore.findAccount(accountName);
       const key = AccountService.getKey(account, permission);
-      privateKey = AccountService(key.encryptedPrivateKey, pincode);
+      privateKey = AccountService.decryptKey(key.encryptedPrivateKey, pincode);
     }
 
-    const signatureProvider = new JsSignatureProvider([privateKey]);
+    const signatureProvider = new JsSignatureProvider(sign ? [privateKey] : []);
 
     return new Api({
       chainId: network.chainId,
@@ -166,6 +167,7 @@ class EosApi {
       },
       transaction: async ({
         broadcast = true,
+        sign = true,
         blocksBehind = 3,
         expireSeconds = 30,
         ...params
