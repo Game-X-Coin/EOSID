@@ -1,4 +1,4 @@
-import { Api, JsSignatureProvider, JsonRpc, RpcError } from 'eosjs-rn';
+import { Api, JsSignatureProvider, JsonRpc, Serialize } from 'eosjs-rn';
 import ecc from 'eosjs-ecc-rn';
 import { TextDecoder, TextEncoder } from 'text-encoding';
 import { AccountStore, NetworkStore } from '../../stores';
@@ -324,6 +324,52 @@ class EosApi {
       },
       sellRam: params => {
         console.log('sell ram');
+      },
+      proposal: async params => {
+        let {
+          account = 'eosio.msig',
+          name = 'propose',
+          proposal_name,
+          packed_transaction
+        } = params;
+
+        if (!proposal_name) {
+          // input random proposal_name
+          const buffer = new Serialize.SerialBuffer({
+            textEncoder: new TextEncoder(),
+            textDecoder: new TextDecoder()
+          });
+          const data = await ecc.key_utils.random32ByteBuffer({ safe: false });
+          buffer.pushArray(data);
+          const name = buffer.getName();
+          proposal_name = name;
+        }
+
+        params.proposer = 'indieveloper';
+        params.requested = [{ actor: 'indieveloper', permission: 'active' }];
+
+        if (!packed_transaction) {
+          const pushTransactionArgs = await EosApi.transactions.transfer({
+            amount: '1.0000 EOS',
+            to: 'indievelop11',
+            memo: '',
+            pincode: '000000',
+            broadcast: false,
+            sign: false
+          });
+          const api = EosApi.getApi({ pincode: '000000' });
+          packed_transaction = api.deserializeTransaction(
+            pushTransactionArgs.serializedTransaction
+          );
+        }
+        const transactions = {
+          ...params,
+          account,
+          name,
+          proposal_name,
+          trx: packed_transaction
+        };
+        return EosApi.transactions.transaction(transactions);
       }
     };
   }
