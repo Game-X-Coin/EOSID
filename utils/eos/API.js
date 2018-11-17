@@ -217,7 +217,7 @@ class EosApi {
 
         const transaction = { ...params, account, name };
 
-        return this.transactions.transaction(transaction);
+        return EosApi.transactions.transaction(transaction);
       },
       stake: params => {
         let {
@@ -267,7 +267,7 @@ class EosApi {
 
         const transaction = { ...params, account, name, transfer };
 
-        return this.transactions.transaction(transaction);
+        return EosApi.transactions.transaction(transaction);
       },
       unStake: params => {
         let {
@@ -317,7 +317,7 @@ class EosApi {
 
         const transaction = { ...params, account, name, transfer };
 
-        return this.transactions.transaction(transaction);
+        return EosApi.transactions.transaction(transaction);
       },
       buyRam: params => {
         console.log('buy ram');
