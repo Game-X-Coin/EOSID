@@ -51,7 +51,7 @@ export class AccountService {
         encryptedPrivateKey,
         permission: permissions[0]
       });
-
+      permissions = permissions.slice(0);
       // check duplicated permission in account
     } else if (
       permissions.find(permission => AccountService.getKey(account, permission))
@@ -60,7 +60,7 @@ export class AccountService {
     }
 
     // update account permissions
-    account.keys = permissions.reduce((pv, permission) => {
+    const keys = permissions.reduce((pv, permission) => {
       const key = {
         publicKey,
         encryptedPrivateKey,
@@ -69,6 +69,10 @@ export class AccountService {
 
       return AccountService.setKey(pv, key);
     }, []);
+
+    if (keys.length) {
+      account.keys ? account.keys.push(keys) : (account.keys = keys);
+    }
 
     // save
     return await AccountRepo.save(account);
@@ -150,10 +154,6 @@ export class AccountService {
       return (foundKey =
         parsedKey.permission === permission ? parsedKey : false);
     });
-
-    if (!foundKey) {
-      return new Error('Not found key');
-    }
 
     return foundKey;
   }
