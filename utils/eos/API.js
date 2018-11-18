@@ -168,8 +168,9 @@ class EosApi {
       transaction: async ({
         broadcast = true,
         sign = true,
+        proposal = false,
         blocksBehind = 3,
-        expireSeconds = 30,
+        expireSeconds = 300,
         ...params
       }) => {
         try {
@@ -179,10 +180,27 @@ class EosApi {
 
           const accountName = params.actor ? params.actor : params.from;
 
-          return await EosApi.getApi({ ...params, accountName }).transact(
+          if (proposal) {
+            broadcast = false;
+            sign = false;
+          }
+
+          const api = EosApi.getApi({ ...params, accountName, sign });
+          const result = api.transact(
             { actions: [{ account, name, authorization, data }] },
-            { broadcast, blocksBehind, expireSeconds }
+            { broadcast, sign, blocksBehind, expireSeconds }
           );
+
+          if (proposal) {
+            const packed_transaction = api.deserializeTransaction(
+              result.serializedTransaction
+            );
+            return await EosApi.proposal({
+              packed_transaction,
+              requested: authorization
+            });
+          }
+          return result;
         } catch (e) {
           console.log(`\nCaught exception: ${e}`);
           console.log(e);
@@ -345,23 +363,19 @@ class EosApi {
           proposal_name = name;
         }
 
-        params.proposer = 'indieveloper';
-        params.requested = [{ actor: 'indieveloper', permission: 'active' }];
+        if (!params.proposer) {
+          const foundAccount = AccountStore.findAccount();
+          params.proposer = foundAccount.name;
+        }
+
+        if (!params.requested) {
+          return new Error('It should needed requested parameter');
+        }
 
         if (!packed_transaction) {
-          const pushTransactionArgs = await EosApi.transactions.transfer({
-            amount: '1.0000 EOS',
-            to: 'indievelop11',
-            memo: '',
-            pincode: '000000',
-            broadcast: false,
-            sign: false
-          });
-          const api = EosApi.getApi({ pincode: '000000' });
-          packed_transaction = api.deserializeTransaction(
-            pushTransactionArgs.serializedTransaction
-          );
+          return new Error('It should needed packed_transaction parameter');
         }
+
         const transactions = {
           ...params,
           account,
