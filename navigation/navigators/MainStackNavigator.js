@@ -10,14 +10,15 @@ import {
   SettingsScreen,
   AddNetworkScreen,
   NetworkScreen as SettingsNetworkScreen,
-  TransactionScreen,
-  TransactionDetailScreen,
   AccountsScreen,
   TransferScreen,
   TransferAmountScreen,
   TransferResultScreen,
   PermissionRequestScreen,
-  ManageResourceScreen
+  ManageResourceScreen,
+  PermissionScreen,
+  ActivityScreen,
+  ActivityDetailScreen
 } from '../../screens/Main';
 
 import {
@@ -29,6 +30,8 @@ import {
   NewAppPinScreen
 } from '../../screens/Shared';
 
+import { Theme } from '../../constants';
+
 // detail screens
 const DetailScreens = {
   // accounts
@@ -37,12 +40,13 @@ const DetailScreens = {
   Transfer: TransferScreen,
   TransferAmount: TransferAmountScreen,
   TransferResult: TransferResultScreen,
+  Permission: PermissionScreen,
   // settings
   SettingsNetwork: SettingsNetworkScreen,
   AddNetwork: AddNetworkScreen,
   Accounts: AccountsScreen,
-  // tx
-  TransactionDetail: TransactionDetailScreen,
+  // activity
+  ActivityDetail: ActivityDetailScreen,
   // confirm pincode
   ConfirmPin: ConfirmPinScreen,
   ConfirmAppPin: ConfirmAppPinScreen,
@@ -58,7 +62,7 @@ const DetailScreens = {
 // for tab icons
 const iconMap = {
   Account: 'md-contact',
-  Transaction: 'md-filing',
+  Activity: 'md-filing',
   Settings: 'md-settings'
 };
 
@@ -66,11 +70,10 @@ const iconMap = {
 const MainTabNavigator = createMaterialBottomTabNavigator(
   {
     Account: AccountScreen,
-    Transaction: TransactionScreen,
+    Activity: ActivityScreen,
     Settings: SettingsScreen
   },
   {
-    shifting: true,
     navigationOptions: ({ navigation }) => ({
       tabBarIcon: ({ tintColor }) => {
         const { routeName } = navigation.state;
@@ -83,7 +86,13 @@ const MainTabNavigator = createMaterialBottomTabNavigator(
           />
         );
       }
-    })
+    }),
+    shifting: true,
+    activeColor: Theme.activeColor,
+    inactiveColor: Theme.inActiveColor,
+    barStyle: {
+      backgroundColor: Theme.mainBackgroundColor
+    }
   }
 );
 

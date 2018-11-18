@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { SafeAreaView } from 'react-native';
 import { Appbar } from 'react-native-paper';
 
 import { AccountInfo } from './AccountInfo';
 import { AccountEmptyState } from './AccountEmptyState';
 
-import HomeStyle from '../../../styles/HomeStyle';
+import { Theme } from '../../../constants';
+import { BackgroundView } from '../../../components/View';
 
 @inject('accountStore')
 @observer
@@ -17,9 +17,11 @@ export class AccountScreen extends Component {
     const { currentAccount } = this.props.accountStore;
 
     return (
-      <SafeAreaView style={HomeStyle.container}>
+      <BackgroundView>
         {!currentAccount && (
-          <Appbar.Header>
+          <Appbar.Header
+            style={{ backgroundColor: Theme.headerBackgroundColor }}
+          >
             <Appbar.Content title="Account" />
             <Appbar.Action
               icon="add"
@@ -29,7 +31,7 @@ export class AccountScreen extends Component {
         )}
 
         {currentAccount ? <AccountInfo /> : <AccountEmptyState />}
-      </SafeAreaView>
+      </BackgroundView>
     );
   }
 }

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observable } from 'mobx';
 import { observer, inject } from 'mobx-react';
-import { SafeAreaView, View } from 'react-native';
+import { View } from 'react-native';
 import {
   Appbar,
   Button,
@@ -15,10 +15,14 @@ import { TextField } from 'react-native-material-textfield';
 import api from '../../../utils/eos/API';
 import { TransferLogService } from '../../../services';
 
-import { KeyboardAvoidingView, ScrollView } from '../../../components/View';
+import {
+  KeyboardAvoidingView,
+  ScrollView,
+  BackgroundView
+} from '../../../components/View';
 
-import HomeStyle from '../../../styles/HomeStyle';
 import { Indicator } from '../../../components/Indicator';
+import { Theme } from '../../../constants';
 
 const debounce = (func, wait) => {
   let timeout;
@@ -135,8 +139,8 @@ export class TransferScreen extends Component {
     const { receiver, loading, error } = this;
 
     return (
-      <SafeAreaView style={HomeStyle.container}>
-        <Appbar.Header>
+      <BackgroundView>
+        <Appbar.Header style={{ backgroundColor: Theme.headerBackgroundColor }}>
           <Appbar.BackAction onPress={() => navigation.goBack(null)} />
           <Appbar.Content title="Receiver" />
         </Appbar.Header>
@@ -181,7 +185,7 @@ export class TransferScreen extends Component {
             />
           </ScrollView>
         </KeyboardAvoidingView>
-      </SafeAreaView>
+      </BackgroundView>
     );
   }
 }

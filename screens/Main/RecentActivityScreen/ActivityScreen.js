@@ -1,32 +1,32 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { SafeAreaView } from 'react-native';
 import { Appbar } from 'react-native-paper';
 
 import { AccountEmptyState } from '../AccountScreen';
-import { TransactionInfo } from './TransactionInfo';
+import { ActivityInfo } from './ActivityInfo';
 
-import HomeStyle from '../../../styles/HomeStyle';
+import { Theme } from '../../../constants';
+import { BackgroundView } from '../../../components/View';
 
 @inject('accountStore')
 @observer
-export class TransactionScreen extends Component {
+export class ActivityScreen extends Component {
   render() {
     const { currentAccount } = this.props.accountStore;
 
     return (
-      <SafeAreaView style={HomeStyle.container}>
-        <Appbar.Header>
-          <Appbar.Content title="Transaction" />
+      <BackgroundView>
+        <Appbar.Header style={{ backgroundColor: Theme.headerBackgroundColor }}>
+          <Appbar.Content title="Recent Activity" />
         </Appbar.Header>
 
         {currentAccount ? (
-          <TransactionInfo />
+          <ActivityInfo />
         ) : (
           // account empty
           <AccountEmptyState />
         )}
-      </SafeAreaView>
+      </BackgroundView>
     );
   }
 }

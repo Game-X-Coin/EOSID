@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observable } from 'mobx';
 import { observer, inject } from 'mobx-react';
-import { SafeAreaView, ScrollView, View } from 'react-native';
+import { View } from 'react-native';
 import {
   Appbar,
   Caption,
@@ -13,7 +13,8 @@ import {
 } from 'react-native-paper';
 import { Icon } from 'expo';
 
-import HomeStyle from '../../../styles/HomeStyle';
+import { Theme } from '../../../constants';
+import { BackgroundView, ScrollView } from '../../../components/View';
 
 const Section = ({ title, children }) => (
   <View>
@@ -92,6 +93,23 @@ export class SettingsScreen extends Component {
     }
   };
 
+  changeAccountPincode = () => {
+    const { navigation } = this.props;
+
+    navigation.navigate('ConfirmPin', {
+      pinProps: {
+        description: 'Confirm password before change.'
+      },
+      cb: async () => {
+        navigation.navigate('NewPin', {
+          pinProps: {
+            description: 'Set password what you want to change.'
+          }
+        });
+      }
+    });
+  };
+
   signOut = () => {
     this.moveScreen('Auth');
   };
@@ -103,48 +121,53 @@ export class SettingsScreen extends Component {
     const { settings } = this.props.settingsStore;
 
     return (
-      <View style={HomeStyle.container}>
-        <SafeAreaView style={HomeStyle.container}>
-          <Appbar.Header>
-            <Appbar.Content title="Settings" />
-          </Appbar.Header>
-          <ScrollView style={HomeStyle.container}>
-            <Section title="User Settings">
+      <BackgroundView>
+        <Appbar.Header style={{ backgroundColor: Theme.headerBackgroundColor }}>
+          <Appbar.Content title="Settings" />
+        </Appbar.Header>
+        <ScrollView>
+          <Section title="User Settings">
+            <Item
+              title="Accounts"
+              description={currentAccount && currentAccount.name}
+              onPress={() => this.moveScreen('Accounts')}
+            />
+          </Section>
+          <Section title="App Settings">
+            <Item
+              title="Networks"
+              onPress={() => this.moveScreen('SettingsNetwork')}
+            />
+            <Item title="Language" />
+            {settings.accountPincodeEnabled && (
               <Item
-                title="Accounts"
-                description={currentAccount && currentAccount.name}
-                onPress={() => this.moveScreen('Accounts')}
+                title="Account Pincode"
+                description="Change pincode"
+                onPress={this.changeAccountPincode}
               />
-            </Section>
-            <Section title="App Settings">
-              <Item
-                title="Networks"
-                onPress={() => this.moveScreen('SettingsNetwork')}
-              />
-              <Item title="Language" />
-              <Item title="App Pincode" onPress={this.toggleAppPincode}>
-                <Switch
-                  value={this.appPincodeEnabled}
-                  onValueChange={this.toggleAppPincode}
-                />
-              </Item>
-            </Section>
-            <Section title="App Info">
-              <Item title="Support" />
-            </Section>
-
-            {settings.appPincodeEnabled && (
-              <Button
-                style={{ padding: 5, marginTop: 15 }}
-                color={Colors.red500}
-                onPress={this.signOut}
-              >
-                Sign out
-              </Button>
             )}
-          </ScrollView>
-        </SafeAreaView>
-      </View>
+            <Item title="App Pincode" onPress={this.toggleAppPincode}>
+              <Switch
+                value={this.appPincodeEnabled}
+                onValueChange={this.toggleAppPincode}
+              />
+            </Item>
+          </Section>
+          <Section title="App Info">
+            <Item title="Support" />
+          </Section>
+
+          {settings.appPincodeEnabled && (
+            <Button
+              style={{ padding: 5, marginTop: 15 }}
+              color={Colors.red500}
+              onPress={this.signOut}
+            >
+              Sign out
+            </Button>
+          )}
+        </ScrollView>
+      </BackgroundView>
     );
   }
 }

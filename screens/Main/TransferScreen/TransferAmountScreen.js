@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { SafeAreaView, View } from 'react-native';
+import { View } from 'react-native';
 import { Appbar, Button } from 'react-native-paper';
 import { TextField } from 'react-native-material-textfield';
 import { Dropdown } from 'react-native-material-dropdown';
@@ -8,9 +8,12 @@ import { withFormik } from 'formik';
 import * as Yup from 'yup';
 
 import { DialogIndicator } from '../../../components/Indicator';
-import { KeyboardAvoidingView, ScrollView } from '../../../components/View';
-
-import HomeStyle from '../../../styles/HomeStyle';
+import {
+  KeyboardAvoidingView,
+  ScrollView,
+  BackgroundView
+} from '../../../components/View';
+import { Theme } from '../../../constants';
 
 @inject('accountStore')
 @observer
@@ -113,8 +116,8 @@ export class TransferAmountScreen extends Component {
     }));
 
     return (
-      <SafeAreaView style={HomeStyle.container}>
-        <Appbar.Header>
+      <BackgroundView>
+        <Appbar.Header style={{ backgroundColor: Theme.headerBackgroundColor }}>
           <Appbar.BackAction onPress={() => navigation.goBack(null)} />
           <Appbar.Content title="Transfer" />
         </Appbar.Header>
@@ -184,7 +187,7 @@ export class TransferAmountScreen extends Component {
             Transfer
           </Button>
         </KeyboardAvoidingView>
-      </SafeAreaView>
+      </BackgroundView>
     );
   }
 }

@@ -1,8 +1,14 @@
 import React, { Component } from 'react';
 import { observable } from 'mobx';
 import { inject, observer } from 'mobx-react';
+import { View, Platform, Text } from 'react-native';
+import { Constants, Icon } from 'expo';
 import { withNavigation } from 'react-navigation';
-import { Portal, Modal, List, RadioButton, Divider } from 'react-native-paper';
+import { Portal, Modal, TouchableRipple } from 'react-native-paper';
+
+import { Theme } from '../../../constants';
+
+import { ScrollView } from '../../../components/View';
 
 @withNavigation
 @inject('accountStore')
@@ -25,44 +31,71 @@ export class AccountSelectDrawer extends Component {
     const { visible, onHide = () => null } = this.props;
     const { currentAccount, accounts } = this.props.accountStore;
 
+    const ListItem = ({
+      title,
+      dark,
+      style,
+      right,
+      onPress = () => null,
+      onLongPress = () => null
+    }) => (
+      <TouchableRipple
+        style={{
+          padding: 20,
+          ...style
+        }}
+        onPress={onPress}
+        onLongPress={onLongPress}
+      >
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <Text style={{ flex: 1, fontSize: 17, color: dark && '#fff' }}>
+            {title}
+          </Text>
+          {right}
+        </View>
+      </TouchableRipple>
+    );
+
     return (
       <Portal>
         <Modal visible={visible} onDismiss={() => onHide()}>
-          <List.Section
+          <View
             style={{
               position: 'absolute',
-              bottom: 0,
+              top: Platform.OS === 'ios' ? 0 : Constants.statusBarHeight,
               left: 0,
               right: 0,
               marginVertical: 0,
-              backgroundColor: '#fff'
+              backgroundColor: Theme.mainBackgroundColor
             }}
-            title="Select to change account"
           >
-            {accounts.map(({ id, name }) => (
-              <List.Item
-                key={id}
-                title={name}
-                right={() => (
-                  <RadioButton
-                    status={
-                      name === (currentAccount && currentAccount.name)
-                        ? 'checked'
-                        : 'unchecked'
-                    }
-                  />
-                )}
-                onPress={() => this.changeAccount(id)}
+            <ScrollView>
+              {accounts.map(({ id, name }) => (
+                <ListItem
+                  key={id}
+                  title={name}
+                  right={
+                    name === (currentAccount && currentAccount.name) && (
+                      <Icon.Ionicons
+                        name="md-checkmark"
+                        color={Theme.primary}
+                        size={25}
+                      />
+                    )
+                  }
+                  onPress={() => this.changeAccount(id)}
+                />
+              ))}
+
+              <ListItem
+                dark
+                style={{ backgroundColor: Theme.primary }}
+                title="Import Account"
+                right={<Icon.Ionicons name="md-add" color="#fff" size={30} />}
+                onPress={() => this.moveScreen()}
               />
-            ))}
-
-            <Divider />
-
-            <List.Item
-              title="Import Account"
-              onPress={() => this.moveScreen()}
-            />
-          </List.Section>
+            </ScrollView>
+          </View>
         </Modal>
       </Portal>
     );

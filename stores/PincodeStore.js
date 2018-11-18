@@ -2,6 +2,7 @@ import { observable, action } from 'mobx';
 
 import { SettingsStore } from '../stores/SettingsStore';
 import { PincodeService } from '../services';
+import { AccountStore } from './AccountStore';
 
 class Store {
   @observable
@@ -42,6 +43,11 @@ class Store {
   @action
   async saveAccountPincode(pincode) {
     return PincodeService.savePincode(pincode, 'account').then(async () => {
+      // if account pincode changes
+      if (AccountStore.accounts.length) {
+        await AccountStore.updateEncryptedKeys(this.accountPincode, pincode);
+      }
+
       this.accountPincode = pincode;
       await SettingsStore.updateSettings({ accountPincodeEnabled: true });
     });

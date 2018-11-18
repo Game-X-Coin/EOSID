@@ -51,7 +51,7 @@ export class AccountService {
         encryptedPrivateKey,
         permission: permissions[0]
       });
-
+      permissions = permissions.slice(0);
       // check duplicated permission in account
     } else if (
       permissions.find(permission => AccountService.getKey(account, permission))
@@ -60,7 +60,7 @@ export class AccountService {
     }
 
     // update account permissions
-    account.keys = permissions.reduce((pv, permission) => {
+    const keys = permissions.reduce((pv, permission) => {
       const key = {
         publicKey,
         encryptedPrivateKey,
@@ -69,6 +69,10 @@ export class AccountService {
 
       return AccountService.setKey(pv, key);
     }, []);
+
+    if (keys.length) {
+      account.keys ? account.keys.push(keys) : (account.keys = keys);
+    }
 
     // save
     return await AccountRepo.save(account);
@@ -82,6 +86,52 @@ export class AccountService {
 
     // remove
     await AccountRepo.remove(findAccount);
+  }
+
+  static async updateEncryptedKeys(prevPincode, newPincode) {
+    const AccountRepo = getRepository(AccountModel);
+    const accounts = await AccountRepo.find();
+
+    const updatedAccounts = accounts.map(account => {
+      const updatedKeys = account.keys.map(key => {
+        const {
+          encryptedPrivateKey,
+          ...parsedKeys
+        } = AccountService.getParsingKey(key);
+
+        const decryptedPrivateKey = AccountService.decryptKey(
+          encryptedPrivateKey,
+          prevPincode
+        );
+
+        // update private key
+        const updatedEncryptedPrivateKey = AccountService.encryptKey(
+          decryptedPrivateKey,
+          newPincode
+        );
+
+        const stringifiedKey = AccountService.stringifyKey({
+          ...parsedKeys,
+          encryptedPrivateKey: updatedEncryptedPrivateKey
+        });
+
+        return stringifiedKey;
+      });
+
+      return {
+        ...account,
+        keys: updatedKeys
+      };
+    });
+
+    // update keys in account repo
+    await Promise.all(
+      updatedAccounts.map(account =>
+        AccountRepo.update(account.id, { keys: account.keys })
+      )
+    );
+
+    return updatedAccounts;
   }
 
   static encryptKey(privateKey, pinCode) {
@@ -108,13 +158,19 @@ export class AccountService {
     return foundKey;
   }
 
+  static stringifyKey(key) {
+    const stringified = JSON.stringify(key);
+    const replaced = stringified.replace(/,/g, '|');
+
+    return replaced;
+  }
+
   static setKey(keys, key) {
     if (!keys) {
       keys = [];
     }
-    key = JSON.stringify(key);
-    key = key.replace(/,/g, '|');
-    keys.push(key);
+    const stringifiedKey = AccountService.stringifyKey(key);
+    keys.push(stringifiedKey);
     return keys;
   }
 

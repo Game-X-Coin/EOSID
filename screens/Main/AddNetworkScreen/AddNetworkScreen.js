@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { SafeAreaView, Keyboard } from 'react-native';
+import { Keyboard } from 'react-native';
 import { Appbar, Button } from 'react-native-paper';
 import { TextField } from 'react-native-material-textfield';
 import { withFormik } from 'formik';
@@ -8,10 +8,14 @@ import * as Yup from 'yup';
 
 import { NetworkError } from '../../../db';
 
-import { KeyboardAvoidingView, ScrollView } from '../../../components/View';
+import {
+  KeyboardAvoidingView,
+  ScrollView,
+  BackgroundView
+} from '../../../components/View';
 
-import HomeStyle from '../../../styles/HomeStyle';
 import { DialogIndicator } from '../../../components/Indicator';
+import { Theme } from '../../../constants';
 
 @inject('networkStore')
 @observer
@@ -77,8 +81,8 @@ export class AddNetworkScreen extends Component {
     } = this.props;
 
     return (
-      <SafeAreaView style={HomeStyle.container}>
-        <Appbar.Header>
+      <BackgroundView>
+        <Appbar.Header style={{ backgroundColor: Theme.headerBackgroundColor }}>
           <Appbar.BackAction onPress={() => navigation.goBack(null)} />
           <Appbar.Content title="Add Network" />
         </Appbar.Header>
@@ -121,7 +125,7 @@ export class AddNetworkScreen extends Component {
             Add network
           </Button>
         </KeyboardAvoidingView>
-      </SafeAreaView>
+      </BackgroundView>
     );
   }
 }

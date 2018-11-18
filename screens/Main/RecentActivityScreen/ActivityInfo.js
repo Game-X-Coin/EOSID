@@ -6,14 +6,14 @@ import { Caption, List, Text, TouchableRipple } from 'react-native-paper';
 import { withNavigation } from 'react-navigation';
 import moment from 'moment';
 
-import { TransactionEmptyState } from './TransactionEmptyState';
+import { ActivityEmptyState } from './ActivityEmptyState';
 
 import { PageIndicator, Indicator } from '../../../components/Indicator';
 
 @withNavigation
 @inject('accountStore')
 @observer
-export class TransactionInfo extends Component {
+export class ActivityInfo extends Component {
   @observable
   page = 1;
 
@@ -94,7 +94,7 @@ export class TransactionInfo extends Component {
     }
 
     if (!actions.length) {
-      return <TransactionEmptyState />;
+      return <ActivityEmptyState />;
     }
 
     return (
@@ -114,8 +114,8 @@ export class TransactionInfo extends Component {
                   key={account_action_seq}
                   style={{ paddingHorizontal: 15, paddingVertical: 10 }}
                   onPress={() =>
-                    this.props.navigation.navigate('TransactionDetail', {
-                      txId: action_trace.trx_id
+                    this.props.navigation.navigate('ActivityDetail', {
+                      actionSeq: account_action_seq
                     })
                   }
                 >
