@@ -147,12 +147,13 @@ export class AccountService {
     return JSON.parse(key);
   }
 
-  static getKey(account, permission = 'active') {
-    let foundKey;
+  static getKey(account, permission) {
+    let foundKey = false;
+
     account.keys.some(key => {
       const parsedKey = AccountService.getParsingKey(key);
       return (foundKey =
-        parsedKey.permission === permission ? parsedKey : false);
+        !permission || parsedKey.permission === permission ? parsedKey : false);
     });
 
     return foundKey;
