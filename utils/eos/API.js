@@ -93,13 +93,13 @@ class EosApi {
           code,
           symbol
         }),
-      precision: ({ account = 'eosio.token', symbol = 'EOS' }) => {
+      precision: async ({ account = 'eosio.token', symbol = 'EOS' }) => {
         if (symbol === 'EOS') {
           return 4;
         }
-        const stats = EosApi.currency.stats({ code: account, symbol });
-        const supplyBalance = stats[symbol].max_supply.split(' ')[0];
-        return supplyBalance.split('.')[1].length;
+        const stats = await EosApi.currency.stats({ code: account, symbol });
+        const maxSupplyBalance = stats[symbol].max_supply.split(' ')[0];
+        return maxSupplyBalance.split('.')[1].length;
       }
     };
   }
@@ -207,7 +207,7 @@ class EosApi {
           throw e;
         }
       },
-      transfer: params => {
+      transfer: async params => {
         let {
           account = 'eosio.token',
           name = 'transfer',
@@ -229,15 +229,17 @@ class EosApi {
         }
 
         symbol = symbol.toUpperCase();
-        const precision = EosApi.currency.precision({ code: account, symbol });
+        const precision = await EosApi.currency.precision({
+          code: account,
+          symbol
+        });
         const fixedBalance = parseFloat(amount).toFixed(precision);
         params.quantity = `${fixedBalance} ${symbol}`;
 
         const transaction = { ...params, account, name };
-
         return EosApi.transactions.transaction(transaction);
       },
-      stake: params => {
+      stake: async params => {
         let {
           account = 'eosio',
           name = 'delegatebw',
@@ -275,7 +277,7 @@ class EosApi {
           params.actor = params.from;
         }
 
-        const precision = EosApi.currency.precision({ symbol });
+        const precision = await EosApi.currency.precision({ symbol });
 
         net = parseFloat(net).toFixed(precision);
         cpu = parseFloat(cpu).toFixed(precision);
@@ -287,7 +289,7 @@ class EosApi {
 
         return EosApi.transactions.transaction(transaction);
       },
-      unStake: params => {
+      unStake: async params => {
         let {
           account = 'eosio',
           name = 'undelegatebw',
@@ -325,7 +327,7 @@ class EosApi {
           transfer = false;
         }
 
-        const precision = EosApi.currency.precision({ symbol });
+        const precision = await EosApi.currency.precision({ symbol });
 
         net = parseFloat(net).toFixed(precision);
         cpu = parseFloat(cpu).toFixed(precision);
