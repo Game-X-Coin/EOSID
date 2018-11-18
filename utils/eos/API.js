@@ -193,9 +193,9 @@ class EosApi {
 
           if (proposal) {
             const packed_transaction = api.deserializeTransaction(
-              result.serializedTransaction
+              (await result).serializedTransaction
             );
-            return await EosApi.proposal({
+            return EosApi.proposal({
               packed_transaction,
               requested: authorization
             });
