@@ -51,7 +51,7 @@ export class AccountService {
         encryptedPrivateKey,
         permission: permissions[0]
       });
-      permissions = permissions.slice(0);
+      permissions = permissions.slice(1);
       // check duplicated permission in account
     } else if (
       permissions.find(permission => AccountService.getKey(account, permission))
@@ -71,7 +71,7 @@ export class AccountService {
     }, []);
 
     if (keys.length) {
-      account.keys ? account.keys.push(keys) : (account.keys = keys);
+      account.keys = [...(account.keys ? account.keys : []), ...keys];
     }
 
     // save
