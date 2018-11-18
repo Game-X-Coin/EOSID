@@ -182,13 +182,14 @@ class Store {
   @action
   async transfer(params) {
     const { id, name } = this.currentAccount;
-    const { permission = 'active' } = params;
-    const key = AccountService.getKey(this.currentAccount, permission);
+    // const { permission = 'active' } = params;
+    const key = AccountService.getKey(this.currentAccount);
 
     return AccountService.transfer({
       ...params,
       sender: name,
       encryptedPrivateKey: key.encryptedPrivateKey,
+      permission: key.permission,
       pincode: PincodeStore.accountPincode
     }).then(async tx => {
       // fetch lastets tokens
@@ -203,13 +204,14 @@ class Store {
   @action
   async manageResource(params) {
     const { name } = this.currentAccount;
-    const { permission = 'active' } = params;
-    const key = AccountService.getKey(this.currentAccount, permission);
+    // const { permission = 'active' } = params;
+    const key = AccountService.getKey(this.currentAccount);
 
     return AccountService.manageResource({
       ...params,
       sender: name,
       encryptedPrivateKey: key.encryptedPrivateKey,
+      permission: key.permission,
       pincode: PincodeStore.accountPincode
     }).then(async tx => {
       await this.getInfo();
