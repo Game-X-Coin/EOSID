@@ -151,6 +151,10 @@ export class AccountService {
         parsedKey.permission === permission ? parsedKey : false);
     });
 
+    if (!foundKey) {
+      return new Error('Not found key');
+    }
+
     return foundKey;
   }
 
