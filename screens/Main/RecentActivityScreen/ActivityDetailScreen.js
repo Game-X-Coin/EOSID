@@ -46,7 +46,7 @@ export class ActivityDetailScreen extends Component {
     const Item = ({ title, description, children }) => (
       <View style={{ marginTop: 5, marginBottom: 5 }}>
         <Caption>{title}</Caption>
-        {description && <Text>{description}</Text>}
+        <Text>{description}</Text>
         {children}
       </View>
     );
