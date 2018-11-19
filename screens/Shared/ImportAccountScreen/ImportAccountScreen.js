@@ -10,8 +10,6 @@ import {
   Text,
   Colors
 } from 'react-native-paper';
-import { TextField } from 'react-native-material-textfield';
-import { Dropdown } from 'react-native-material-dropdown';
 import { Icon } from 'expo';
 import { withFormik } from 'formik';
 import * as Yup from 'yup';
@@ -29,6 +27,8 @@ import {
 
 import { DialogIndicator } from '../../../components/Indicator';
 import { Theme } from '../../../constants';
+import { TextField } from '../../../components/TextField';
+import { SelectField } from '../../../components/SelectField';
 
 @inject('settingsStore', 'networkStore', 'accountStore')
 @withFormik({
@@ -244,8 +244,7 @@ export class ImportAccountScreen extends Component {
               autoFocus
               multiline
               label="Private key"
-              title="Enter the private key of the account to import"
-              style={{ fontFamily: 'monospace' }}
+              info="Private key of account to import"
               value={values.privateKey}
               error={touched.privateKey && errors.privateKey}
               onChangeText={_ => {
@@ -254,9 +253,9 @@ export class ImportAccountScreen extends Component {
               }}
             />
 
-            <Dropdown
+            <SelectField
               label="Network"
-              title="Network of account to import"
+              info="Network of account to import"
               data={networks}
               value={values.networkId}
               error={touched.networkId && errors.networkId}

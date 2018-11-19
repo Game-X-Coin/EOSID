@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { Keyboard } from 'react-native';
 import { Appbar, Button } from 'react-native-paper';
-import { TextField } from 'react-native-material-textfield';
 import { withFormik } from 'formik';
 import * as Yup from 'yup';
 
@@ -16,6 +15,7 @@ import {
 
 import { DialogIndicator } from '../../../components/Indicator';
 import { Theme } from '../../../constants';
+import { TextField } from '../../../components/TextField';
 
 @inject('networkStore')
 @observer
@@ -77,7 +77,8 @@ export class AddNetworkScreen extends Component {
       touched,
       setFieldValue,
       setFieldTouched,
-      handleSubmit
+      handleSubmit,
+      isValid
     } = this.props;
 
     return (
@@ -97,7 +98,8 @@ export class AddNetworkScreen extends Component {
             <TextField
               autoFocus
               label="Name"
-              title="Name to identify your network"
+              placeholder="MyEoS"
+              info="Name to identify your network"
               value={values.name}
               error={touched.name && errors.name}
               onChangeText={_ => {
@@ -108,6 +110,7 @@ export class AddNetworkScreen extends Component {
 
             <TextField
               label="URL"
+              placeholder="http://my.eos.net"
               value={values.url}
               error={touched.url && errors.url}
               onChangeText={_ => {
@@ -119,8 +122,9 @@ export class AddNetworkScreen extends Component {
 
           <Button
             mode="contained"
-            style={{ padding: 5, borderRadius: 0 }}
+            disabled={!isValid}
             onPress={handleSubmit}
+            style={{ padding: 5, borderRadius: 0 }}
           >
             Add network
           </Button>

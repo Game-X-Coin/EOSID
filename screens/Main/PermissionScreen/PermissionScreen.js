@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { View, Clipboard } from 'react-native';
 import { Appbar, Button, Text } from 'react-native-paper';
+import { Icon } from 'expo';
 import Toast from '@rimiti/react-native-toastify';
 
 import { Theme } from '../../../constants';
@@ -40,14 +41,22 @@ export class PermissionScreen extends Component {
           <View
             style={{
               flexDirection: 'row',
+              alignItems: 'center',
               margin: Theme.innerSpacing,
-              padding: 20,
+              marginBottom: 25,
+              padding: 15,
               backgroundColor: Theme.mainBackgroundColor,
               borderRadius: Theme.innerBorderRadius,
               ...Theme.shadow
             }}
           >
-            <Text style={{ flex: 1, fontSize: 17 }}>Account</Text>
+            <View
+              style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}
+            >
+              <Icon.Ionicons size={30} name="md-contact" />
+              <Text style={{ marginLeft: 10, fontSize: 17 }}>Account</Text>
+            </View>
+
             <Text style={{ fontSize: 17 }}>{name}</Text>
           </View>
 
@@ -61,11 +70,11 @@ export class PermissionScreen extends Component {
                 key={permission}
                 style={{
                   marginHorizontal: Theme.innerSpacing,
-                  marginBottom: Theme.innerSpacing
+                  marginBottom: 25
                 }}
               >
-                <View style={{ paddingBottom: 15 }}>
-                  <Text style={{ fontSize: 17 }}>{capitalizedPerm} Key</Text>
+                <View style={{ marginBottom: 15 }}>
+                  <Text style={{ fontSize: 15 }}>{capitalizedPerm} Key</Text>
                 </View>
 
                 <View
@@ -79,7 +88,8 @@ export class PermissionScreen extends Component {
                   <Text
                     style={{
                       flex: 1,
-                      padding: 20,
+                      alignSelf: 'center',
+                      padding: 15,
                       fontSize: 15,
                       fontFamily: 'monospace'
                     }}

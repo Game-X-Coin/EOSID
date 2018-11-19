@@ -2,13 +2,49 @@ import React, { Component } from 'react';
 import { FlatList, View } from 'react-native';
 import { observable, computed } from 'mobx';
 import { observer, inject } from 'mobx-react';
-import { Caption, List, Text, TouchableRipple } from 'react-native-paper';
+import { Text, TouchableRipple } from 'react-native-paper';
 import { withNavigation } from 'react-navigation';
 import moment from 'moment';
+import { Svg } from 'expo';
 
 import { ActivityEmptyState } from './ActivityEmptyState';
 
-import { PageIndicator, Indicator } from '../../../components/Indicator';
+import { SkeletonIndicator } from '../../../components/Indicator';
+import { Theme } from '../../../constants';
+import { Title } from 'react-native-paper';
+
+const ActivityIndicator = () => (
+  <View
+    style={{
+      padding: 17,
+      borderBottomWidth: 1,
+      borderBottomColor: '#d6d6d6'
+    }}
+  >
+    <SkeletonIndicator width="100%" height={40}>
+      <Svg.Rect x="0" y="0" rx="4" ry="4" width="100%" height="15" />
+      <Svg.Rect x="0" y="25" rx="4" ry="4" width="50%" height="15" />
+    </SkeletonIndicator>
+  </View>
+);
+
+const ActivityGroupIndicator = () => (
+  <View style={{ margin: Theme.innerSpacing }}>
+    <SkeletonIndicator width="100%" height={30}>
+      <Svg.Rect x="15" y="0" rx="4" ry="4" width="100" height="15" />
+    </SkeletonIndicator>
+    <View
+      style={{
+        backgroundColor: '#fff',
+        borderRadius: Theme.innerBorderRadius,
+        ...Theme.shadow
+      }}
+    >
+      <ActivityIndicator />
+      <ActivityIndicator />
+    </View>
+  </View>
+);
 
 @withNavigation
 @inject('accountStore')
@@ -66,11 +102,7 @@ export class ActivityInfo extends Component {
       return null;
     }
 
-    return (
-      <View style={{ paddingVertical: 20 }}>
-        <Indicator />
-      </View>
-    );
+    return <ActivityGroupIndicator />;
   };
 
   render() {
@@ -84,13 +116,19 @@ export class ActivityInfo extends Component {
      *  };
      */
     const groupedActions = actions.reduce((pv, action) => {
-      const time = moment(action.block_time).format('MM/DD');
+      const time = moment(action.block_time).format('YYYY-MM-DD');
 
       return { ...pv, [time]: pv[time] ? [...pv[time], action] : [action] };
     }, {});
 
     if (!fetched) {
-      return <PageIndicator />;
+      return (
+        <View>
+          <ActivityGroupIndicator />
+          <ActivityGroupIndicator />
+          <ActivityGroupIndicator />
+        </View>
+      );
     }
 
     if (!actions.length) {
@@ -106,46 +144,85 @@ export class ActivityInfo extends Component {
         onRefresh={this.onRefresh}
         onEndReached={this.onEndReached}
         ListFooterComponent={this.renderFooter}
-        renderItem={({ item: time }) => (
-          <List.Section title={time}>
-            {groupedActions[time].map(
-              ({ account_action_seq, action_trace, block_time }) => (
-                <TouchableRipple
-                  key={account_action_seq}
-                  style={{ paddingHorizontal: 15, paddingVertical: 10 }}
-                  onPress={() =>
-                    this.props.navigation.navigate('ActivityDetail', {
-                      actionSeq: account_action_seq
-                    })
-                  }
-                >
-                  <View style={{ flexDirection: 'row' }}>
-                    <View style={{ flex: 1 }}>
-                      <View style={{ flexDirection: 'row' }}>
-                        <Text style={{ marginRight: 7, fontSize: 17 }}>
-                          {action_trace.act.name}
-                        </Text>
-                        <Caption>{action_trace.act.account}</Caption>
-                      </View>
+        renderItem={({ item: key }) => (
+          <View
+            style={{
+              marginHorizontal: Theme.innerSpacing,
+              marginVertical: Theme.innerSpacing
+            }}
+          >
+            <View
+              style={{
+                flexDirection: 'row',
+                paddingHorizontal: 10,
+                marginBottom: 10
+              }}
+            >
+              <Text style={{ flex: 1, fontSize: 15 }}>
+                {moment(key).fromNow()}
+              </Text>
+              <Text style={{ color: Theme.infoColor }}>
+                {moment(key).format('ll')}
+              </Text>
+            </View>
 
-                      <Caption numberOfLines={2}>
-                        {JSON.stringify(action_trace.act.data)}
-                      </Caption>
-                    </View>
-                    <Text
+            <View
+              style={{
+                backgroundColor: '#fff',
+                borderRadius: Theme.innerBorderRadius,
+                overflow: 'hidden',
+                ...Theme.shadow
+              }}
+            >
+              {groupedActions[key].map(
+                ({ account_action_seq, action_trace, block_time }) => (
+                  <TouchableRipple
+                    key={account_action_seq}
+                    style={{
+                      padding: 17,
+                      borderBottomWidth: 1,
+                      borderBottomColor: '#d6d6d6'
+                    }}
+                    onPress={() =>
+                      this.props.navigation.navigate('ActivityDetail', {
+                        actionSeq: account_action_seq
+                      })
+                    }
+                  >
+                    <View
                       style={{
-                        alignSelf: 'center',
-                        paddingLeft: 15,
-                        fontSize: 13
+                        flexDirection: 'row'
                       }}
                     >
-                      {moment(block_time).format('hh:mm')}
-                    </Text>
-                  </View>
-                </TouchableRipple>
-              )
-            )}
-          </List.Section>
+                      <View style={{ flex: 1 }}>
+                        <Title
+                          style={{
+                            marginBottom: 5,
+                            fontSize: 18,
+                            lineHeight: 18
+                          }}
+                        >
+                          {action_trace.act.name}
+                        </Title>
+                        <Text style={{ fontSize: 13 }}>
+                          by {action_trace.act.account}
+                        </Text>
+                      </View>
+                      <Text
+                        style={{
+                          paddingLeft: 15,
+                          fontSize: 13,
+                          color: Theme.infoColor
+                        }}
+                      >
+                        {moment(block_time).format('A hh:mm')}
+                      </Text>
+                    </View>
+                  </TouchableRipple>
+                )
+              )}
+            </View>
+          </View>
         )}
       />
     );

@@ -1,6 +1,6 @@
 import React from 'react';
 import { observer, inject } from 'mobx-react';
-import { Linking } from 'react-native';
+import { Animated, Easing, Linking } from 'react-native';
 import { createStackNavigator } from 'react-navigation';
 import { createMaterialBottomTabNavigator } from 'react-navigation-material-bottom-tabs';
 import { Icon, Linking as ExpoLinking } from 'expo';
@@ -18,7 +18,10 @@ import {
   ManageResourceScreen,
   PermissionScreen,
   ActivityScreen,
-  ActivityDetailScreen
+  ActivityDetailScreen,
+  ResourceScreen,
+  SettingsAppPinScreen,
+  SettingsAccountPinScreen
 } from '../../screens/Main';
 
 import {
@@ -36,6 +39,7 @@ import { Theme } from '../../constants';
 const DetailScreens = {
   // accounts
   ImportAccount: ImportAccountScreen,
+  Resource: ResourceScreen,
   ManageResource: ManageResourceScreen,
   Transfer: TransferScreen,
   TransferAmount: TransferAmountScreen,
@@ -43,6 +47,8 @@ const DetailScreens = {
   Permission: PermissionScreen,
   // settings
   SettingsNetwork: SettingsNetworkScreen,
+  SettingsAppPin: SettingsAppPinScreen,
+  SettingsAccountPin: SettingsAccountPinScreen,
   AddNetwork: AddNetworkScreen,
   Accounts: AccountsScreen,
   // activity
@@ -149,6 +155,30 @@ export const MainStackNavigator = createStackNavigator(
   },
   {
     headerMode: 'none',
-    cardStyle: { backgroundColor: '#fff' }
+    cardStyle: { backgroundColor: '#fff' },
+    transitionConfig: () => ({
+      transitionSpec: {
+        duration: 300,
+        easing: Easing.out(Easing.bezier(0.42, 0, 1, 1)),
+        timing: Animated.timing,
+        useNativeDriver: true
+      },
+      screenInterpolator: ({ layout, position, scene }) => {
+        const { index } = scene;
+        const { initWidth } = layout;
+
+        const translateX = position.interpolate({
+          inputRange: [index - 1, index, index + 1],
+          outputRange: [initWidth, 0, -30]
+        });
+
+        const opacity = position.interpolate({
+          inputRange: [index - 1, index - 0.99, index],
+          outputRange: [0, 1, 1]
+        });
+
+        return { opacity, transform: [{ translateX }] };
+      }
+    })
   }
 );

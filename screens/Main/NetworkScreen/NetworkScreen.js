@@ -23,14 +23,14 @@ export class NetworkScreen extends Component {
 
         <ScrollView>
           <List.Section title="Mainnet">
-            {defaultNetworks.map(({ id, name, url }) => (
-              <List.Item key={id} title={name} description={url} />
+            {defaultNetworks.map(({ id, name, chainURL }) => (
+              <List.Item key={id} title={name} description={chainURL} />
             ))}
           </List.Section>
 
           <List.Section title="Custom">
-            {customNetworks.map(({ id, name, url }) => (
-              <List.Item key={id} title={name} description={url} />
+            {customNetworks.map(({ id, name, chainURL }) => (
+              <List.Item key={id} title={name} description={chainURL} />
             ))}
             {!customNetworks.length && <List.Item title="No custom networks" />}
           </List.Section>

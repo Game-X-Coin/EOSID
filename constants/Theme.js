@@ -1,17 +1,18 @@
-const tintColor = '#2f95dc';
+const tintColor = '#1873e6';
 
 export const Theme = {
-  primary: '#1873e6',
+  primary: tintColor,
   secondary: '#ffd111',
-  teritary: '#33ba20',
+  tertiary: '#33ba20',
+  quaternary: '#ff4b34',
   activeColor: tintColor,
   inActiveColor: '#bababa',
   headerBackgroundColor: 'transparent',
-  mainBackgroundGradient: ['#fff', '#f8f9fa'],
+  mainBackgroundGradient: ['#fff', 'rgba(244, 244, 244, 0.5)'],
   mainBackgroundColor: '#fff',
-  innerSpacing: 25,
+  innerSpacing: 20,
   innerPadding: 25,
-  innerBorderRadius: 5,
+  innerBorderRadius: 7,
   shadow: {
     elevation: 4
     /* ios shadow
@@ -21,10 +22,7 @@ export const Theme = {
     shadowRadius: 2, 
     */
   },
-  errorBackground: 'red',
-  errorText: '#fff',
-  warningBackground: '#EAEB5E',
-  warningText: '#666804',
-  noticeBackground: tintColor,
-  noticeText: '#fff'
+  successColor: tintColor,
+  errorColor: '#ff4b34',
+  infoColor: '#bcbcbc'
 };
