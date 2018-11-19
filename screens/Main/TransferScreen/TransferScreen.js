@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observable } from 'mobx';
 import { observer, inject } from 'mobx-react';
-import { SafeAreaView, View } from 'react-native';
+import { View } from 'react-native';
 import {
   Appbar,
   Button,
@@ -10,15 +10,18 @@ import {
   Caption,
   TouchableRipple
 } from 'react-native-paper';
-import { TextField } from 'react-native-material-textfield';
+import moment from 'moment';
 
 import api from '../../../utils/eos/API';
 import { TransferLogService } from '../../../services';
+import { Theme } from '../../../constants';
 
-import { KeyboardAvoidingView, ScrollView } from '../../../components/View';
-
-import HomeStyle from '../../../styles/HomeStyle';
-import { Indicator } from '../../../components/Indicator';
+import {
+  KeyboardAvoidingView,
+  ScrollView,
+  BackgroundView
+} from '../../../components/View';
+import { TextField } from '../../../components/TextField';
 
 const debounce = (func, wait) => {
   let timeout;
@@ -50,19 +53,18 @@ export class TransferLogs extends Component {
 
   render() {
     return (
-      <View>
-        <View style={{ paddingHorizontal: 20 }}>
+      <View style={{ paddingBottom: Theme.innerPadding }}>
+        <View style={{ paddingHorizontal: Theme.innerSpacing }}>
           <Text>Recent History</Text>
-          <Divider style={{ marginVertical: 10 }} />
+          <Divider style={{ marginTop: 10 }} />
         </View>
 
         {this.transferLogs.map(log => (
           <TouchableRipple
             key={log.id}
             style={{
-              paddingHorizontal: 20,
-              paddingVertical: 5,
-              marginBottom: 5
+              paddingHorizontal: Theme.innerSpacing,
+              paddingVertical: 10
             }}
             onPress={() => this.props.onLogPress(log)}
           >
@@ -74,7 +76,7 @@ export class TransferLogs extends Component {
             >
               <View style={{ flex: 1 }}>
                 <Text>{log.receiver}</Text>
-                <Caption>{log.createdAt}</Caption>
+                <Caption>{moment(log.createdAt).format('YYYY-MM-DD')}</Caption>
               </View>
               <Text style={{ fontSize: 15 }}>
                 {log.amount} {log.symbol}
@@ -135,35 +137,34 @@ export class TransferScreen extends Component {
     const { receiver, loading, error } = this;
 
     return (
-      <SafeAreaView style={HomeStyle.container}>
-        <Appbar.Header>
+      <BackgroundView>
+        <Appbar.Header style={{ backgroundColor: Theme.headerBackgroundColor }}>
           <Appbar.BackAction onPress={() => navigation.goBack(null)} />
-          <Appbar.Content title="Receiver" />
+          <Appbar.Content title="Transfer" />
         </Appbar.Header>
 
         <KeyboardAvoidingView>
           <ScrollView>
-            <View style={{ padding: 20 }}>
+            <View
+              style={{
+                marginHorizontal: Theme.innerSpacing,
+                marginBottom: Theme.innerSpacing
+              }}
+            >
               <TextField
                 autoFocus
-                label="Enter receiver's account"
-                title="example: eosauthority"
+                label="Receiver's account"
+                placeholder="iameosiduser"
                 value={receiver}
                 error={error}
-                renderAccessory={() =>
-                  loading && (
-                    <View style={{ paddingHorizontal: 5 }}>
-                      <Indicator size="small" />
-                    </View>
-                  )
-                }
+                loading={loading}
                 onChangeText={v => this.onChangeReceiver(v)}
               />
 
               <Button
                 mode="contained"
                 style={{
-                  marginVertical: 20,
+                  marginBottom: 20,
                   padding: 5
                 }}
                 disabled={!receiver.length}
@@ -181,7 +182,7 @@ export class TransferScreen extends Component {
             />
           </ScrollView>
         </KeyboardAvoidingView>
-      </SafeAreaView>
+      </BackgroundView>
     );
   }
 }

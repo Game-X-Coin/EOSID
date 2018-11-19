@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import { Provider } from 'mobx-react/native';
-import { Provider as PaperProvider } from 'react-native-paper';
+import { DefaultTheme, Provider as PaperProvider } from 'react-native-paper';
 import Sentry from 'sentry-expo';
 
 import RenderApp from './RenderApp';
+
+import { Theme } from './constants/Theme';
 
 import {
   PincodeStore,
@@ -19,6 +21,14 @@ import {
 Sentry.config(
   'https://55321a0b2afa487c9b6ae9d5d1fa5ea9@sentry.io/1314438'
 ).install();
+
+const theme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    ...Theme
+  }
+};
 
 export default class App extends Component {
   componentDidCatch(error, errorInfo) {
@@ -37,7 +47,7 @@ export default class App extends Component {
 
     return (
       <Provider {...stores}>
-        <PaperProvider>
+        <PaperProvider theme={theme}>
           <RenderApp />
         </PaperProvider>
       </Provider>

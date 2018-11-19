@@ -1,17 +1,21 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { SafeAreaView, Keyboard } from 'react-native';
+import { Keyboard } from 'react-native';
 import { Appbar, Button } from 'react-native-paper';
-import { TextField } from 'react-native-material-textfield';
 import { withFormik } from 'formik';
 import * as Yup from 'yup';
 
 import { NetworkError } from '../../../db';
 
-import { KeyboardAvoidingView, ScrollView } from '../../../components/View';
+import {
+  KeyboardAvoidingView,
+  ScrollView,
+  BackgroundView
+} from '../../../components/View';
 
-import HomeStyle from '../../../styles/HomeStyle';
 import { DialogIndicator } from '../../../components/Indicator';
+import { Theme } from '../../../constants';
+import { TextField } from '../../../components/TextField';
 
 @inject('networkStore')
 @observer
@@ -73,12 +77,13 @@ export class AddNetworkScreen extends Component {
       touched,
       setFieldValue,
       setFieldTouched,
-      handleSubmit
+      handleSubmit,
+      isValid
     } = this.props;
 
     return (
-      <SafeAreaView style={HomeStyle.container}>
-        <Appbar.Header>
+      <BackgroundView>
+        <Appbar.Header style={{ backgroundColor: Theme.headerBackgroundColor }}>
           <Appbar.BackAction onPress={() => navigation.goBack(null)} />
           <Appbar.Content title="Add Network" />
         </Appbar.Header>
@@ -93,7 +98,8 @@ export class AddNetworkScreen extends Component {
             <TextField
               autoFocus
               label="Name"
-              title="Name to identify your network"
+              placeholder="MyEoS"
+              info="Name to identify your network"
               value={values.name}
               error={touched.name && errors.name}
               onChangeText={_ => {
@@ -104,6 +110,7 @@ export class AddNetworkScreen extends Component {
 
             <TextField
               label="URL"
+              placeholder="http://my.eos.net"
               value={values.url}
               error={touched.url && errors.url}
               onChangeText={_ => {
@@ -115,13 +122,14 @@ export class AddNetworkScreen extends Component {
 
           <Button
             mode="contained"
-            style={{ padding: 5, borderRadius: 0 }}
+            disabled={!isValid}
             onPress={handleSubmit}
+            style={{ padding: 5, borderRadius: 0 }}
           >
             Add network
           </Button>
         </KeyboardAvoidingView>
-      </SafeAreaView>
+      </BackgroundView>
     );
   }
 }

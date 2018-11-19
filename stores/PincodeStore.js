@@ -2,6 +2,7 @@ import { observable, action } from 'mobx';
 
 import { SettingsStore } from '../stores/SettingsStore';
 import { PincodeService } from '../services';
+import { AccountStore } from './AccountStore';
 
 class Store {
   @observable
@@ -11,17 +12,24 @@ class Store {
   appPincode = '';
 
   @action
+  async getPincodes() {
+    const [appPincode, accountPincode] = await Promise.all([
+      PincodeService.getPincode('app'),
+      PincodeService.getPincode('account')
+    ]);
+
+    this.appPincode = appPincode;
+    this.accountPincode = accountPincode;
+  }
+
+  @action
   async validateAppPincode(pincode) {
-    return PincodeService.validatePincode(pincode, 'app').then(() => {
-      this.appPincode = pincode;
-    });
+    return PincodeService.validatePincode(pincode, 'app');
   }
 
   @action
   async validateAccountPincode(pincode) {
-    return PincodeService.validatePincode(pincode, 'account').then(() => {
-      this.accountPincode = pincode;
-    });
+    return PincodeService.validatePincode(pincode, 'account');
   }
 
   @action
@@ -35,6 +43,11 @@ class Store {
   @action
   async saveAccountPincode(pincode) {
     return PincodeService.savePincode(pincode, 'account').then(async () => {
+      // if account pincode changes
+      if (AccountStore.accounts.length) {
+        await AccountStore.updateEncryptedKeys(this.accountPincode, pincode);
+      }
+
       this.accountPincode = pincode;
       await SettingsStore.updateSettings({ accountPincodeEnabled: true });
     });

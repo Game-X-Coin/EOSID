@@ -1,16 +1,19 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { SafeAreaView, View } from 'react-native';
 import { Appbar, Button } from 'react-native-paper';
-import { TextField } from 'react-native-material-textfield';
-import { Dropdown } from 'react-native-material-dropdown';
 import { withFormik } from 'formik';
 import * as Yup from 'yup';
 
 import { DialogIndicator } from '../../../components/Indicator';
-import { KeyboardAvoidingView, ScrollView } from '../../../components/View';
+import {
+  KeyboardAvoidingView,
+  ScrollView,
+  BackgroundView
+} from '../../../components/View';
+import { TextField } from '../../../components/TextField';
+import { SelectField } from '../../../components/SelectField';
 
-import HomeStyle from '../../../styles/HomeStyle';
+import { Theme } from '../../../constants';
 
 @inject('accountStore')
 @observer
@@ -113,8 +116,8 @@ export class TransferAmountScreen extends Component {
     }));
 
     return (
-      <SafeAreaView style={HomeStyle.container}>
-        <Appbar.Header>
+      <BackgroundView>
+        <Appbar.Header style={{ backgroundColor: Theme.headerBackgroundColor }}>
           <Appbar.BackAction onPress={() => navigation.goBack(null)} />
           <Appbar.Content title="Transfer" />
         </Appbar.Header>
@@ -125,44 +128,47 @@ export class TransferAmountScreen extends Component {
         />
 
         <KeyboardAvoidingView>
-          <ScrollView style={{ padding: 20 }}>
+          <ScrollView
+            style={{
+              marginHorizontal: Theme.innerSpacing
+            }}
+          >
             <TextField
               label="Receiver"
               value={values.receiver}
               editable={false}
+              onPress={() => navigation.goBack(null)}
             />
 
-            <View style={{ flexDirection: 'row' }}>
-              <View style={{ flex: 1 }}>
-                <TextField
-                  autoFocus
-                  label="Enter transfer amount"
-                  keyboardType="numeric"
-                  value={values.amount}
-                  title={`${availableAmount} ${values.symbol} available`}
-                  error={touched.amount && errors.amount}
-                  onChangeText={_ => {
-                    setFieldTouched('amount', true);
-                    setFieldValue('amount', _);
-                  }}
-                />
-              </View>
-
-              <View style={{ width: 90, marginLeft: 8 }}>
-                <Dropdown
+            <TextField
+              autoFocus
+              label="Transfer Amount"
+              keyboardType="numeric"
+              value={values.amount}
+              info={`${availableAmount} ${values.symbol} available`}
+              error={touched.amount && errors.amount}
+              onChangeText={_ => {
+                setFieldTouched('amount', true);
+                setFieldValue('amount', _);
+              }}
+              prefixComp={
+                <SelectField
                   value={values.symbol}
                   data={tokenData}
-                  onChangeText={_ => {
-                    setFieldValue('symbol', _);
+                  onChange={_ => setFieldValue('symbol', _)}
+                  containerStyle={{
+                    marginBottom: 0,
+                    marginRight: 15,
+                    width: values.symbol.length * 10 + 60
                   }}
                 />
-              </View>
-            </View>
+              }
+            />
 
             <TextField
               multiline
-              label="Enter memo (optional)"
-              suffix={`${values.memo.length} / 256`}
+              label="Memo (optional)"
+              info={`${values.memo.length} / 256`}
               value={values.memo}
               error={touched.memo && errors.memo}
               onChangeText={_ => {
@@ -181,10 +187,10 @@ export class TransferAmountScreen extends Component {
             disabled={!isValid}
             onPress={handleSubmit}
           >
-            Transfer
+            Next
           </Button>
         </KeyboardAvoidingView>
-      </SafeAreaView>
+      </BackgroundView>
     );
   }
 }

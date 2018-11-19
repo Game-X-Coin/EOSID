@@ -7,7 +7,7 @@ import { Button } from 'react-native-paper';
 
 @inject('accountStore')
 @observer
-export class TransactionEmptyState extends Component {
+export class ActivityEmptyState extends Component {
   @observable
   refreshing = false;
 
@@ -23,7 +23,7 @@ export class TransactionEmptyState extends Component {
     return (
       <EmptyState
         image={require('../../../assets/example.png')}
-        title="No transactions yet"
+        title="No activities yet"
         description="Looks like you have not done anything yet, If not, please press the refresh button."
       >
         <Button

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { SafeAreaView } from 'react-native';
+import { View } from 'react-native';
 import { Appbar } from 'react-native-paper';
 
 import { PermissionRequestInfo } from './PermissionRequestInfo';
@@ -17,7 +17,7 @@ export class PermissionRequestScreen extends Component {
     const { currentAccount } = this.props.accountStore;
 
     return (
-      <SafeAreaView style={HomeStyle.container}>
+      <View style={HomeStyle.container}>
         <Appbar.Header>
           <Appbar.Content title="Permission Request" />
           <Appbar.Action
@@ -27,7 +27,7 @@ export class PermissionRequestScreen extends Component {
         </Appbar.Header>
 
         {currentAccount ? <PermissionRequestInfo /> : <AccountEmptyState />}
-      </SafeAreaView>
+      </View>
     );
   }
 }

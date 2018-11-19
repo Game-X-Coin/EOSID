@@ -91,6 +91,15 @@ class Store {
   }
 
   @action
+  async updateEncryptedKeys(prevPincode, newPincode) {
+    return AccountService.updateEncryptedKeys(prevPincode, newPincode).then(
+      accounts => {
+        this.setAccounts(accounts);
+      }
+    );
+  }
+
+  @action
   async removeAccount(accountId) {
     return AccountService.removeAccount(accountId).then(_ => {
       const filterDeletedAccount = this.accounts.filter(
@@ -173,17 +182,18 @@ class Store {
   @action
   async transfer(params) {
     const { id, name } = this.currentAccount;
-    const { permission = 'active' } = params;
-    const key = AccountService.getKey(this.currentAccount, permission);
+    // const { permission = 'active' } = params;
+    const key = AccountService.getKey(this.currentAccount);
 
     return AccountService.transfer({
       ...params,
       sender: name,
       encryptedPrivateKey: key.encryptedPrivateKey,
+      permission: key.permission,
       pincode: PincodeStore.accountPincode
     }).then(async tx => {
-      // fetch lastets tokens
       await this.getTokens();
+      await this.getActions();
       // log transfer
       TransferLogService.addTransferLog({ ...params, accountId: id });
 
@@ -194,17 +204,19 @@ class Store {
   @action
   async manageResource(params) {
     const { name } = this.currentAccount;
-    const { permission = 'active' } = params;
-    const key = AccountService.getKey(this.currentAccount, permission);
+    // const { permission = 'active' } = params;
+    const key = AccountService.getKey(this.currentAccount);
 
     return AccountService.manageResource({
       ...params,
       sender: name,
       encryptedPrivateKey: key.encryptedPrivateKey,
+      permission: key.permission,
       pincode: PincodeStore.accountPincode
     }).then(async tx => {
       await this.getInfo();
       await this.getTokens();
+      await this.getActions();
 
       return tx;
     });

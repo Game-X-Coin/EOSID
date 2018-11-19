@@ -1,6 +1,6 @@
 import React from 'react';
 import { observer, inject } from 'mobx-react';
-import { Linking } from 'react-native';
+import { Animated, Easing, Linking } from 'react-native';
 import { createStackNavigator } from 'react-navigation';
 import { createMaterialBottomTabNavigator } from 'react-navigation-material-bottom-tabs';
 import { Icon, Linking as ExpoLinking } from 'expo';
@@ -10,14 +10,18 @@ import {
   SettingsScreen,
   AddNetworkScreen,
   NetworkScreen as SettingsNetworkScreen,
-  TransactionScreen,
-  TransactionDetailScreen,
   AccountsScreen,
   TransferScreen,
   TransferAmountScreen,
   TransferResultScreen,
   PermissionRequestScreen,
-  ManageResourceScreen
+  ManageResourceScreen,
+  PermissionScreen,
+  ActivityScreen,
+  ActivityDetailScreen,
+  ResourceScreen,
+  SettingsAppPinScreen,
+  SettingsAccountPinScreen
 } from '../../screens/Main';
 
 import {
@@ -29,20 +33,26 @@ import {
   NewAppPinScreen
 } from '../../screens/Shared';
 
+import { Theme } from '../../constants';
+
 // detail screens
 const DetailScreens = {
   // accounts
   ImportAccount: ImportAccountScreen,
+  Resource: ResourceScreen,
   ManageResource: ManageResourceScreen,
   Transfer: TransferScreen,
   TransferAmount: TransferAmountScreen,
   TransferResult: TransferResultScreen,
+  Permission: PermissionScreen,
   // settings
   SettingsNetwork: SettingsNetworkScreen,
+  SettingsAppPin: SettingsAppPinScreen,
+  SettingsAccountPin: SettingsAccountPinScreen,
   AddNetwork: AddNetworkScreen,
   Accounts: AccountsScreen,
-  // tx
-  TransactionDetail: TransactionDetailScreen,
+  // activity
+  ActivityDetail: ActivityDetailScreen,
   // confirm pincode
   ConfirmPin: ConfirmPinScreen,
   ConfirmAppPin: ConfirmAppPinScreen,
@@ -58,7 +68,7 @@ const DetailScreens = {
 // for tab icons
 const iconMap = {
   Account: 'md-contact',
-  Transaction: 'md-filing',
+  Activity: 'md-filing',
   Settings: 'md-settings'
 };
 
@@ -66,11 +76,10 @@ const iconMap = {
 const MainTabNavigator = createMaterialBottomTabNavigator(
   {
     Account: AccountScreen,
-    Transaction: TransactionScreen,
+    Activity: ActivityScreen,
     Settings: SettingsScreen
   },
   {
-    shifting: true,
     navigationOptions: ({ navigation }) => ({
       tabBarIcon: ({ tintColor }) => {
         const { routeName } = navigation.state;
@@ -83,7 +92,13 @@ const MainTabNavigator = createMaterialBottomTabNavigator(
           />
         );
       }
-    })
+    }),
+    shifting: true,
+    activeColor: Theme.activeColor,
+    inactiveColor: Theme.inActiveColor,
+    barStyle: {
+      backgroundColor: Theme.mainBackgroundColor
+    }
   }
 );
 
@@ -140,6 +155,30 @@ export const MainStackNavigator = createStackNavigator(
   },
   {
     headerMode: 'none',
-    cardStyle: { backgroundColor: '#fff' }
+    cardStyle: { backgroundColor: '#fff' },
+    transitionConfig: () => ({
+      transitionSpec: {
+        duration: 300,
+        easing: Easing.out(Easing.bezier(0.42, 0, 1, 1)),
+        timing: Animated.timing,
+        useNativeDriver: true
+      },
+      screenInterpolator: ({ layout, position, scene }) => {
+        const { index } = scene;
+        const { initWidth } = layout;
+
+        const translateX = position.interpolate({
+          inputRange: [index - 1, index, index + 1],
+          outputRange: [initWidth, 0, -30]
+        });
+
+        const opacity = position.interpolate({
+          inputRange: [index - 1, index - 0.99, index],
+          outputRange: [0, 1, 1]
+        });
+
+        return { opacity, transform: [{ translateX }] };
+      }
+    })
   }
 );

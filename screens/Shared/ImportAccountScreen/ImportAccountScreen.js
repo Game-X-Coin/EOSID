@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
-import { observable } from 'mobx';
 import { observer, inject } from 'mobx-react';
-import { SafeAreaView, View, Keyboard } from 'react-native';
+import { View, Keyboard } from 'react-native';
 import {
   Appbar,
   Button,
@@ -11,8 +10,6 @@ import {
   Text,
   Colors
 } from 'react-native-paper';
-import { TextField } from 'react-native-material-textfield';
-import { Dropdown } from 'react-native-material-dropdown';
 import { Icon } from 'expo';
 import { withFormik } from 'formik';
 import * as Yup from 'yup';
@@ -22,10 +19,16 @@ import { AccountService } from '../../../services';
 
 import api from '../../../utils/eos/API';
 
-import { ScrollView, KeyboardAvoidingView } from '../../../components/View';
+import {
+  ScrollView,
+  KeyboardAvoidingView,
+  BackgroundView
+} from '../../../components/View';
 
-import HomeStyle from '../../../styles/HomeStyle';
 import { DialogIndicator } from '../../../components/Indicator';
+import { Theme } from '../../../constants';
+import { TextField } from '../../../components/TextField';
+import { SelectField } from '../../../components/SelectField';
 
 @inject('settingsStore', 'networkStore', 'accountStore')
 @withFormik({
@@ -52,11 +55,10 @@ import { DialogIndicator } from '../../../components/Indicator';
 })
 @observer
 export class ImportAccountScreen extends Component {
-  @observable
-  showDialog = false;
-
-  @observable
-  showLoadingDialog = false;
+  state = {
+    showDialog: false,
+    showLoadingDialog: false
+  };
 
   async handleSubmit() {
     const {
@@ -163,16 +165,22 @@ export class ImportAccountScreen extends Component {
   }
 
   toggleDialog() {
-    this.showDialog = !this.showDialog;
+    this.setState({
+      showDialog: !this.state.showDialog
+    });
   }
 
   toggleLoadingDialog() {
-    this.showLoadingDialog = !this.showLoadingDialog;
+    this.setState({
+      showLoadingDialog: !this.state.showLoadingDialog
+    });
   }
 
   hideDialogs() {
-    this.showDialog = false;
-    this.showLoadingDialog = false;
+    this.setState({
+      showDialog: false,
+      showLoadingDialog: false
+    });
   }
 
   render() {
@@ -187,6 +195,7 @@ export class ImportAccountScreen extends Component {
       setFieldTouched,
       isValid
     } = this.props;
+    const { showDialog, showLoadingDialog } = this.state;
 
     const isSignUp =
       navigation.state.params && navigation.state.params.isSignUp;
@@ -198,7 +207,7 @@ export class ImportAccountScreen extends Component {
 
     const SelectAccountDialog = () => (
       <Portal>
-        <Dialog visible={this.showDialog} onDismiss={() => this.hideDialogs()}>
+        <Dialog visible={showDialog} onDismiss={() => this.hideDialogs()}>
           <Dialog.Title>Select account</Dialog.Title>
           <Dialog.Content>
             {values.accounts.map(account => (
@@ -214,8 +223,8 @@ export class ImportAccountScreen extends Component {
     );
 
     return (
-      <SafeAreaView style={HomeStyle.container}>
-        <Appbar.Header>
+      <BackgroundView>
+        <Appbar.Header style={{ backgroundColor: Theme.headerBackgroundColor }}>
           <Appbar.BackAction onPress={() => navigation.goBack(null)} />
           <Appbar.Content title="Import account" />
         </Appbar.Header>
@@ -225,7 +234,7 @@ export class ImportAccountScreen extends Component {
 
         {/* Import loading */}
         <DialogIndicator
-          visible={this.showLoadingDialog}
+          visible={showLoadingDialog}
           title="Preparing to import account..."
         />
 
@@ -235,8 +244,7 @@ export class ImportAccountScreen extends Component {
               autoFocus
               multiline
               label="Private key"
-              title="Enter the private key of the account to import"
-              style={{ fontFamily: 'monospace' }}
+              info="Private key of account to import"
               value={values.privateKey}
               error={touched.privateKey && errors.privateKey}
               onChangeText={_ => {
@@ -245,9 +253,9 @@ export class ImportAccountScreen extends Component {
               }}
             />
 
-            <Dropdown
+            <SelectField
               label="Network"
-              title="Network of account to import"
+              info="Network of account to import"
               data={networks}
               value={values.networkId}
               error={touched.networkId && errors.networkId}
@@ -292,7 +300,7 @@ export class ImportAccountScreen extends Component {
             </Button>
           </View>
         </KeyboardAvoidingView>
-      </SafeAreaView>
+      </BackgroundView>
     );
   }
 }
