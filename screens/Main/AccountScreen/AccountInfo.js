@@ -42,15 +42,7 @@ export class AccountInfo extends Component {
   moveScreen = (...args) => this.props.navigation.navigate(...args);
 
   render() {
-    const { info, tokens, fetched, currentAccount } = this.props.accountStore;
-
-    const { cpu_weight = 0, net_weight = 0 } = info;
-
-    const delegatedCPU = cpu_weight * 0.0001;
-    const delegatedNET = net_weight * 0.0001;
-    const undelegatedAmount =
-      Object.keys(tokens).length && parseFloat(tokens.EOS);
-    const totalAsset = delegatedCPU + delegatedNET + undelegatedAmount;
+    const { tokens, fetched, currentAccount } = this.props.accountStore;
 
     const BalanceIndicator = () => (
       <SkeletonIndicator width={200} height={65}>
@@ -64,8 +56,8 @@ export class AccountInfo extends Component {
         style={{
           flexDirection: 'row',
           alignItems: 'center',
-          marginVertical: 10,
-          paddingHorizontal: Theme.innerPadding
+          marginVertical: 12.5,
+          paddingHorizontal: 20
         }}
       >
         <SkeletonIndicator width={35} height={35}>
@@ -85,7 +77,7 @@ export class AccountInfo extends Component {
         <View style={{ flex: 1, flexDirection: 'row' }}>
           <TouchableRipple borderless onPress={() => this.showDrawer()}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Text style={{ padding: 15, fontSize: 17 }}>
+              <Text style={{ paddingLeft: 15, marginRight: 7, fontSize: 17 }}>
                 {currentAccount.name}
               </Text>
               <Icon.Ionicons name="ios-arrow-down" size={17} />
@@ -127,10 +119,8 @@ export class AccountInfo extends Component {
                   marginBottom: 5
                 }}
               >
-                <Title style={{ fontSize: 35, lineHeight: 35 }}>
-                  {totalAsset.toFixed(4)}
-                </Title>
-                <Text style={{ marginLeft: 7, fontSize: 15, lineHeight: 35 }}>
+                <Text style={{ fontSize: 30 }}>{tokens.EOS}</Text>
+                <Text style={{ marginLeft: 7, fontSize: 15, lineHeight: 30 }}>
                   EOS
                 </Text>
               </View>
@@ -180,7 +170,7 @@ export class AccountInfo extends Component {
             >
               <Icon.Ionicons
                 name="md-arrow-down"
-                color={Theme.teritary}
+                color={Theme.tertiary}
                 size={30}
               />
               <Title style={{ marginLeft: 15, fontSize: 17 }}>Receive</Title>
@@ -190,7 +180,7 @@ export class AccountInfo extends Component {
 
         <TouchableRipple
           style={{ margin: Theme.innerSpacing, padding: 15 }}
-          onPress={() => this.moveScreen('ManageResource')}
+          onPress={() => this.moveScreen('Resource')}
         >
           <View
             style={{
@@ -199,9 +189,7 @@ export class AccountInfo extends Component {
               justifyContent: 'center'
             }}
           >
-            <Text style={{ marginRight: 15, fontSize: 17 }}>
-              Manage Resource
-            </Text>
+            <Text style={{ marginRight: 10, fontSize: 17 }}>View Resource</Text>
             <Icon.Ionicons name="ios-arrow-forward" size={17} />
           </View>
         </TouchableRipple>
@@ -212,7 +200,8 @@ export class AccountInfo extends Component {
             flex: 1,
             marginHorizontal: Theme.innerSpacing,
             backgroundColor: Theme.mainBackgroundColor,
-            borderTopRadius: Theme.innerBorderRadius,
+            borderTopLeftRadius: Theme.innerBorderRadius,
+            borderTopRightRadius: Theme.innerBorderRadius,
             ...Theme.shadow
           }}
         >
@@ -220,19 +209,19 @@ export class AccountInfo extends Component {
             style={{
               alignItems: 'center',
               justifyContent: 'center',
-              height: 50
+              height: 40
             }}
           >
             <View
               style={{
                 marginBottom: 5,
-                width: 25,
+                width: 20,
                 height: 2,
                 backgroundColor: '#d8d8d8'
               }}
             />
             <View
-              style={{ width: 25, height: 2, backgroundColor: '#d8d8d8' }}
+              style={{ width: 20, height: 2, backgroundColor: '#d8d8d8' }}
             />
           </View>
           <View>
