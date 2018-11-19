@@ -1,4 +1,4 @@
-import { Api, JsSignatureProvider, JsonRpc, RpcError } from 'eosjs-rn';
+import { Api, JsSignatureProvider, JsonRpc, Serialize } from 'eosjs-rn';
 import ecc from 'eosjs-ecc-rn';
 import { TextDecoder, TextEncoder } from 'text-encoding';
 import { AccountStore, NetworkStore } from '../../stores';
@@ -44,16 +44,17 @@ class EosApi {
     accountName,
     privateKey,
     pincode,
-    permission = 'active'
+    permission = 'active',
+    sign = true
   } = {}) {
     const network = NetworkStore.currentNetwork;
-    if (!privateKey && pincode) {
+    if (sign && !privateKey && pincode) {
       const account = AccountStore.findAccount(accountName);
       const key = AccountService.getKey(account, permission);
-      privateKey = AccountService(key.encryptedPrivateKey, pincode);
+      privateKey = AccountService.decryptKey(key.encryptedPrivateKey, pincode);
     }
 
-    const signatureProvider = new JsSignatureProvider([privateKey]);
+    const signatureProvider = new JsSignatureProvider(sign ? [privateKey] : []);
 
     return new Api({
       chainId: network.chainId,
@@ -92,13 +93,13 @@ class EosApi {
           code,
           symbol
         }),
-      precision: ({ account = 'eosio.token', symbol = 'EOS' }) => {
+      precision: async ({ account = 'eosio.token', symbol = 'EOS' }) => {
         if (symbol === 'EOS') {
           return 4;
         }
-        const stats = EosApi.currency.stats({ code: account, symbol });
-        const supplyBalance = stats[symbol].max_supply.split(' ')[0];
-        return supplyBalance.split('.')[1].length;
+        const stats = await EosApi.currency.stats({ code: account, symbol });
+        const maxSupplyBalance = stats[symbol].max_supply.split(' ')[0];
+        return maxSupplyBalance.split('.')[1].length;
       }
     };
   }
@@ -166,8 +167,10 @@ class EosApi {
       },
       transaction: async ({
         broadcast = true,
+        sign = true,
+        proposal = false,
         blocksBehind = 3,
-        expireSeconds = 30,
+        expireSeconds = 300,
         ...params
       }) => {
         try {
@@ -177,17 +180,34 @@ class EosApi {
 
           const accountName = params.actor ? params.actor : params.from;
 
-          return await EosApi.getApi({ ...params, accountName }).transact(
+          if (proposal) {
+            broadcast = false;
+            sign = false;
+          }
+
+          const api = EosApi.getApi({ ...params, accountName, sign });
+          const result = api.transact(
             { actions: [{ account, name, authorization, data }] },
-            { broadcast, blocksBehind, expireSeconds }
+            { broadcast, sign, blocksBehind, expireSeconds }
           );
+
+          if (proposal) {
+            const packed_transaction = api.deserializeTransaction(
+              (await result).serializedTransaction
+            );
+            return EosApi.proposal({
+              packed_transaction,
+              requested: authorization
+            });
+          }
+          return result;
         } catch (e) {
           console.log(`\nCaught exception: ${e}`);
           console.log(e);
           throw e;
         }
       },
-      transfer: params => {
+      transfer: async params => {
         let {
           account = 'eosio.token',
           name = 'transfer',
@@ -209,15 +229,17 @@ class EosApi {
         }
 
         symbol = symbol.toUpperCase();
-        const precision = EosApi.currency.precision({ code: account, symbol });
+        const precision = await EosApi.currency.precision({
+          code: account,
+          symbol
+        });
         const fixedBalance = parseFloat(amount).toFixed(precision);
         params.quantity = `${fixedBalance} ${symbol}`;
 
         const transaction = { ...params, account, name };
-
-        return this.transactions.transaction(transaction);
+        return EosApi.transactions.transaction(transaction);
       },
-      stake: params => {
+      stake: async params => {
         let {
           account = 'eosio',
           name = 'delegatebw',
@@ -255,7 +277,7 @@ class EosApi {
           params.actor = params.from;
         }
 
-        const precision = EosApi.currency.precision({ symbol });
+        const precision = await EosApi.currency.precision({ symbol });
 
         net = parseFloat(net).toFixed(precision);
         cpu = parseFloat(cpu).toFixed(precision);
@@ -265,9 +287,9 @@ class EosApi {
 
         const transaction = { ...params, account, name, transfer };
 
-        return this.transactions.transaction(transaction);
+        return EosApi.transactions.transaction(transaction);
       },
-      unStake: params => {
+      unStake: async params => {
         let {
           account = 'eosio',
           name = 'undelegatebw',
@@ -305,7 +327,7 @@ class EosApi {
           transfer = false;
         }
 
-        const precision = EosApi.currency.precision({ symbol });
+        const precision = await EosApi.currency.precision({ symbol });
 
         net = parseFloat(net).toFixed(precision);
         cpu = parseFloat(cpu).toFixed(precision);
@@ -315,13 +337,55 @@ class EosApi {
 
         const transaction = { ...params, account, name, transfer };
 
-        return this.transactions.transaction(transaction);
+        return EosApi.transactions.transaction(transaction);
       },
       buyRam: params => {
         console.log('buy ram');
       },
       sellRam: params => {
         console.log('sell ram');
+      },
+      proposal: async params => {
+        let {
+          account = 'eosio.msig',
+          name = 'propose',
+          proposal_name,
+          packed_transaction
+        } = params;
+
+        if (!proposal_name) {
+          // input random proposal_name
+          const buffer = new Serialize.SerialBuffer({
+            textEncoder: new TextEncoder(),
+            textDecoder: new TextDecoder()
+          });
+          const data = await ecc.key_utils.random32ByteBuffer({ safe: false });
+          buffer.pushArray(data);
+          const name = buffer.getName();
+          proposal_name = name;
+        }
+
+        if (!params.proposer) {
+          const foundAccount = AccountStore.findAccount();
+          params.proposer = foundAccount.name;
+        }
+
+        if (!params.requested) {
+          return new Error('It should needed requested parameter');
+        }
+
+        if (!packed_transaction) {
+          return new Error('It should needed packed_transaction parameter');
+        }
+
+        const transactions = {
+          ...params,
+          account,
+          name,
+          proposal_name,
+          trx: packed_transaction
+        };
+        return EosApi.transactions.transaction(transactions);
       }
     };
   }
