@@ -7,7 +7,7 @@ module.exports = api => {
         plugins: []
       },
       production: {
-        plugins: ['react-native-paper/babel']
+        plugins: ['react-native-paper/babel', 'transform-remove-console']
       }
     }
   };
