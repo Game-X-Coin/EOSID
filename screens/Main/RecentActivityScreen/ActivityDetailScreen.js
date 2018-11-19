@@ -1,12 +1,53 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { View } from 'react-native';
-import { Appbar, Divider, Caption, Text, Title } from 'react-native-paper';
+import { Appbar, Text, Title } from 'react-native-paper';
 import moment from 'moment';
+import { Svg } from 'expo';
 
-import { PageIndicator } from '../../../components/Indicator';
+import { SkeletonIndicator } from '../../../components/Indicator';
 import { BackgroundView, ScrollView } from '../../../components/View';
 import { Theme } from '../../../constants';
+
+const ActivityIndicator = () => (
+  <View
+    style={{
+      margin: Theme.innerSpacing,
+      padding: Theme.innerPadding,
+      backgroundColor: Theme.mainBackgroundColor,
+      borderRadius: Theme.innerBorderRadius,
+      ...Theme.shadow
+    }}
+  >
+    <SkeletonIndicator width="100%" height={40}>
+      <Svg.Rect x="0" y="0" rx="4" ry="4" width="70%" height="15" />
+      <Svg.Rect x="0" y="25" rx="4" ry="4" width="35%" height="15" />
+    </SkeletonIndicator>
+
+    <View
+      style={{
+        marginVertical: 20,
+        height: 1,
+        backgroundColor: '#d6d6d6'
+      }}
+    />
+
+    <SkeletonIndicator width="100%" height={60}>
+      <Svg.Rect x="0" y="0" rx="4" ry="4" width="30%" height="15" />
+      <Svg.Rect x="0" y="25" rx="4" ry="4" width="50%" height="15" />
+    </SkeletonIndicator>
+
+    <SkeletonIndicator width="100%" height={60}>
+      <Svg.Rect x="0" y="0" rx="4" ry="4" width="30%" height="15" />
+      <Svg.Rect x="0" y="25" rx="4" ry="4" width="50%" height="15" />
+    </SkeletonIndicator>
+
+    <SkeletonIndicator width="100%" height={40}>
+      <Svg.Rect x="0" y="0" rx="4" ry="4" width="30%" height="15" />
+      <Svg.Rect x="0" y="25" rx="4" ry="4" width="50%" height="15" />
+    </SkeletonIndicator>
+  </View>
+);
 
 @inject('accountStore', 'networkStore')
 @observer
@@ -40,14 +81,15 @@ export class ActivityDetailScreen extends Component {
     const { navigation } = this.props;
     const {
       fetched,
-      info: { action_trace: { trx_id, block_time, act } = {} }
+      info: { action_trace: { block_time, act } = {} }
     } = this.state;
 
-    const Item = ({ title, description, children }) => (
-      <View style={{ marginTop: 5, marginBottom: 5 }}>
-        <Caption>{title}</Caption>
-        {description && <Text>{description}</Text>}
-        {children}
+    const Item = ({ title, description }) => (
+      <View style={{ marginTop: 20 }}>
+        <Text style={{ marginBottom: 7, fontSize: 16, fontWeight: '500' }}>
+          {title}
+        </Text>
+        <Text style={{ fontSize: 16 }}>{description}</Text>
       </View>
     );
 
@@ -59,38 +101,48 @@ export class ActivityDetailScreen extends Component {
         </Appbar.Header>
 
         {!fetched ? (
-          <PageIndicator />
+          <ActivityIndicator />
         ) : (
-          <ScrollView style={{ padding: Theme.innerPadding }}>
+          <ScrollView style={{ margin: Theme.innerSpacing }}>
             <View
               style={{
-                flexDirection: 'row',
-                alignItems: 'flex-end',
-                marginBottom: 15
-              }}
-            >
-              <Title style={{ marginRight: 10, fontSize: 25 }}>
-                {act.name}
-              </Title>
-              <Caption style={{ lineHeight: 25, fontSize: 15 }}>
-                by {act.account}
-              </Caption>
-            </View>
-
-            <Text>
-              {moment(block_time).format('lll')} ({moment(block_time).fromNow()}
-              )
-            </Text>
-
-            <View
-              style={{
-                padding: 20,
-                marginTop: Theme.innerSpacing,
+                padding: Theme.innerPadding,
                 borderRadius: Theme.innerBorderRadius,
                 backgroundColor: Theme.mainBackgroundColor,
                 ...Theme.shadow
               }}
             >
+              <View
+                style={{
+                  flexDirection: 'row',
+                  marginBottom: 20
+                }}
+              >
+                <View
+                  style={{
+                    flex: 1
+                  }}
+                >
+                  <Title style={{ marginBottom: 5, lineHeight: 20 }}>
+                    {act.name}
+                  </Title>
+                  <Text style={{ fontSize: 13 }}>by {act.account}</Text>
+                </View>
+
+                <View>
+                  <Text style={{ fontSize: 14 }}>
+                    {moment(block_time).format('lll')}
+                  </Text>
+                </View>
+              </View>
+
+              <View
+                style={{
+                  height: 1,
+                  backgroundColor: '#d6d6d6'
+                }}
+              />
+
               {Object.keys(act.data).map(key => {
                 const data = act.data[key];
                 const description =
