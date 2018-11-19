@@ -23,7 +23,7 @@
       "bundleIdentifier": "io.gamexcoin.eosid"
     },
     "android": {
-      "versionCode": 2,
+      "versionCode": 3,
       "package": "io.gamexcoin.eosid",
       "intentFilters": [{
         "action": "VIEW",
