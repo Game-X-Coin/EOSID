@@ -191,8 +191,8 @@ class Store {
       encryptedPrivateKey: key.encryptedPrivateKey,
       pincode: PincodeStore.accountPincode
     }).then(async tx => {
-      // fetch lastets tokens
       await this.getTokens();
+      await this.getActions();
       // log transfer
       TransferLogService.addTransferLog({ ...params, accountId: id });
 
@@ -214,6 +214,7 @@ class Store {
     }).then(async tx => {
       await this.getInfo();
       await this.getTokens();
+      await this.getActions();
 
       return tx;
     });
