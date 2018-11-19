@@ -121,6 +121,7 @@ export class TextField extends Component {
                   fontSize: 15,
                   ...style
                 }}
+                pointerEvents={onPress ? 'none' : 'auto'}
                 {...props}
               />
               <Suffix />

@@ -14,13 +14,12 @@ export const Theme = {
   innerPadding: 25,
   innerBorderRadius: 7,
   shadow: {
-    elevation: 4
-    /* ios shadow
+    elevation: 4,
+    // ios shadow
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.8,
-    shadowRadius: 2, 
-    */
+    shadowOpacity: 0.3,
+    shadowRadius: 2
   },
   successColor: tintColor,
   errorColor: '#ff4b34',

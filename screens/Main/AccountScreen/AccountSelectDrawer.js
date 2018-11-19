@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observable } from 'mobx';
 import { inject, observer } from 'mobx-react';
-import { View, Platform, Text } from 'react-native';
+import { SafeAreaView, View, Platform, Text } from 'react-native';
 import { Constants, Icon } from 'expo';
 import { withNavigation } from 'react-navigation';
 import { Portal, Modal, TouchableRipple } from 'react-native-paper';
@@ -59,7 +59,7 @@ export class AccountSelectDrawer extends Component {
     return (
       <Portal>
         <Modal visible={visible} onDismiss={() => onHide()}>
-          <View
+          <SafeAreaView
             style={{
               position: 'absolute',
               top: Platform.OS === 'ios' ? 0 : Constants.statusBarHeight,
@@ -95,7 +95,7 @@ export class AccountSelectDrawer extends Component {
                 onPress={() => this.moveScreen()}
               />
             </ScrollView>
-          </View>
+          </SafeAreaView>
         </Modal>
       </Portal>
     );
