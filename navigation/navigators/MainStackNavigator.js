@@ -1,9 +1,9 @@
-import React from 'react';
-import { observer, inject } from 'mobx-react';
-import { Animated, Easing, Linking } from 'react-native';
-import { createStackNavigator } from 'react-navigation';
-import { createMaterialBottomTabNavigator } from 'react-navigation-material-bottom-tabs';
-import { Icon, Linking as ExpoLinking } from 'expo';
+import React from "react";
+import { observer, inject } from "mobx-react";
+import { Animated, Easing, Linking } from "react-native";
+import { createStackNavigator } from "react-navigation";
+import { createMaterialBottomTabNavigator } from "react-navigation-material-bottom-tabs";
+import { Icon, Linking as ExpoLinking } from "expo";
 
 import {
   AccountScreen,
@@ -22,18 +22,19 @@ import {
   ResourceScreen,
   SettingsAppPinScreen,
   SettingsAccountPinScreen
-} from '../../screens/Main';
+} from "../../screens/Main";
 
 import {
   ImportAccountScreen,
   ShowErrorScreen,
+  ShowSuccessScreen,
   ConfirmPinScreen,
   ConfirmAppPinScreen,
   NewPinScreen,
   NewAppPinScreen
-} from '../../screens/Shared';
+} from "../../screens/Shared";
 
-import { Theme } from '../../constants';
+import { Theme } from "../../constants";
 
 // detail screens
 const DetailScreens = {
@@ -61,15 +62,16 @@ const DetailScreens = {
   NewAppPin: NewAppPinScreen,
   // confirm dapp sign
   PermissionRequest: PermissionRequestScreen,
-  // show error
-  ShowError: ShowErrorScreen
+  // show result status
+  ShowError: ShowErrorScreen,
+  ShowSuccess: ShowSuccessScreen
 };
 
 // for tab icons
 const iconMap = {
-  Account: 'md-contact',
-  Activity: 'md-filing',
-  Settings: 'md-settings'
+  Account: "md-contact",
+  Activity: "md-filing",
+  Settings: "md-settings"
 };
 
 // tab navigator
@@ -102,39 +104,39 @@ const MainTabNavigator = createMaterialBottomTabNavigator(
   }
 );
 
-@inject('accountStore')
+@inject("accountStore")
 @observer
 class MainTabNavigatorWrapper extends React.Component {
   constructor(params) {
     super(params);
 
     this.addLinkingListener();
-    this.state = { redirectData: null, initialLinkingUri: '' };
+    this.state = { redirectData: null, initialLinkingUri: "" };
   }
 
   handleLinkingHandler = event => {
     const data = ExpoLinking.parse(event.url);
-    if (data.path && data.path !== '') {
+    if (data.path && data.path !== "") {
       this.props.navigation.navigate(data.path, data.queryParams);
     }
     this.setState({ redirectData: data });
   };
 
   addLinkingListener = () => {
-    ExpoLinking.addEventListener('url', this.handleLinkingHandler);
+    ExpoLinking.addEventListener("url", this.handleLinkingHandler);
   };
 
   async componentWillMount() {
     const initialLinkingUri = await Linking.getInitialURL();
     const data = ExpoLinking.parse(initialLinkingUri);
-    if (data.path && data.path !== '') {
+    if (data.path && data.path !== "") {
       this.props.navigation.navigate(data.path, data.queryParams);
     }
     this.setState({ initialLinkingUri });
   }
 
   componentWillUnmount() {
-    ExpoLinking.removeEventListener('url', this.handleLinkingHandler);
+    ExpoLinking.removeEventListener("url", this.handleLinkingHandler);
   }
 
   componentDidMount() {
@@ -154,9 +156,9 @@ export const MainStackNavigator = createStackNavigator(
     ...DetailScreens
   },
   {
-    headerMode: 'none',
-    cardStyle: { backgroundColor: '#fff' },
-    transitionConfig: () => ({
+    headerMode: "none",
+    cardStyle: { backgroundColor: "#fff" }
+    /* transitionConfig: () => ({
       transitionSpec: {
         duration: 300,
         easing: Easing.out(Easing.bezier(0.42, 0, 1, 1)),
@@ -179,6 +181,6 @@ export const MainStackNavigator = createStackNavigator(
 
         return { opacity, transform: [{ translateX }] };
       }
-    })
+    }) */
   }
 );
