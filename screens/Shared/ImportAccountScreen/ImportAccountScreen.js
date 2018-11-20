@@ -145,8 +145,7 @@ export class ImportAccountScreen extends Component {
       // hide loading
       this.toggleLoadingDialog();
 
-      // navigate
-      isSignUp ? navigation.navigate('Account') : navigation.goBack(null);
+      navigation.navigate('Account');
     };
 
     // hide dialogs before navigate
@@ -225,7 +224,9 @@ export class ImportAccountScreen extends Component {
     return (
       <BackgroundView>
         <Appbar.Header style={{ backgroundColor: Theme.headerBackgroundColor }}>
-          <Appbar.BackAction onPress={() => navigation.goBack(null)} />
+          {!isSignUp && (
+            <Appbar.BackAction onPress={() => navigation.goBack(null)} />
+          )}
           <Appbar.Content title="Import account" />
         </Appbar.Header>
 
