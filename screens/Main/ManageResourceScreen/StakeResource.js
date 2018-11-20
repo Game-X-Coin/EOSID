@@ -130,27 +130,27 @@ export class StakeResource extends Component {
       },
       // when PIN matched
       cb: async () => {
-        // show loading dialog
         this.showDialog = true;
 
-        // fetch
-        const result = await accountStore.manageResource({
-          cpu,
-          net,
-          isStaking: true
-        });
+        try {
+          await accountStore.manageResource({
+            cpu,
+            net,
+            isStaking: true
+          });
 
-        // hide dialog
-        this.showDialog = false;
-
-        if (result.code) {
+          navigation.navigate('ShowSuccess', {
+            title: 'Stake Resource Succeed',
+            description: `Successfully stake ${totalAmount} EOS for cpu/net`
+          });
+        } catch ({ message }) {
           navigation.navigate('ShowError', {
             title: 'Stake Resource Failed',
             description: 'Please check the error, it may be a network error.',
-            error: result
+            error: message
           });
-        } else {
-          navigation.navigate('Account');
+        } finally {
+          this.showDialog = false;
         }
       }
     });
