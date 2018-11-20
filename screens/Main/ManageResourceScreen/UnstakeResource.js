@@ -128,23 +128,24 @@ export class UnstakeResource extends Component {
         // show loading dialog
         this.showDialog = true;
 
-        // fetch
-        const result = await accountStore.manageResource({
-          cpu,
-          net
-        });
+        try {
+          await accountStore.manageResource({
+            cpu,
+            net
+          });
 
-        // hide dialog
-        this.showDialog = false;
-
-        if (result.code) {
+          navigation.navigate('ShowSuccess', {
+            title: 'Unstake Resource Succeed',
+            description: `Successfully unstake ${totalAmount} EOS from cpu/net`
+          });
+        } catch ({ message }) {
           navigation.navigate('ShowError', {
             title: 'Unstake Resource Failed',
             description: 'Please check the error, it may be a network error.',
-            error: result
+            error: message
           });
-        } else {
-          navigation.navigate('Account');
+        } finally {
+          this.showDialog = false;
         }
       }
     });
