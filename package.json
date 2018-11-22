@@ -45,6 +45,7 @@
     "react-native-paper": "^2.2.4",
     "react-native-sqlite-storage": "^3.3.5",
     "react-navigation": "^2.18.2",
+    "react-navigation-backhandler": "^1.2.0",
     "react-navigation-material-bottom-tabs": "^0.4.0",
     "sentry-expo": "^1.10.0",
     "text-encoding": "^0.7.0",

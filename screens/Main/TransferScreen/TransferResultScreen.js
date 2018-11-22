@@ -2,15 +2,21 @@ import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { View } from 'react-native';
 import { Button, Text, Appbar } from 'react-native-paper';
+import { AndroidBackHandler } from 'react-navigation-backhandler';
 
 import { Theme } from '../../../constants';
 
 @inject('accountStore')
 @observer
 export class TransferResultScreen extends Component {
-  confirm() {
-    this.props.navigation.navigate('Account');
-  }
+  moveToActivity = () => {
+    this.props.navigation.navigate('Activity');
+  };
+
+  onBackPress = () => {
+    this.moveToActivity();
+    return true;
+  };
 
   render() {
     const { navigation, accountStore } = this.props;
@@ -28,64 +34,66 @@ export class TransferResultScreen extends Component {
     );
 
     return (
-      <View style={{ flex: 1, backgroundColor: Theme.primary }}>
-        <Appbar.Header dark style={{ backgroundColor: 'transparent' }}>
-          <Appbar.Content title="Transfer Result" />
-        </Appbar.Header>
+      <AndroidBackHandler onBackPress={this.onBackPress}>
+        <View style={{ flex: 1, backgroundColor: Theme.primary }}>
+          <Appbar.Header dark style={{ backgroundColor: 'transparent' }}>
+            <Appbar.Content title="Transfer Result" />
+          </Appbar.Header>
 
-        <View
-          style={{
-            flex: 1,
-            margin: Theme.innerSpacing,
-            paddingTop: 50
-          }}
-        >
-          <View style={{ flex: 1 }}>
-            <Text
-              style={{
-                marginBottom: 7,
-                fontSize: 20,
-                color: Theme.secondary
-              }}
-            >
-              {receiver}
-            </Text>
-
-            <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
-              <Text style={{ fontSize: 30, marginRight: 7, color: '#fff' }}>
-                {amount}
-              </Text>
+          <View
+            style={{
+              flex: 1,
+              margin: Theme.innerSpacing,
+              paddingTop: 50
+            }}
+          >
+            <View style={{ flex: 1 }}>
               <Text
                 style={{
-                  fontSize: 17,
-                  lineHeight: 30,
-                  color: '#fff'
+                  marginBottom: 7,
+                  fontSize: 20,
+                  color: Theme.secondary
                 }}
               >
-                {symbol}
+                {receiver}
               </Text>
+
+              <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
+                <Text style={{ fontSize: 30, marginRight: 7, color: '#fff' }}>
+                  {amount}
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 17,
+                    lineHeight: 30,
+                    color: '#fff'
+                  }}
+                >
+                  {symbol}
+                </Text>
+              </View>
             </View>
+
+            {(memo || '') !== '' && (
+              <SubItem title="Memo" description={memo || ''} />
+            )}
+
+            <SubItem
+              title="Remaining Amount"
+              description={`${balance} ${symbol}`}
+            />
           </View>
 
-          {(memo || '') !== '' && (
-            <SubItem title="Memo" description={memo || ''} />
-          )}
-
-          <SubItem
-            title="Remaining Amount"
-            description={`${balance} ${symbol}`}
-          />
+          <Button
+            style={{ padding: 5, margin: Theme.innerSpacing }}
+            mode="contained"
+            color="#fff"
+            onPress={this.moveToActivity}
+          >
+            Close
+          </Button>
         </View>
-
-        <Button
-          style={{ padding: 5, margin: Theme.innerSpacing }}
-          mode="contained"
-          color="#fff"
-          onPress={() => this.confirm()}
-        >
-          Close
-        </Button>
-      </View>
+      </AndroidBackHandler>
     );
   }
 }

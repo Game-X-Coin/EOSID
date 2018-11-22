@@ -23,7 +23,7 @@ export class ShowErrorScreen extends Component {
         </Appbar.Header>
 
         <EmptyState
-          image={require('../../../assets/images/success.png')}
+          image={require('../../../assets/images/error.png')}
           title={title}
           description={description}
           descriptionStyle={{ marginBottom: 20 }}
