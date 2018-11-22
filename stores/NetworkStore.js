@@ -1,8 +1,6 @@
 import { observable, action, computed } from 'mobx';
 
-import { NetworkService } from '../services';
-
-import { AccountStore } from './AccountStore';
+import NetworkService from '../services/NetworkService';
 
 import { DEFAULT_NETWORKS } from '../constants';
 
@@ -16,26 +14,26 @@ class Store {
   customNetworks = [];
 
   @computed
-  get eos() {
-    return api;
-  }
-
-  @computed
   get allNetworks() {
     return [...this.defaultNetworks, ...this.customNetworks];
   }
 
-  @computed
-  get currentNetwork() {
-    const { currentAccount } = AccountStore;
+  @action
+  getNetwork(account) {
+    let currentNetwork = this.defaultNetworks[0];
 
-    if (currentAccount) {
-      return this.allNetworks.find(
-        network => network.id === currentAccount.networkId
+    if (account) {
+      currentNetwork = this.allNetworks.find(
+        network => network.id === account.networkId
       );
     }
-    // return default network
-    return this.defaultNetworks[0];
+
+    return currentNetwork;
+  }
+
+  @action
+  setCurrentNetwork(account) {
+    api.currentNetwork = this.getNetwork(account);
   }
 
   @action
@@ -71,4 +69,4 @@ class Store {
   }
 }
 
-export const NetworkStore = new Store();
+export default new Store();

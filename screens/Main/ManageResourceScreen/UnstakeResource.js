@@ -124,14 +124,15 @@ export class UnstakeResource extends Component {
         description: `Unstake ${totalAmount} EOS from cpu/net`
       },
       // when PIN matched
-      cb: async () => {
+      cb: async pincode => {
         // show loading dialog
         this.showDialog = true;
 
         try {
           await accountStore.manageResource({
             cpu,
-            net
+            net,
+            pincode
           });
 
           navigation.navigate('ShowSuccess', {

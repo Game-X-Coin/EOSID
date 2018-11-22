@@ -1,8 +1,8 @@
 import { observable, action } from 'mobx';
 
-import { SettingsStore } from '../stores/SettingsStore';
 import { PincodeService } from '../services';
-import { AccountStore } from './AccountStore';
+import SettingsStore from './SettingsStore';
+import AccountStore from './AccountStore';
 
 class Store {
   @observable
@@ -54,4 +54,4 @@ class Store {
   }
 }
 
-export const PincodeStore = new Store();
+export default new Store();

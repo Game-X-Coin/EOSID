@@ -3,8 +3,9 @@ import { getRepository } from 'typeorm-expo/browser';
 import { NetworkModel, NetworkError } from '../db';
 
 import api from '../utils/eos/API';
+import Fetch from '../utils/Fetch';
 
-export class NetworkService {
+export default class NetworkService {
   static async getNetworks() {
     const NetworkRepo = getRepository(NetworkModel);
     const networks = await NetworkRepo.find();
@@ -42,5 +43,21 @@ export class NetworkService {
 
     // remove
     await NetworkRepo.remove(findNetwork);
+  }
+
+  static async fetchNodes() {
+    try {
+      console.log('asdasd');
+      const producers = await api.producers.get();
+      console.log(producers);
+      producers.map(producer => {
+        const url = producer.url;
+        const fetch = new Fetch({ baseURL: url });
+        const result = fetch.get('/bp.json');
+        console.log(result);
+      });
+    } catch (e) {
+      console.log(e);
+    }
   }
 }

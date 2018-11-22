@@ -38,6 +38,8 @@ export default class RenderApp extends Component {
       accountStore
     } = this.props;
 
+    networkStore.setCurrentNetwork();
+
     await Promise.all([
       pincodeStore.getPincodes(),
       settingsStore.getSettings(),

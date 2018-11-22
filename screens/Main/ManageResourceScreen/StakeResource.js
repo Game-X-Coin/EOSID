@@ -129,14 +129,15 @@ export class StakeResource extends Component {
         description: `Stake ${totalAmount} EOS for cpu/net`
       },
       // when PIN matched
-      cb: async () => {
+      cb: async pincode => {
         this.showDialog = true;
 
         try {
           await accountStore.manageResource({
             cpu,
             net,
-            isStaking: true
+            isStaking: true,
+            pincode
           });
 
           navigation.navigate('ShowSuccess', {
