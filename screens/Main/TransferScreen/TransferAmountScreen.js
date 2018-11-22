@@ -70,23 +70,23 @@ import { Theme } from '../../../constants';
         // show transfer loading dialog
         setFieldValue('showDialog', true);
 
-        const result = await accountStore.transfer(values);
+        try {
+          const result = await accountStore.transfer(values);
 
-        // hide dialog
-        setFieldValue('showDialog', false);
-
-        if (result.code === 500) {
-          navigation.navigate('ShowError', {
-            title: 'Transfer Failed',
-            description: 'Please check the error, it may be a network error.',
-            error: result
-          });
-        } else {
           navigation.navigate('TransferResult', {
             ...values,
             amount: fixedAmount,
             result
           });
+        } catch ({ message }) {
+          navigation.navigate('ShowError', {
+            title: 'Transfer Failed',
+            description: 'Please check the error, it may be a network error.',
+            error: message
+          });
+        } finally {
+          // hide dialog
+          setFieldValue('showDialog', false);
         }
       }
     });
