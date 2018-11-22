@@ -44,20 +44,4 @@ export default class NetworkService {
     // remove
     await NetworkRepo.remove(findNetwork);
   }
-
-  static async fetchNodes() {
-    try {
-      console.log('asdasd');
-      const producers = await api.producers.get();
-      console.log(producers);
-      producers.map(producer => {
-        const url = producer.url;
-        const fetch = new Fetch({ baseURL: url });
-        const result = fetch.get('/bp.json');
-        console.log(result);
-      });
-    } catch (e) {
-      console.log(e);
-    }
-  }
 }
