@@ -90,8 +90,8 @@ export class PermissionScreen extends Component {
                       flex: 1,
                       alignSelf: 'center',
                       padding: 15,
-                      fontSize: 15,
-                      fontFamily: 'monospace'
+                      fontSize: 15
+                      // fontFamily: 'monospace'
                     }}
                   >
                     {publicKey}

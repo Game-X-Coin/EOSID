@@ -1,8 +1,10 @@
 import { observable, action, computed } from 'mobx';
 
-import { AccountService, TransferLogService } from '../services';
+import AccountService from '../services/AccountService';
+import TransferLogService from '../services/TransferLogService';
 
-import { SettingsStore, PincodeStore } from './';
+import NetworkStore from './NetworkStore';
+import SettingsStore from './SettingsStore';
 
 import api from '../utils/eos/API';
 
@@ -57,6 +59,8 @@ class Store {
       await SettingsStore.updateSettings({ accountId });
       // fetch account info
       await this.getAccountInfo();
+      // set current network
+      NetworkStore.setCurrentNetwork(this.currentAccount);
     }
   }
 
@@ -75,8 +79,7 @@ class Store {
   @action
   async addAccount(accountInfo) {
     return AccountService.addAccount({
-      ...accountInfo,
-      pincode: PincodeStore.accountPincode
+      ...accountInfo
     }).then(async account => {
       // remove duplicate entity
       const accounts = this.accounts.filter(
@@ -187,10 +190,9 @@ class Store {
 
     return AccountService.transfer({
       ...params,
-      sender: name,
+      from: name,
       encryptedPrivateKey: key.encryptedPrivateKey,
-      permission: key.permission,
-      pincode: PincodeStore.accountPincode
+      permission: key.permission
     }).then(async tx => {
       await this.getTokens();
       await this.getActions();
@@ -209,10 +211,9 @@ class Store {
 
     return AccountService.manageResource({
       ...params,
-      sender: name,
+      from: name,
       encryptedPrivateKey: key.encryptedPrivateKey,
-      permission: key.permission,
-      pincode: PincodeStore.accountPincode
+      permission: key.permission
     }).then(async tx => {
       await this.getInfo();
       await this.getTokens();
@@ -223,4 +224,4 @@ class Store {
   }
 }
 
-export const AccountStore = new Store();
+export default new Store();

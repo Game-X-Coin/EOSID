@@ -4,7 +4,7 @@ import { AES, enc } from 'crypto-js';
 import { AccountModel, AccountError } from '../db';
 import api from '../utils/eos/API';
 
-export class AccountService {
+export default class AccountService {
   static async getAccounts() {
     const AccountRepo = getRepository(AccountModel);
     const accounts = await AccountRepo.find();
@@ -44,13 +44,10 @@ export class AccountService {
 
     if (!account) {
       // create new account instance
-      account = new AccountModel({
-        ...accountInfo,
-        name,
-        publicKey,
-        encryptedPrivateKey,
-        permission: permissions[0]
-      });
+      const keys = [
+        { publicKey, encryptedPrivateKey, permission: permissions[0] }
+      ];
+      account = new AccountModel({ ...accountInfo, name, keys });
       permissions = permissions.slice(1);
       // check duplicated permission in account
     } else if (
@@ -177,7 +174,7 @@ export class AccountService {
 
   static async transfer({
     pincode,
-    sender,
+    from,
     receiver,
     encryptedPrivateKey,
     ...transferInfo
@@ -190,7 +187,7 @@ export class AccountService {
       privateKey,
       pincode,
       to: receiver,
-      from: sender
+      from
     });
   }
 

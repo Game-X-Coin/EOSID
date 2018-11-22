@@ -66,12 +66,12 @@ import { Theme } from '../../../constants';
         title: 'Confirm Transfer',
         description: `Transfer ${fixedAmount} ${values.symbol}`
       },
-      async cb() {
+      async cb(pincode) {
         // show transfer loading dialog
         setFieldValue('showDialog', true);
 
         try {
-          const result = await accountStore.transfer(values);
+          const result = await accountStore.transfer({ ...values, pincode });
 
           navigation.navigate('TransferResult', {
             ...values,

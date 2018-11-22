@@ -29,15 +29,16 @@ import { DialogIndicator } from '../../../components/Indicator';
 import { Theme } from '../../../constants';
 import { TextField } from '../../../components/TextField';
 import { SelectField } from '../../../components/SelectField';
+import { PincodeStore } from '../../../stores';
 
-@inject('settingsStore', 'networkStore', 'accountStore')
+@inject('settingsStore', 'networkStore', 'accountStore', 'pincodeStore')
 @withFormik({
   mapPropsToValues: ({ networkStore }) => ({
     accounts: [],
     // form
     privateKey: '',
     publicKey: '',
-    networkId: networkStore.defaultNetworks[0].id // default network
+    networkId: networkStore.getNetwork().id // default network
   }),
   validationSchema: props => {
     const { errors: RequiredFieldErrors } = AccountError.RequiredFields;
@@ -103,6 +104,7 @@ export class ImportAccountScreen extends Component {
       accountStore,
       settingsStore: { settings },
       networkStore: { allNetworks },
+      pincodeStore: { accountPincode },
       navigation,
       values,
       setErrors
@@ -111,7 +113,7 @@ export class ImportAccountScreen extends Component {
 
     const network = allNetworks.find(({ id }) => id === values.networkId);
 
-    const addAccount = async () => {
+    const addAccount = async pincode => {
       // show loading
       this.toggleLoadingDialog();
 
@@ -134,7 +136,8 @@ export class ImportAccountScreen extends Component {
           publicKey: values.publicKey,
           privateKey: values.privateKey,
           networkId: values.networkId,
-          permissions: foundPerms
+          permissions: foundPerms,
+          pincode: pincode && accountPincode
         });
       } catch (error) {
         setErrors({ importError: true, ...error.errors });
@@ -154,8 +157,8 @@ export class ImportAccountScreen extends Component {
     // new account pincode
     if (!settings.accountPincodeEnabled) {
       navigation.navigate('NewPin', {
-        async cb() {
-          await addAccount();
+        async cb(pincode) {
+          await addAccount(pincode);
         }
       });
     } else {

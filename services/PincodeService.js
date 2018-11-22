@@ -8,7 +8,7 @@ const serviceTypes = {
   account: SECURE_STORE_ACCOUNT_PINCODE
 };
 
-export class PincodeService {
+export default class PincodeService {
   static async getPincode(type) {
     const service = serviceTypes[type];
 

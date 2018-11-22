@@ -3,8 +3,9 @@ import { getRepository } from 'typeorm-expo/browser';
 import { NetworkModel, NetworkError } from '../db';
 
 import api from '../utils/eos/API';
+import Fetch from '../utils/Fetch';
 
-export class NetworkService {
+export default class NetworkService {
   static async getNetworks() {
     const NetworkRepo = getRepository(NetworkModel);
     const networks = await NetworkRepo.find();

@@ -1,5 +1,4 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm-expo/browser';
-import { AccountService } from '../services';
 
 export const ACCOUNT_KEY = 'Account';
 
@@ -65,21 +64,12 @@ export class AccountModel {
 
   constructor(data) {
     if (data) {
-      const {
-        id,
-        name,
-        publicKey,
-        encryptedPrivateKey,
-        networkId,
-        permission
-      } = data;
+      const { id, name, networkId, keys = [] } = data;
 
       this.id = id;
       this.name = name;
       this.networkId = networkId;
-
-      const key = { publicKey, encryptedPrivateKey, permission };
-      this.keys = AccountService.setKey(this.keys, key);
+      this.keys = keys;
     }
   }
 

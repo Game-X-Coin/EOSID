@@ -47,4 +47,4 @@ class Store {
   }
 }
 
-export const SettingsStore = new Store();
+export default new Store();

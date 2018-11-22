@@ -15,7 +15,7 @@ export class ConfirmPinScreen extends Component {
       navigation.goBack(null);
 
       try {
-        params.cb && params.cb();
+        params.cb && params.cb(pincode);
       } catch (error) {
         console.log(error);
       }
