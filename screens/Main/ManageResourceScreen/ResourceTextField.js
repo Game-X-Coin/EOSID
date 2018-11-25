@@ -23,7 +23,6 @@ export class ResourceTextField extends Component {
           keyboardType="numeric"
           textAlign="right"
           suffix="EOS"
-          style={{ marginBottom: 0, fontSize: 17 }}
           {...props}
         />
 
@@ -41,15 +40,14 @@ export class ResourceTextField extends Component {
                 style={{
                   flex: 1,
                   marginRight: 10,
-                  borderRadius: 4,
                   overflow: 'hidden',
-                  ...Theme.shadow
+                  ...Theme.surface,
+                  backgroundColor: Theme.pallete.gray
                 }}
               >
                 <TouchableRipple
                   style={{
-                    paddingVertical: 5,
-                    backgroundColor: Theme.mainBackgroundColor
+                    paddingVertical: 5
                   }}
                   onPress={() => onChangePercent(easyControls[key])}
                 >

@@ -8,6 +8,7 @@ import { UnstakeResource } from './UnstakeResource';
 
 import { Theme } from '../../../constants';
 import { ResourceView } from './ResourceView';
+import { BackgroundView } from '../../../components/View';
 
 const TopTabNavigator = createMaterialTopTabNavigator(
   {
@@ -20,10 +21,10 @@ const TopTabNavigator = createMaterialTopTabNavigator(
       activeTintColor: 'black',
       inactiveTintColor: 'black',
       style: {
-        backgroundColor: Theme.mainBackgroundColor
+        backgroundColor: Theme.app.backgroundColor
       },
       indicatorStyle: {
-        backgroundColor: Theme.primary,
+        backgroundColor: Theme.pallete.primary,
         height: 3
       }
     }
@@ -36,9 +37,12 @@ class ManageResourceScreen extends Component {
     const { resourceName } = navigation.state.params;
 
     return (
-      <View style={{ flex: 1 }}>
+      <BackgroundView>
         <Appbar.Header
-          style={{ elevation: 0, backgroundColor: Theme.mainBackgroundColor }}
+          style={{
+            elevation: 0,
+            backgroundColor: Theme.header.backgroundColor
+          }}
         >
           <Appbar.BackAction onPress={() => navigation.goBack(null)} />
           <Appbar.Content title={`Manage ${resourceName}`} />
@@ -46,7 +50,7 @@ class ManageResourceScreen extends Component {
 
         <ResourceView type={resourceName} />
         <TopTabNavigator navigation={navigation} />
-      </View>
+      </BackgroundView>
     );
   }
 }
