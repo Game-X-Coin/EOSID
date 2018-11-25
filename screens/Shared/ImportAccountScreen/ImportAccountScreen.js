@@ -192,10 +192,8 @@ export class ImportAccountScreen extends Component {
   render() {
     const {
       navigation,
-      networkStore: { allNetworks },
       values,
       errors,
-      touched,
       setFieldValue,
       setFieldTouched,
       isValid
@@ -253,7 +251,7 @@ export class ImportAccountScreen extends Component {
               label="Private key"
               info="Private key of account to import"
               value={values.privateKey}
-              error={touched.privateKey && errors.privateKey}
+              error={errors.privateKey}
               onChangeText={_ => {
                 setFieldTouched('privateKey', true);
                 setFieldValue('privateKey', _);
@@ -265,8 +263,8 @@ export class ImportAccountScreen extends Component {
               info="Chain of account to import"
               data={chains}
               value={values.chainId}
-              error={touched.chainId && errors.chainId}
-              onChangeText={_ => {
+              error={errors.chainId}
+              onChange={_ => {
                 setFieldTouched('chainId', true);
                 setFieldValue('chainId', _);
               }}
