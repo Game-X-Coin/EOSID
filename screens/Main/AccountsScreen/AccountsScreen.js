@@ -63,7 +63,7 @@ export class AccountsScreen extends Component {
         </Appbar.Header>
 
         <ScrollView>
-          {accounts.map(({ id, name, networkId }) => (
+          {accounts.map(({ id, name, chainId }) => (
             <TouchableRipple
               key={id}
               style={{
@@ -77,7 +77,7 @@ export class AccountsScreen extends Component {
                 <View style={{ flex: 1 }}>
                   <Text>{name}</Text>
                   <Caption>
-                    {allNetworks.find(({ id }) => id === networkId).name}
+                    {allNetworks.find(({ id }) => id === chainId).name}
                   </Caption>
                 </View>
                 {name === (currentAccount && currentAccount.name) && (

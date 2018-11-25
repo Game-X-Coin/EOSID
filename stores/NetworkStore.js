@@ -13,6 +13,9 @@ class Store {
   @observable
   customNetworks = [];
 
+  @observable
+  currentNetwork = this.defaultNetworks[0];
+
   @computed
   get allNetworks() {
     return [...this.defaultNetworks, ...this.customNetworks];
@@ -20,15 +23,13 @@ class Store {
 
   @action
   getNetwork(account) {
-    let currentNetwork = this.defaultNetworks[0];
-
-    if (account) {
-      currentNetwork = this.allNetworks.find(
-        network => network.id === account.networkId
+    if (account && this.currentNetwork.chainId !== account.chainId) {
+      this.currentNetwork = this.allNetworks.find(
+        network => network.chainId === account.chainId
       );
     }
 
-    return currentNetwork;
+    return this.currentNetwork;
   }
 
   @action
@@ -37,16 +38,29 @@ class Store {
   }
 
   @action
+  setDefaultNetworks(networks) {
+    this.defaultNetworks = networks;
+  }
+
+  @action
   setCustomNetworks(networks) {
-    console.log('networks', networks);
     this.customNetworks = networks;
   }
 
   @action
   async getNetworks() {
-    return NetworkService.getNetworks().then(networks => {
-      this.setCustomNetworks(networks);
+    return await NetworkService.getDefaultNetworks().then(networks => {
+      this.setDefaultNetworks(networks);
     });
+    // return await Promise.all([
+    //   NetworkService.getDefaultNetworks().then(networks => {
+    //     this.setDefaultNetworks(networks);
+    //   })
+    // NetworkService.getCustomNetworks().then(networks => {
+    //   this.setCustomNetworks(networks);
+    // }),
+    // this.setCurrentNetwork()
+    // ]);
   }
 
   @action

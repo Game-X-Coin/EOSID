@@ -44,17 +44,12 @@ export default class AccountService {
 
     if (!account) {
       // create new account instance
-      const key = {
+      const keys = AccountService.setKey({
         publicKey,
         encryptedPrivateKey,
         permission: permissions[0]
-      };
-
-      account = new AccountModel({
-        ...accountInfo,
-        name,
-        keys: AccountService.setKey([], key)
       });
+      account = new AccountModel({ ...accountInfo, name, keys });
       permissions = permissions.slice(1);
       // check duplicated permission in account
     } else if (
@@ -71,7 +66,7 @@ export default class AccountService {
         permission
       };
 
-      return AccountService.setKey(pv, key);
+      return AccountService.setKey(key, pv);
     }, []);
 
     if (keys.length) {
@@ -170,10 +165,7 @@ export default class AccountService {
     return replaced;
   }
 
-  static setKey(keys, key) {
-    if (!keys) {
-      keys = [];
-    }
+  static setKey(key, keys = []) {
     const stringifiedKey = AccountService.stringifyKey(key);
     keys.push(stringifiedKey);
     return keys;
