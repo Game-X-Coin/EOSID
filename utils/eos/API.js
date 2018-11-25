@@ -419,7 +419,7 @@ class EosApi {
   static get blocks() {
     return {
       get: ({ block_num_or_id }) =>
-        EosApi.ChainAPI().post('/v1/chain/block', { block_num_or_id }),
+        EosApi.ChainAPI().post('/v1/chain/get_block', { block_num_or_id }),
       getHeaderState: ({ block_num_or_id }) =>
         EosApi.ChainAPI().post('/v1/chain/get_block_header_state', {
           block_num_or_id
