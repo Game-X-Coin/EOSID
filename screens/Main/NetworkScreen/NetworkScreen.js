@@ -10,9 +10,14 @@ import { Theme } from '../../../constants';
 export class NetworkScreen extends Component {
   moveScreen = routeName => this.props.navigation.navigate(routeName);
 
+  changeNetwork = async (chainId, networkId) => {
+    const { networkStore } = this.props;
+    networkStore.changeNetwork(chainId, networkId);
+  };
+
   render() {
     const { networkStore, navigation } = this.props;
-    const { defaultNetworks, customNetworks } = networkStore;
+    const { chains } = networkStore;
 
     return (
       <BackgroundView>
@@ -22,55 +27,39 @@ export class NetworkScreen extends Component {
         </Appbar.Header>
 
         <ScrollView>
-          <List.Section title="Mainnet">
-            {defaultNetworks.map(
-              ({ id, name, chainURL, responseTime, success }) => (
-                <List.Item
-                  key={id}
-                  title={name}
-                  description={`${chainURL}`}
-                  right={props => (
-                    <Text {...props}>
-                      {responseTime && responseTime !== 9999
-                        ? `${responseTime} ms`
-                        : 'delayed'}{' '}
-                      {success ? 'alive' : 'disalive'}
-                    </Text>
-                  )}
-                  style={
-                    networkStore.currentNetwork.id === id
-                      ? { backgroundColor: Theme.primary }
-                      : {}
-                  }
-                />
-              )
-            )}
-          </List.Section>
-          <List.Section title="Custom">
-            {customNetworks.map(
-              ({ id, name, chainURL, responseTime, success }) => (
-                <List.Item
-                  key={id}
-                  title={name}
-                  description={`${chainURL}`}
-                  right={props => (
-                    <Text {...props}>
-                      {responseTime && responseTime !== 9999
-                        ? `${responseTime} ms`
-                        : 'delayed'}{' '}
-                      {success ? 'alive' : 'disalive'}
-                    </Text>
-                  )}
-                  style={
-                    networkStore.currentNetwork.id === id
-                      ? { backgroundColor: Theme.primary }
-                      : {}
-                  }
-                />
-              )
-            )}
-            {!customNetworks.length && <List.Item title="No custom networks" />}
-          </List.Section>
+          {Object.keys(chains).map(key => (
+            <List.Section title={chains[key].name} key={key}>
+              {chains[key].nodes &&
+                chains[key].nodes.length &&
+                chains[key].nodes.map(
+                  ({ id, name, chainURL, responseTime, success }) => (
+                    <List.Item
+                      key={id}
+                      title={name}
+                      description={`${chainURL}`}
+                      right={props => (
+                        <Text {...props}>
+                          {responseTime && responseTime !== 9999
+                            ? `${responseTime} ms`
+                            : 'delayed'}{' '}
+                          {success ? 'alive' : 'disalive'}
+                        </Text>
+                      )}
+                      style={
+                        networkStore.currentNetwork.id === id
+                          ? { backgroundColor: Theme.primary }
+                          : {}
+                      }
+                      disabled={networkStore.currentNetwork.id === id}
+                      onPress={() => this.changeNetwork(key, id)}
+                    />
+                  )
+                )}
+              {(!chains[key].nodes || !chains[key].nodes.length) && (
+                <List.Item title="No networks" />
+              )}
+            </List.Section>
+          ))}
         </ScrollView>
 
         <Button
@@ -78,7 +67,7 @@ export class NetworkScreen extends Component {
           mode="contained"
           onPress={() => this.moveScreen('AddNetwork')}
         >
-          Add custom network
+          Add network
         </Button>
       </BackgroundView>
     );
