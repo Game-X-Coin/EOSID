@@ -56,7 +56,9 @@ export class TransferLogs extends Component {
       <View style={{ paddingBottom: Theme.innerPadding }}>
         <View style={{ paddingHorizontal: Theme.innerSpacing }}>
           <Text>Recent History</Text>
-          <Divider style={{ marginTop: 10 }} />
+          <Divider
+            style={{ marginTop: 10, backgroundColor: Theme.pallete.darkGray }}
+          />
         </View>
 
         {this.transferLogs.map(log => (
@@ -76,7 +78,7 @@ export class TransferLogs extends Component {
             >
               <View style={{ flex: 1 }}>
                 <Text>{log.receiver}</Text>
-                <Caption>{moment(log.createdAt).format('YYYY-MM-DD')}</Caption>
+                <Caption>{moment(log.createdAt).format('YYYY/MM/DD')}</Caption>
               </View>
               <Text style={{ fontSize: 15 }}>
                 {log.amount} {log.symbol}
@@ -154,11 +156,15 @@ export class TransferScreen extends Component {
               <TextField
                 autoFocus
                 label="Receiver's account"
+                info={loading ? 'Searching account...' : ''}
                 placeholder="iameosiduser"
                 value={receiver}
                 error={error}
                 loading={loading}
-                onChangeText={v => this.onChangeReceiver(v)}
+                onChangeText={v => {
+                  this.loading = true;
+                  this.onChangeReceiver(v);
+                }}
               />
 
               <Button
@@ -167,8 +173,8 @@ export class TransferScreen extends Component {
                   marginBottom: 20,
                   padding: 5
                 }}
-                disabled={!receiver.length}
-                onPress={() => !loading && !error && this.handleSubmit()}
+                disabled={!receiver.length || loading || error}
+                onPress={() => this.handleSubmit()}
               >
                 Next
               </Button>
