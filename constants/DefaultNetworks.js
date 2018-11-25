@@ -9,3 +9,4 @@ const JUNGLE = new NetworkModel({
 });
 
 export const DEFAULT_NETWORKS = [JUNGLE];
+export const DEFAULT_CHAIN = JUNGLE.chainId;

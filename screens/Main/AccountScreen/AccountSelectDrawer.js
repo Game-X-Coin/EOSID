@@ -18,9 +18,9 @@ export class AccountSelectDrawer extends Component {
   @observable
   visible = false;
 
-  changeAccount(accountId) {
+  changeAccount(accountId, chainId) {
     this.props.onHide();
-    this.props.accountStore.changeCurrentAccount(accountId);
+    this.props.accountStore.changeCurrentAccount(accountId, chainId);
   }
 
   moveScreen() {
@@ -88,7 +88,7 @@ export class AccountSelectDrawer extends Component {
                       />
                     )
                   }
-                  onPress={() => this.changeAccount(id)}
+                  onPress={() => this.changeAccount(id, chainId)}
                 />
               ))}
 

@@ -20,8 +20,8 @@ import Chains from '../../../constants/Chains';
 export class AccountsScreen extends Component {
   moveScreen = routeName => this.props.navigation.navigate(routeName);
 
-  changeAccount = accoundId => {
-    this.props.accountStore.changeCurrentAccount(accoundId);
+  changeAccount = (accoundId, chainId) => {
+    this.props.accountStore.changeCurrentAccount(accoundId, chainId);
     this.moveScreen('Account');
   };
 
@@ -69,7 +69,7 @@ export class AccountsScreen extends Component {
                 paddingHorizontal: Theme.innerPadding,
                 paddingVertical: 15
               }}
-              onPress={() => this.changeAccount(id)}
+              onPress={() => this.changeAccount(id, chainId)}
               onLongPress={() => this.confirmRemoveAccount(id)}
             >
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>

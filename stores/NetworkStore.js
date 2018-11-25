@@ -2,7 +2,7 @@ import { observable, action, computed } from 'mobx';
 
 import NetworkService from '../services/NetworkService';
 
-import { DEFAULT_NETWORKS } from '../constants';
+import { DEFAULT_NETWORKS, DEFAULT_CHAIN } from '../constants';
 import Chains from '../constants/Chains';
 
 import api from '../utils/eos/API';
@@ -23,18 +23,28 @@ class Store {
   @observable
   currentNetwork = this.defaultNetworks[0];
 
+  @observable
+  currentChain = DEFAULT_CHAIN;
+
   @computed
   get allNetworks() {
     return [...this.defaultNetworks, ...this.customNetworks];
   }
 
   @action
-  getNetwork(account) {
-    if (account && this.currentNetwork.chainId !== account.chainId) {
-      const chain = this.chains[account.chainId];
+  getNetwork(chainId) {
+    if (
+      chainId &&
+      (!this.currentNetwork.nodes || this.currentNetwork.chainId !== chainId)
+    ) {
+      const chain = this.chains[chainId];
       this.currentNetwork = chain.nodes
         ? chain.nodes[0]
         : this.defaultNetworks[0];
+    } else {
+      this.currentNetwork =
+        (this.chains[chainId || this.currentChain || 0].nodes || [])[0] ||
+        this.defaultNetworks[0];
     }
 
     return this.currentNetwork;
@@ -42,7 +52,7 @@ class Store {
 
   @action
   setCurrentNetwork(account) {
-    api.currentNetwork = this.getNetwork(account);
+    api.currentNetwork = this.getNetwork(account && account.chainId);
   }
 
   @action

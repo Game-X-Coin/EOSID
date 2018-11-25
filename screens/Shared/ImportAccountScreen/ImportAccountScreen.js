@@ -63,12 +63,7 @@ export class ImportAccountScreen extends Component {
   };
 
   async handleSubmit() {
-    const {
-      networkStore: { allNetworks },
-      values,
-      setFieldValue,
-      setErrors
-    } = this.props;
+    const { networkStore, values, setFieldValue, setErrors } = this.props;
     // avoid modal hiding
     Keyboard.dismiss();
 
@@ -80,9 +75,9 @@ export class ImportAccountScreen extends Component {
     this.toggleLoadingDialog();
 
     try {
-      const network = allNetworks.find(
-        ({ chainId }) => chainId === values.chainId
-      );
+      const chain = Chains.find(({ id }) => id === values.chainId);
+      const network = networkStore.getNetwork(chain.id);
+
       const accounts = await AccountService.findKeyAccount(
         publicKey,
         network.historyURL
@@ -106,16 +101,15 @@ export class ImportAccountScreen extends Component {
     const {
       accountStore,
       settingsStore: { settings },
-      networkStore: { allNetworks },
+      networkStore,
       pincodeStore: { accountPincode },
       navigation,
       values,
       setErrors
     } = this.props;
 
-    const network = allNetworks.find(
-      ({ chainId }) => chainId === values.chainId
-    );
+    const chain = Chains.find(({ id }) => id === values.chainId);
+    const network = networkStore.getNetwork(chain.id);
 
     const addAccount = async pincode => {
       // show loading

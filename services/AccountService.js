@@ -5,9 +5,13 @@ import { AccountModel, AccountError } from '../db';
 import api from '../utils/eos/API';
 
 export default class AccountService {
-  static async getAccounts() {
+  static async getAccounts(chainId) {
     const AccountRepo = getRepository(AccountModel);
-    const accounts = await AccountRepo.find();
+    const where = {};
+    if (chainId) {
+      where.chainId = chainId;
+    }
+    const accounts = await AccountRepo.find(where);
 
     return accounts;
   }

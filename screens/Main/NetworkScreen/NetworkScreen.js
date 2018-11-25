@@ -5,14 +5,15 @@ import { Appbar, List, Button, Text } from 'react-native-paper';
 import { ScrollView, BackgroundView } from '../../../components/View';
 import { Theme } from '../../../constants';
 
-@inject('networkStore')
+@inject('accountStore', 'networkStore')
 @observer
 export class NetworkScreen extends Component {
   moveScreen = routeName => this.props.navigation.navigate(routeName);
 
   changeNetwork = async (chainId, networkId) => {
-    const { networkStore } = this.props;
+    const { accountStore, networkStore } = this.props;
     networkStore.changeNetwork(chainId, networkId);
+    accountStore.getAccounts();
   };
 
   render() {

@@ -49,14 +49,18 @@ class Store {
   get currentAccount() {
     const { accountId } = SettingsStore.settings;
 
-    return this.accounts.find(account => account.id === accountId);
+    let account = this.accounts.find(account => account.id === accountId);
+    if (!account && this.accounts.length) {
+      account = this.accounts[0];
+    }
+    return account;
   }
 
   @action
-  async changeCurrentAccount(accountId) {
+  async changeCurrentAccount(accountId, chainId) {
     if (accountId !== (this.currentAccount && this.currentAccount.accountId)) {
       // update settings
-      await SettingsStore.updateSettings({ accountId });
+      await SettingsStore.updateSettings({ accountId, chainId });
       // set current network
       NetworkStore.setCurrentNetwork(this.currentAccount);
       // fetch account info
@@ -71,7 +75,8 @@ class Store {
 
   @action
   async getAccounts() {
-    return AccountService.getAccounts().then(accounts => {
+    const currentNetwork = NetworkStore.currentNetwork;
+    return AccountService.getAccounts(currentNetwork.chainId).then(accounts => {
       this.setAccounts(accounts);
     });
   }
@@ -89,7 +94,7 @@ class Store {
       accounts.push(account);
 
       this.setAccounts(accounts);
-      await this.changeCurrentAccount(account.id);
+      await this.changeCurrentAccount(account.id, account.chainId);
       await this.getAccountInfo();
     });
   }
@@ -112,7 +117,8 @@ class Store {
 
       this.setAccounts(filterDeletedAccount);
       this.changeCurrentAccount(
-        this.accounts.length ? this.accounts[0].id : ''
+        this.accounts.length ? this.accounts[0].id : '',
+        this.accounts.length ? this.accounts[0].chainId : ''
       );
     });
   }
