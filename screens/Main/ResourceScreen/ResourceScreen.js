@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { View } from 'react-native';
+import { View, Image } from 'react-native';
 import { Appbar, Text } from 'react-native-paper';
 import moment from 'moment';
 
@@ -8,6 +8,7 @@ import { BackgroundView } from '../../../components/View';
 
 import { Theme } from '../../../constants';
 import { ResourceView } from '../ManageResourceScreen/ResourceView';
+import { PageIndicator } from '../../../components/Indicator';
 
 @inject('accountStore')
 @observer
@@ -17,7 +18,7 @@ export class ResourceScreen extends Component {
   render() {
     const {
       navigation,
-      accountStore: { info }
+      accountStore: { info, fetched }
     } = this.props;
 
     const { refund_request } = info;
@@ -31,50 +32,68 @@ export class ResourceScreen extends Component {
 
     return (
       <BackgroundView>
-        <Appbar.Header style={{ backgroundColor: Theme.headerBackgroundColor }}>
+        <Appbar.Header
+          style={{ backgroundColor: Theme.header.backgroundColor }}
+        >
           <Appbar.BackAction onPress={() => navigation.goBack(null)} />
           <Appbar.Content title="Resource" />
         </Appbar.Header>
 
-        <View style={{ margin: Theme.innerSpacing }}>
-          <ResourceView
-            type="CPU"
-            onPress={() =>
-              this.moveScreen('ManageResource', { resourceName: 'CPU' })
-            }
-          />
-          <ResourceView
-            type="Network"
-            onPress={() =>
-              this.moveScreen('ManageResource', { resourceName: 'Network' })
-            }
-          />
-          <ResourceView type="RAM" />
+        {!fetched ? (
+          <PageIndicator />
+        ) : (
+          <View>
+            <View style={{ height: 20, backgroundColor: Theme.pallete.gray }} />
 
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              padding: 15,
-              backgroundColor: Theme.mainBackgroundColor,
-              borderRadius: Theme.innerBorderRadius,
-              ...Theme.shadow
-            }}
-          >
-            <Text style={{ flex: 1 }}>Refunding</Text>
+            <ResourceView
+              type="CPU"
+              onPress={() =>
+                this.moveScreen('ManageResource', { resourceName: 'CPU' })
+              }
+            />
+            <View style={{ height: 20, backgroundColor: Theme.pallete.gray }} />
 
-            {refund_request ? (
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Text style={{ color: Theme.primary }}>
-                  {moment(refundTime).fromNow()}
-                </Text>
-                <Text> / {refundAmount.toFixed(4)} EOS</Text>
+            <ResourceView
+              type="Network"
+              onPress={() =>
+                this.moveScreen('ManageResource', { resourceName: 'Network' })
+              }
+            />
+            <View style={{ height: 20, backgroundColor: Theme.pallete.gray }} />
+
+            <ResourceView type="RAM" />
+            <View style={{ height: 20, backgroundColor: Theme.pallete.gray }} />
+
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                padding: 20
+              }}
+            >
+              <View
+                style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}
+              >
+                <Image
+                  style={{ width: 20, height: 20, marginRight: 10 }}
+                  source={require('../../../assets/icons/refund.png')}
+                />
+                <Text>Refunding</Text>
               </View>
-            ) : (
-              <Text>No refund yet</Text>
-            )}
+
+              {refund_request ? (
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <Text>
+                    {moment(refundTime).fromNow()} / {refundAmount.toFixed(4)}{' '}
+                    EOS
+                  </Text>
+                </View>
+              ) : (
+                <Text>No refund yet</Text>
+              )}
+            </View>
           </View>
-        </View>
+        )}
       </BackgroundView>
     );
   }
