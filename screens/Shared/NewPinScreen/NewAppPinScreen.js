@@ -12,7 +12,7 @@ export class NewAppPinScreen extends Component {
 
     try {
       await pincodeStore.saveAppPincode(pincode);
-      params.cb && params.cb();
+      params.cb && params.cb(pincode);
       navigation.goBack(null);
     } catch (error) {
       console.log(error);

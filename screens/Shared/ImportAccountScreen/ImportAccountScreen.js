@@ -109,8 +109,6 @@ export class ImportAccountScreen extends Component {
       values,
       setErrors
     } = this.props;
-    const { isSignUp } = navigation.state.params || {};
-
     const network = allNetworks.find(({ id }) => id === values.networkId);
 
     const addAccount = async pincode => {
@@ -137,7 +135,7 @@ export class ImportAccountScreen extends Component {
           privateKey: values.privateKey,
           networkId: values.networkId,
           permissions: foundPerms,
-          pincode: pincode && accountPincode
+          pincode
         });
       } catch (error) {
         setErrors({ importError: true, ...error.errors });
@@ -162,7 +160,7 @@ export class ImportAccountScreen extends Component {
         }
       });
     } else {
-      await addAccount();
+      await addAccount(accountPincode);
     }
   }
 

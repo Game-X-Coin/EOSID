@@ -12,7 +12,7 @@ export class NewPinScreen extends Component {
 
     try {
       await pincodeStore.saveAccountPincode(pincode);
-      params.cb && params.cb();
+      params.cb && params.cb(pincode);
       navigation.goBack(null);
     } catch (error) {
       console.log(error);
