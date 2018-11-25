@@ -297,7 +297,7 @@ export default [
       'https://eossweden.se/wp-content/uploads/2018/06/Square-Leaf-Banner-01.svg',
     nodes: [
       {
-        url: 'https://api.eossweden.se"',
+        url: 'https://api.eossweden.se',
         location: {
           name: 'Sweden',
           country: 'SE',
