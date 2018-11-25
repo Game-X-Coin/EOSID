@@ -1,55 +1,15 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { View } from 'react-native';
-import { Appbar, Text, Title } from 'react-native-paper';
+import { Appbar, Text } from 'react-native-paper';
 import moment from 'moment';
-import { Svg } from 'expo';
 
-import { SkeletonIndicator } from '../../../components/Indicator';
 import { BackgroundView, ScrollView } from '../../../components/View';
 import { Theme } from '../../../constants';
+import EosApi from '../../../utils/eos/API';
+import { PageIndicator } from '../../../components/Indicator';
 
-const ActivityIndicator = () => (
-  <View
-    style={{
-      margin: Theme.innerSpacing,
-      padding: Theme.innerPadding,
-      backgroundColor: Theme.mainBackgroundColor,
-      borderRadius: Theme.innerBorderRadius,
-      ...Theme.shadow
-    }}
-  >
-    <SkeletonIndicator width="100%" height={40}>
-      <Svg.Rect x="0" y="0" rx="4" ry="4" width="70%" height="15" />
-      <Svg.Rect x="0" y="25" rx="4" ry="4" width="35%" height="15" />
-    </SkeletonIndicator>
-
-    <View
-      style={{
-        marginVertical: 20,
-        height: 1,
-        backgroundColor: '#d6d6d6'
-      }}
-    />
-
-    <SkeletonIndicator width="100%" height={60}>
-      <Svg.Rect x="0" y="0" rx="4" ry="4" width="30%" height="15" />
-      <Svg.Rect x="0" y="25" rx="4" ry="4" width="50%" height="15" />
-    </SkeletonIndicator>
-
-    <SkeletonIndicator width="100%" height={60}>
-      <Svg.Rect x="0" y="0" rx="4" ry="4" width="30%" height="15" />
-      <Svg.Rect x="0" y="25" rx="4" ry="4" width="50%" height="15" />
-    </SkeletonIndicator>
-
-    <SkeletonIndicator width="100%" height={40}>
-      <Svg.Rect x="0" y="0" rx="4" ry="4" width="30%" height="15" />
-      <Svg.Rect x="0" y="25" rx="4" ry="4" width="50%" height="15" />
-    </SkeletonIndicator>
-  </View>
-);
-
-@inject('accountStore', 'networkStore')
+@inject('accountStore')
 @observer
 export class ActivityDetailScreen extends Component {
   constructor() {
@@ -64,12 +24,11 @@ export class ActivityDetailScreen extends Component {
   async componentDidMount() {
     const {
       navigation,
-      networkStore: { eos },
       accountStore: { currentAccount }
     } = this.props;
     const { params } = navigation.state || {};
 
-    const { actions = [] } = await eos.actions.get({
+    const { actions = [] } = await EosApi.actions.get({
       pos: params.actionSeq,
       account_name: currentAccount.name
     });
@@ -85,72 +44,68 @@ export class ActivityDetailScreen extends Component {
     } = this.state;
 
     const Item = ({ title, description }) => (
-      <View style={{ marginTop: 20 }}>
-        <Text style={{ marginBottom: 7, fontSize: 16, fontWeight: '500' }}>
+      <View style={{ padding: 17 }}>
+        <Text style={{ marginBottom: 7, ...Theme.text, fontWeight: '500' }}>
           {title}
         </Text>
-        <Text style={{ fontSize: 16 }}>{description}</Text>
+        <Text style={Theme.h5}>{description}</Text>
       </View>
     );
 
     return (
       <BackgroundView>
-        <Appbar.Header style={{ backgroundColor: Theme.headerBackgroundColor }}>
+        <Appbar.Header
+          style={{ backgroundColor: Theme.header.backgroundColor }}
+        >
           <Appbar.BackAction onPress={() => navigation.goBack(null)} />
           <Appbar.Content title="Activity Detail" />
         </Appbar.Header>
 
         {!fetched ? (
-          <ActivityIndicator />
+          <PageIndicator />
         ) : (
-          <ScrollView style={{ margin: Theme.innerSpacing }}>
+          <ScrollView>
+            <View style={{ height: 20, backgroundColor: Theme.pallete.gray }} />
             <View
               style={{
-                padding: Theme.innerPadding,
-                borderRadius: Theme.innerBorderRadius,
-                backgroundColor: Theme.mainBackgroundColor,
-                ...Theme.shadow
+                flexDirection: 'row',
+                alignItems: 'center',
+                padding: 17
               }}
             >
               <View
                 style={{
-                  flexDirection: 'row',
-                  marginBottom: 20
+                  flex: 1
                 }}
               >
-                <View
+                <Text
                   style={{
-                    flex: 1
+                    marginBottom: 5,
+                    fontSize: 18,
+                    lineHeight: 18
                   }}
                 >
-                  <Title style={{ marginBottom: 5, lineHeight: 20 }}>
-                    {act.name}
-                  </Title>
-                  <Text style={{ fontSize: 13 }}>by {act.account}</Text>
-                </View>
-
-                <View>
-                  <Text style={{ fontSize: 14 }}>
-                    {moment(block_time).format('lll')}
-                  </Text>
-                </View>
+                  {act.name}
+                </Text>
+                <Text style={{ fontSize: 13 }}>by {act.account}</Text>
               </View>
 
-              <View
-                style={{
-                  height: 1,
-                  backgroundColor: '#d6d6d6'
-                }}
-              />
-
-              {Object.keys(act.data).map(key => {
-                const data = act.data[key];
-                const description =
-                  data.constructor === Array ? JSON.stringify(data) : data;
-
-                return <Item key={key} title={key} description={description} />;
-              })}
+              <View>
+                <Text style={{ fontSize: 13, color: Theme.pallete.darkGray }}>
+                  {moment(block_time).format('lll')}
+                </Text>
+              </View>
             </View>
+
+            <View style={{ height: 20, backgroundColor: Theme.pallete.gray }} />
+
+            {Object.keys(act.data).map(key => {
+              const data = act.data[key];
+              const description =
+                data.constructor === Array ? JSON.stringify(data) : data;
+
+              return <Item key={key} title={key} description={description} />;
+            })}
           </ScrollView>
         )}
       </BackgroundView>
