@@ -83,7 +83,7 @@ export default class NetworkService {
           node.producer
         }`;
         node.chainURL = node.url;
-        node.historyURL = node.url;
+        node.historyURL = node.historyURL ? node.historyURL : node.url;
         node.success = false;
         node.responseTime = 9999;
         const start = new Date().getTime();
