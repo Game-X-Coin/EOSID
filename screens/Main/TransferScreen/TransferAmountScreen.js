@@ -143,6 +143,7 @@ export class TransferAmountScreen extends Component {
             <TextField
               autoFocus
               label="Transfer Amount"
+              textAlign="right"
               keyboardType="numeric"
               value={values.amount}
               info={`${availableAmount} ${values.symbol} available`}
@@ -153,12 +154,12 @@ export class TransferAmountScreen extends Component {
               }}
               prefixComp={
                 <SelectField
-                  value={values.symbol}
                   data={tokenData}
+                  value={values.symbol}
+                  error={touched.amount && errors.amount}
                   onChange={_ => setFieldValue('symbol', _)}
                   containerStyle={{
-                    marginBottom: 0,
-                    marginRight: 15,
+                    marginVertical: 0,
                     width: values.symbol.length * 10 + 60
                   }}
                 />
