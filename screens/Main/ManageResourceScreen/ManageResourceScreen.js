@@ -7,6 +7,7 @@ import { StakeResource } from './StakeResource';
 import { UnstakeResource } from './UnstakeResource';
 
 import { Theme } from '../../../constants';
+import { ResourceView } from './ResourceView';
 
 const TopTabNavigator = createMaterialTopTabNavigator(
   {
@@ -32,6 +33,7 @@ const TopTabNavigator = createMaterialTopTabNavigator(
 class ManageResourceScreen extends Component {
   render() {
     const { navigation } = this.props;
+    const { resourceName } = navigation.state.params;
 
     return (
       <View style={{ flex: 1 }}>
@@ -39,8 +41,10 @@ class ManageResourceScreen extends Component {
           style={{ elevation: 0, backgroundColor: Theme.mainBackgroundColor }}
         >
           <Appbar.BackAction onPress={() => navigation.goBack(null)} />
-          <Appbar.Content title="Manage Resource" />
+          <Appbar.Content title={`Manage ${resourceName}`} />
         </Appbar.Header>
+
+        <ResourceView type={resourceName} />
         <TopTabNavigator navigation={navigation} />
       </View>
     );
