@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { FlatList, View } from 'react-native';
 import { observable, computed } from 'mobx';
 import { observer, inject } from 'mobx-react';
-import { Text, TouchableRipple } from 'react-native-paper';
+import { Text, TouchableRipple, Colors } from 'react-native-paper';
 import { withNavigation } from 'react-navigation';
 import moment from 'moment';
 import { Svg } from 'expo';
@@ -11,38 +11,42 @@ import { ActivityEmptyState } from './ActivityEmptyState';
 
 import { SkeletonIndicator } from '../../../components/Indicator';
 import { Theme } from '../../../constants';
-import { Title } from 'react-native-paper';
 
 const ActivityIndicator = () => (
   <View
     style={{
       padding: 17,
       borderBottomWidth: 1,
-      borderBottomColor: '#d6d6d6'
+      borderBottomColor: Theme.pallete.gray
     }}
   >
     <SkeletonIndicator width="100%" height={40}>
-      <Svg.Rect x="0" y="0" rx="4" ry="4" width="100%" height="15" />
-      <Svg.Rect x="0" y="25" rx="4" ry="4" width="50%" height="15" />
+      <Svg.Rect x="0" y="0" rx="4" ry="4" width="70%" height="15" />
+      <Svg.Rect x="0" y="25" rx="4" ry="4" width="100%" height="15" />
     </SkeletonIndicator>
   </View>
 );
 
 const ActivityGroupIndicator = () => (
-  <View style={{ margin: Theme.innerSpacing }}>
-    <SkeletonIndicator width="100%" height={30}>
-      <Svg.Rect x="15" y="0" rx="4" ry="4" width="100" height="15" />
-    </SkeletonIndicator>
+  <View>
+    <View style={{ height: 20, backgroundColor: Theme.pallete.gray }} />
+
     <View
       style={{
-        backgroundColor: '#fff',
-        borderRadius: Theme.innerBorderRadius,
-        ...Theme.shadow
+        marginTop: 15,
+        marginHorizontal: 20,
+        paddingVertical: 15,
+        borderBottomWidth: 1,
+        borderColor: Colors.grey200
       }}
     >
-      <ActivityIndicator />
-      <ActivityIndicator />
+      <SkeletonIndicator width="100%" height={15}>
+        <Svg.Rect x="0" y="0" rx="4" ry="4" width="80" height="15" />
+      </SkeletonIndicator>
     </View>
+
+    <ActivityIndicator />
+    <ActivityIndicator />
   </View>
 );
 
@@ -145,35 +149,29 @@ export class ActivityInfo extends Component {
         onEndReached={this.onEndReached}
         ListFooterComponent={this.renderFooter}
         renderItem={({ item: key }) => (
-          <View
-            style={{
-              marginHorizontal: Theme.innerSpacing,
-              marginVertical: Theme.innerSpacing
-            }}
-          >
+          <View style={{ backgroundColor: '#fff' }}>
+            <View style={{ height: 20, backgroundColor: Theme.pallete.gray }} />
+
             <View
               style={{
                 flexDirection: 'row',
-                paddingHorizontal: 10,
-                marginBottom: 10
+                alignItems: 'flex-end',
+                marginTop: 15,
+                marginHorizontal: 20,
+                paddingVertical: 10,
+                borderBottomWidth: 1,
+                borderColor: Colors.grey200
               }}
             >
-              <Text style={{ flex: 1, fontSize: 15 }}>
+              <Text style={{ flex: 1, ...Theme.h5 }}>
                 {moment(key).fromNow()}
               </Text>
-              <Text style={{ color: Theme.infoColor }}>
+              <Text style={{ color: Theme.pallete.darkGray, ...Theme.text }}>
                 {moment(key).format('ll')}
               </Text>
             </View>
 
-            <View
-              style={{
-                backgroundColor: '#fff',
-                borderRadius: Theme.innerBorderRadius,
-                overflow: 'hidden',
-                ...Theme.shadow
-              }}
-            >
+            <View>
               {groupedActions[key].map(
                 ({ account_action_seq, action_trace, block_time }) => (
                   <TouchableRipple
@@ -181,7 +179,7 @@ export class ActivityInfo extends Component {
                     style={{
                       padding: 17,
                       borderBottomWidth: 1,
-                      borderBottomColor: '#d6d6d6'
+                      borderBottomColor: Theme.pallete.gray
                     }}
                     onPress={() =>
                       this.props.navigation.navigate('ActivityDetail', {
@@ -191,11 +189,12 @@ export class ActivityInfo extends Component {
                   >
                     <View
                       style={{
-                        flexDirection: 'row'
+                        flexDirection: 'row',
+                        alignItems: 'center'
                       }}
                     >
                       <View style={{ flex: 1 }}>
-                        <Title
+                        <Text
                           style={{
                             marginBottom: 5,
                             fontSize: 18,
@@ -203,7 +202,7 @@ export class ActivityInfo extends Component {
                           }}
                         >
                           {action_trace.act.name}
-                        </Title>
+                        </Text>
                         <Text style={{ fontSize: 13 }}>
                           by {action_trace.act.account}
                         </Text>
@@ -212,7 +211,7 @@ export class ActivityInfo extends Component {
                         style={{
                           paddingLeft: 15,
                           fontSize: 13,
-                          color: Theme.infoColor
+                          color: Theme.pallete.darkGray
                         }}
                       >
                         {moment(block_time).format('A hh:mm')}

@@ -16,7 +16,7 @@ export class ShowErrorScreen extends Component {
         <Appbar.Header
           style={{
             justifyContent: 'flex-end',
-            backgroundColor: Theme.headerBackgroundColor
+            backgroundColor: Theme.header.backgroundColor
           }}
         >
           <Appbar.Action icon="close" onPress={onPress} />
@@ -33,9 +33,8 @@ export class ShowErrorScreen extends Component {
               marginBottom: 35,
               padding: 15,
               width: '80%',
-              backgroundColor: Theme.mainBackgroundColor,
-              borderRadius: Theme.innerBorderRadius,
-              ...Theme.shadow
+              backgroundColor: Theme.pallete.gray,
+              borderRadius: 5
             }}
           >
             <Text>{error}</Text>

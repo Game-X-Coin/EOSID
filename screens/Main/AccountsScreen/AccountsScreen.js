@@ -55,7 +55,9 @@ export class AccountsScreen extends Component {
 
     return (
       <BackgroundView>
-        <Appbar.Header style={{ backgroundColor: Theme.headerBackgroundColor }}>
+        <Appbar.Header
+          style={{ backgroundColor: Theme.header.backgroundColor }}
+        >
           <Appbar.BackAction onPress={() => navigation.goBack(null)} />
           <Appbar.Content title="Accounts" />
         </Appbar.Header>
@@ -81,7 +83,7 @@ export class AccountsScreen extends Component {
                 {name === (currentAccount && currentAccount.name) && (
                   <Icon.Ionicons
                     name="md-checkmark"
-                    color={Theme.primary}
+                    color={Theme.pallete.primary}
                     size={25}
                   />
                 )}
