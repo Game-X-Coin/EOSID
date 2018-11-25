@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { Appbar, List, Button } from 'react-native-paper';
+import { Appbar, List, Button, Text } from 'react-native-paper';
 
 import { ScrollView, BackgroundView } from '../../../components/View';
 import { Theme } from '../../../constants';
@@ -23,15 +23,52 @@ export class NetworkScreen extends Component {
 
         <ScrollView>
           <List.Section title="Mainnet">
-            {defaultNetworks.map(({ id, name, chainURL }) => (
-              <List.Item key={id} title={name} description={chainURL} />
-            ))}
+            {defaultNetworks.map(
+              ({ id, name, chainURL, responseTime, success }) => (
+                <List.Item
+                  key={id}
+                  title={name}
+                  description={`${chainURL}`}
+                  right={props => (
+                    <Text {...props}>
+                      {responseTime && responseTime !== 9999
+                        ? `${responseTime} ms`
+                        : 'delayed'}{' '}
+                      {success ? 'alive' : 'disalive'}
+                    </Text>
+                  )}
+                  style={
+                    networkStore.currentNetwork.id === id
+                      ? { backgroundColor: Theme.primary }
+                      : {}
+                  }
+                />
+              )
+            )}
           </List.Section>
-
           <List.Section title="Custom">
-            {customNetworks.map(({ id, name, chainURL }) => (
-              <List.Item key={id} title={name} description={chainURL} />
-            ))}
+            {customNetworks.map(
+              ({ id, name, chainURL, responseTime, success }) => (
+                <List.Item
+                  key={id}
+                  title={name}
+                  description={`${chainURL}`}
+                  right={props => (
+                    <Text {...props}>
+                      {responseTime && responseTime !== 9999
+                        ? `${responseTime} ms`
+                        : 'delayed'}{' '}
+                      {success ? 'alive' : 'disalive'}
+                    </Text>
+                  )}
+                  style={
+                    networkStore.currentNetwork.id === id
+                      ? { backgroundColor: Theme.primary }
+                      : {}
+                  }
+                />
+              )
+            )}
             {!customNetworks.length && <List.Item title="No custom networks" />}
           </List.Section>
         </ScrollView>

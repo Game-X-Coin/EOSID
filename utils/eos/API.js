@@ -2,9 +2,10 @@ import { Api, JsSignatureProvider, JsonRpc, Serialize } from 'eosjs-rn';
 import ecc from 'eosjs-ecc-rn';
 import { TextDecoder, TextEncoder } from 'text-encoding';
 import Fetch from '../Fetch';
+import { DEFAULT_NETWORKS } from '../../constants';
 
 class EosApi {
-  static currentNetwork = null;
+  static currentNetwork = DEFAULT_NETWORKS ? DEFAULT_NETWORKS[0] : null;
   static FetchChain = null;
   static FetchHistory = null;
   static isJungleNet = false;
@@ -394,7 +395,7 @@ class EosApi {
   static get producers() {
     return {
       get: async ({ json = true, limit = 21 } = {}) =>
-        await EosApi.HistoryAPI().post('/v1/history/get_producers', {
+        await EosApi.ChainAPI().post('/v1/chain/get_producers', {
           json,
           limit
         })
@@ -418,7 +419,7 @@ class EosApi {
   static get blocks() {
     return {
       get: ({ block_num_or_id }) =>
-        EosApi.ChainAPI().post('/v1/chain/block', { block_num_or_id }),
+        EosApi.ChainAPI().post('/v1/chain/get_block', { block_num_or_id }),
       getHeaderState: ({ block_num_or_id }) =>
         EosApi.ChainAPI().post('/v1/chain/get_block_header_state', {
           block_num_or_id
