@@ -24,9 +24,10 @@ Sentry.config(
 
 const theme = {
   ...DefaultTheme,
+  ...Theme.paper,
   colors: {
     ...DefaultTheme.colors,
-    ...Theme
+    ...Theme.paper.colors
   }
 };
 
