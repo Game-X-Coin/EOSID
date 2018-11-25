@@ -54,6 +54,7 @@
   },
   "devDependencies": {
     "babel-eslint": "^10.0.1",
+    "babel-plugin-inline-dotenv": "^1.2.0",
     "babel-plugin-transform-remove-console": "^6.9.4",
     "babel-preset-expo": "^5.0.0",
     "eslint": "^5.6.1",
