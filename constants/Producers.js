@@ -44,16 +44,16 @@ export default [
           latitude: 82.9072,
           longitude: 40.4273
         }
-      },
-      {
-        url: 'http://api-mainnet1.starteos.io',
-        location: {
-          name: 'Tokyo',
-          country: 'JP',
-          latitude: 35.4984,
-          longitude: 139.4972
-        }
       }
+      // {
+      //   url: 'http://api-mainnet1.starteos.io',
+      //   location: {
+      //     name: 'Tokyo',
+      //     country: 'JP',
+      //     latitude: 35.4984,
+      //     longitude: 139.4972
+      //   }
+      // }
     ]
   },
   {
