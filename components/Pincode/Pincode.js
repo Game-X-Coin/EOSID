@@ -5,7 +5,7 @@ import { View, Dimensions } from 'react-native';
 import { Text, TouchableRipple, Colors } from 'react-native-paper';
 import { Icon } from 'expo';
 
-import { Theme, DarkTheme } from '../../constants';
+import { DarkTheme } from '../../constants';
 import { BackgroundView } from '../View';
 
 const shuffle = array => {

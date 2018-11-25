@@ -29,7 +29,6 @@ import { DialogIndicator } from '../../../components/Indicator';
 import { Theme } from '../../../constants';
 import { TextField } from '../../../components/TextField';
 import { SelectField } from '../../../components/SelectField';
-import { PincodeStore } from '../../../stores';
 
 @inject('settingsStore', 'networkStore', 'accountStore', 'pincodeStore')
 @withFormik({
@@ -224,7 +223,9 @@ export class ImportAccountScreen extends Component {
 
     return (
       <BackgroundView>
-        <Appbar.Header style={{ backgroundColor: Theme.headerBackgroundColor }}>
+        <Appbar.Header
+          style={{ backgroundColor: Theme.header.backgroundColor }}
+        >
           {!isSignUp && (
             <Appbar.BackAction onPress={() => navigation.goBack(null)} />
           )}

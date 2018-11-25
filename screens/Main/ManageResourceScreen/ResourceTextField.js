@@ -64,7 +64,7 @@ export class ResourceTextField extends Component {
             );
           })}
 
-          <Text style={{ fontSize: 13, color: Theme.infoColor }}>%</Text>
+          <Text style={{ fontSize: 13, color: Theme.pallete.darkGray }}>%</Text>
         </View>
       </View>
     );

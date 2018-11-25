@@ -3,7 +3,7 @@ import { observable } from 'mobx';
 import { observer } from 'mobx-react';
 import { Pincode } from './Pincode';
 import { Appbar } from 'react-native-paper';
-import { Theme } from '../../constants';
+import { DarkTheme } from '../../constants';
 
 @observer
 export class ConfirmPincode extends Component {
@@ -29,7 +29,11 @@ export class ConfirmPincode extends Component {
     return (
       <React.Fragment>
         <Appbar.Header
-          style={{ backgroundColor: Theme.mainBackgroundColor, elevation: 0 }}
+          style={{
+            backgroundColor: DarkTheme.header.backgroundColor,
+            elevation: 0
+          }}
+          dark
         >
           {backAction && <Appbar.BackAction onPress={backAction} />}
           <Appbar.Content title={title} />

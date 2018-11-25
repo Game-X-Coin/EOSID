@@ -92,10 +92,6 @@ export class AccountInfo extends Component {
     return false;
   };
 
-  componentDidMount() {
-    this.moveScreen('Activity');
-  }
-
   moveScreen = (...args) => this.props.navigation.navigate(...args);
 
   render() {

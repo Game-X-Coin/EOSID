@@ -70,28 +70,17 @@ export const Theme = {
   p,
   ...generateHeadings(),
 
-  primary: tintColor,
-  secondary: '#ffd111',
-  tertiary: '#33ba20',
-  quaternary: '#ff4b34',
-  activeColor: tintColor,
-  inActiveColor: '#bababa',
-  headerBackgroundColor: 'transparent',
-  mainBackgroundColor: '#0d0d0d',
   innerSpacing: 20,
   innerPadding: 25,
   innerBorderRadius: 7,
   shadow: {
-    elevation: 10,
+    elevation: 4,
     // ios shadow
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.3,
     shadowRadius: 2
-  },
-  successColor: tintColor,
-  errorColor: '#ff4b34',
-  infoColor: '#bcbcbc'
+  }
 };
 
 export const DarkTheme = {
@@ -105,7 +94,10 @@ export const DarkTheme = {
     ...app,
     backgroundColor: tintColor
   },
-  header,
+  header: {
+    ...header,
+    backgroundColor: tintColor
+  },
   tab,
 
   surface: {

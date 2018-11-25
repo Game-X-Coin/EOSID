@@ -78,7 +78,11 @@ export class TextField extends Component {
     const Prefix = () =>
       prefix ? (
         <Text
-          style={{ paddingRight: 15, fontSize: 15, color: Theme.infoColor }}
+          style={{
+            paddingRight: 15,
+            fontSize: 15,
+            color: Theme.pallete.darkGray
+          }}
         >
           {prefix}
         </Text>
@@ -87,7 +91,11 @@ export class TextField extends Component {
     const Suffix = () =>
       suffix ? (
         <Text
-          style={{ paddingRight: 15, fontSize: 15, color: Theme.infoColor }}
+          style={{
+            paddingRight: 15,
+            fontSize: 15,
+            color: Theme.pallete.darkGray
+          }}
         >
           {suffix}
         </Text>

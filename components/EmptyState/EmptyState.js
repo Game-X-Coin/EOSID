@@ -40,7 +40,7 @@ export class EmptyState extends Component {
             marginBottom: 35,
             paddingHorizontal: 30,
             textAlign: 'center',
-            color: Theme.infoColor,
+            color: Theme.pallete.darkGray,
             ...descriptionStyle
           }}
         >
