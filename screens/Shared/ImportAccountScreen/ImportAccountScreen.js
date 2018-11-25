@@ -29,7 +29,8 @@ import { DialogIndicator } from '../../../components/Indicator';
 import { Theme } from '../../../constants';
 import { TextField } from '../../../components/TextField';
 import { SelectField } from '../../../components/SelectField';
-import { PincodeStore } from '../../../stores';
+
+import Chains from '../../../constants/Chains';
 
 @inject('settingsStore', 'networkStore', 'accountStore', 'pincodeStore')
 @withFormik({
@@ -38,7 +39,7 @@ import { PincodeStore } from '../../../stores';
     // form
     privateKey: '',
     publicKey: '',
-    networkId: networkStore.getNetwork().id // default network
+    chainId: Chains[0].id // default network
   }),
   validationSchema: props => {
     const { errors: RequiredFieldErrors } = AccountError.RequiredFields;
@@ -50,7 +51,7 @@ import { PincodeStore } from '../../../stores';
         .test('validate-privateKey', InvalidPrivateKeyErrors.privateKey, v =>
           api.Key.isValidPrivate({ wif: v })
         ),
-      networkId: Yup.string().required(RequiredFieldErrors.networkId)
+      chainId: Yup.string().required(RequiredFieldErrors.chainId)
     });
   }
 })
@@ -79,7 +80,9 @@ export class ImportAccountScreen extends Component {
     this.toggleLoadingDialog();
 
     try {
-      const network = allNetworks.find(({ id }) => id === values.networkId);
+      const network = allNetworks.find(
+        ({ chainId }) => chainId === values.chainId
+      );
       const accounts = await AccountService.findKeyAccount(
         publicKey,
         network.historyURL
@@ -109,9 +112,10 @@ export class ImportAccountScreen extends Component {
       values,
       setErrors
     } = this.props;
-    const { isSignUp } = navigation.state.params || {};
 
-    const network = allNetworks.find(({ id }) => id === values.networkId);
+    const network = allNetworks.find(
+      ({ chainId }) => chainId === values.chainId
+    );
 
     const addAccount = async pincode => {
       // show loading
@@ -135,11 +139,12 @@ export class ImportAccountScreen extends Component {
           name: accountName,
           publicKey: values.publicKey,
           privateKey: values.privateKey,
-          networkId: values.networkId,
+          chainId: values.chainId,
           permissions: foundPerms,
-          pincode: pincode && accountPincode
+          pincode: pincode || accountPincode
         });
       } catch (error) {
+        console.log(error);
         setErrors({ importError: true, ...error.errors });
         this.hideDialogs();
         return;
@@ -189,7 +194,6 @@ export class ImportAccountScreen extends Component {
     const {
       navigation,
       networkStore: { allNetworks },
-
       values,
       errors,
       touched,
@@ -197,14 +201,15 @@ export class ImportAccountScreen extends Component {
       setFieldTouched,
       isValid
     } = this.props;
+    console.log(errors);
     const { showDialog, showLoadingDialog } = this.state;
 
     const isSignUp =
       navigation.state.params && navigation.state.params.isSignUp;
 
-    const networks = allNetworks.map(network => ({
-      label: network.name,
-      value: network.id
+    const chains = Chains.map(chain => ({
+      label: chain.name,
+      value: chain.id
     }));
 
     const SelectAccountDialog = () => (
@@ -258,14 +263,14 @@ export class ImportAccountScreen extends Component {
             />
 
             <SelectField
-              label="Network"
-              info="Network of account to import"
-              data={networks}
-              value={values.networkId}
-              error={touched.networkId && errors.networkId}
+              label="Chain"
+              info="Chain of account to import"
+              data={chains}
+              value={values.chainId}
+              error={touched.chainId && errors.chainId}
               onChangeText={_ => {
-                setFieldTouched('networkId', true);
-                setFieldValue('networkId', _);
+                setFieldTouched('chainId', true);
+                setFieldValue('chainId', _);
               }}
             />
 

@@ -17,7 +17,8 @@ export class AccountError {
     return new AccountError({
       errors: {
         privateKey: 'Please enter your private key',
-        networkId: 'Please select account network'
+        networkId: 'Please select account network',
+        chainId: 'Please select account chain'
       }
     });
   }
@@ -57,18 +58,18 @@ export class AccountModel {
   name = '';
 
   @Column('varchar')
-  networkId = '';
+  chainId = '';
 
   @Column('simple-array')
   keys = [];
 
   constructor(data) {
     if (data) {
-      const { id, name, networkId, keys = [] } = data;
+      const { id, name, chainId, keys = [] } = data;
 
       this.id = id;
       this.name = name;
-      this.networkId = networkId;
+      this.chainId = chainId;
       this.keys = keys;
     }
   }
