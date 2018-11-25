@@ -39,7 +39,7 @@ import Chains from '../../../constants/Chains';
     // form
     privateKey: '',
     publicKey: '',
-    chainId: Chains[0].id // default network
+    chainId: networkStore.currentNetwork.chainId // default network
   }),
   validationSchema: props => {
     const { errors: RequiredFieldErrors } = AccountError.RequiredFields;

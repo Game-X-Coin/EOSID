@@ -9,6 +9,7 @@ import { Portal, Modal, TouchableRipple } from 'react-native-paper';
 import { Theme } from '../../../constants';
 
 import { ScrollView } from '../../../components/View';
+import Chains from '../../../constants/Chains';
 
 @withNavigation
 @inject('accountStore')
@@ -70,12 +71,16 @@ export class AccountSelectDrawer extends Component {
             }}
           >
             <ScrollView>
-              {accounts.map(({ id, name }) => (
+              {accounts.map(({ id, name, chainId }) => (
                 <ListItem
                   key={id}
-                  title={name}
+                  title={`${name} - ${
+                    Chains.find(chain => chain.id === chainId).name
+                  }`}
                   right={
-                    name === (currentAccount && currentAccount.name) && (
+                    currentAccount &&
+                    name === currentAccount.name &&
+                    chainId === currentAccount.chainId && (
                       <Icon.Ionicons
                         name="md-checkmark"
                         color={Theme.primary}

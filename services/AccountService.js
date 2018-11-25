@@ -33,6 +33,7 @@ export default class AccountService {
     permissions,
     publicKey,
     name,
+    chainId,
     ...accountInfo
   }) {
     const AccountRepo = getRepository(AccountModel);
@@ -40,7 +41,7 @@ export default class AccountService {
     // encrypt private key
     const encryptedPrivateKey = AccountService.encryptKey(privateKey, pincode);
 
-    let account = await AccountRepo.findOne({ name });
+    let account = await AccountRepo.findOne({ name, chainId });
 
     if (!account) {
       // create new account instance
@@ -49,7 +50,7 @@ export default class AccountService {
         encryptedPrivateKey,
         permission: permissions[0]
       });
-      account = new AccountModel({ ...accountInfo, name, keys });
+      account = new AccountModel({ ...accountInfo, name, keys, chainId });
       permissions = permissions.slice(1);
       // check duplicated permission in account
     } else if (

@@ -9,6 +9,7 @@ import { Icon, Svg } from 'expo';
 import { AccountSelectDrawer } from './AccountSelectDrawer';
 import { Theme } from '../../../constants';
 import { SkeletonIndicator } from '../../../components/Indicator';
+import Chains from '../../../constants/Chains';
 
 @withNavigation
 @inject('accountStore')
@@ -43,6 +44,7 @@ export class AccountInfo extends Component {
 
   render() {
     const { tokens, fetched, currentAccount } = this.props.accountStore;
+    const chain = Chains.find(chain => chain.id === currentAccount.chainId);
 
     const BalanceIndicator = () => (
       <SkeletonIndicator width={200} height={65}>
@@ -78,7 +80,7 @@ export class AccountInfo extends Component {
           <TouchableRipple borderless onPress={() => this.showDrawer()}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <Text style={{ paddingLeft: 15, marginRight: 7, fontSize: 17 }}>
-                {currentAccount.name}
+                {currentAccount.name} - {chain && chain.name}
               </Text>
               <Icon.Ionicons name="ios-arrow-down" size={17} />
             </View>

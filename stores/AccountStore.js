@@ -57,10 +57,10 @@ class Store {
     if (accountId !== (this.currentAccount && this.currentAccount.accountId)) {
       // update settings
       await SettingsStore.updateSettings({ accountId });
-      // fetch account info
-      await this.getAccountInfo();
       // set current network
       NetworkStore.setCurrentNetwork(this.currentAccount);
+      // fetch account info
+      await this.getAccountInfo();
     }
   }
 
@@ -83,7 +83,8 @@ class Store {
     }).then(async account => {
       // remove duplicate entity
       const accounts = this.accounts.filter(
-        entity => entity.name !== account.name
+        entity =>
+          entity.name !== account.name && entity.chainId !== account.chainId
       );
       accounts.push(account);
 
