@@ -195,7 +195,7 @@ class Store {
       permission: key.permission
     }).then(async tx => {
       await this.getTokens();
-      await this.getActions();
+      this.getActions();
       // log transfer
       TransferLogService.addTransferLog({ ...params, accountId: id });
 
@@ -216,8 +216,8 @@ class Store {
       permission: key.permission
     }).then(async tx => {
       await this.getInfo();
-      await this.getTokens();
-      await this.getActions();
+      this.getTokens();
+      this.getActions();
 
       return tx;
     });
