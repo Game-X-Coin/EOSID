@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { View, Keyboard } from 'react-native';
+import { View, Keyboard, SafeAreaView } from 'react-native';
 import {
   Appbar,
   Button,
@@ -284,7 +284,7 @@ export class ImportAccountScreen extends Component {
           </ScrollView>
 
           {/* Fixed bottom buttons */}
-          <View style={{ flexDirection: 'row' }}>
+          <SafeAreaView style={{ flexDirection: 'row' }}>
             {isSignUp && (
               <Button
                 style={{ flex: 1, padding: 5, borderRadius: 0 }}
@@ -302,7 +302,7 @@ export class ImportAccountScreen extends Component {
             >
               Import
             </Button>
-          </View>
+          </SafeAreaView>
         </KeyboardAvoidingView>
       </BackgroundView>
     );
