@@ -12,7 +12,6 @@ export class TextField extends Component {
       info,
       error,
       loading,
-      containerStyle,
       style,
       suffix,
       prefix,
@@ -26,8 +25,8 @@ export class TextField extends Component {
       <Text
         style={{
           alignSelf: 'flex-end',
-          fontSize: 12,
-          lineHeight: 12,
+          fontSize: 13,
+          lineHeight: 13,
           ...props.style
         }}
       >
@@ -35,28 +34,44 @@ export class TextField extends Component {
       </Text>
     );
 
-    const ErrorText = () =>
-      error ? (
-        <HelperText style={{ color: Theme.errorColor }}>{error}</HelperText>
-      ) : null;
+    const ErrorText = () => (
+      <View
+        style={{
+          height: 25,
+          paddingHorizontal: 15,
+          justifyContent: 'center'
+        }}
+      >
+        <HelperText
+          style={{
+            width: '100%',
+            color: Theme.pallete.error
+          }}
+        >
+          {error}
+        </HelperText>
+      </View>
+    );
 
     const InfoText = () =>
-      !error && info ? (
-        <HelperText style={{ color: Theme.infoColor }}>{info}</HelperText>
+      info ? (
+        <HelperText style={{ color: Theme.pallete.darkGray }}>
+          {info}
+        </HelperText>
       ) : null;
 
     const Label = () =>
       label ? (
         <View
           style={{
+            paddingHorizontal: 15,
+            paddingTop: 15,
             flexDirection: 'row',
-            alignItems: 'flex-start',
-            marginBottom: 10
+            alignItems: 'flex-start'
           }}
         >
-          <Text style={{ flex: 1, fontSize: 14 }}>{label}</Text>
+          <HelperText style={{ flex: 1 }}>{label}</HelperText>
           <InfoText />
-          <ErrorText />
         </View>
       ) : null;
 
@@ -86,50 +101,68 @@ export class TextField extends Component {
       ) : null;
 
     return (
-      <View style={{ marginTop: 10, ...containerStyle }}>
-        <Label />
-
+      <View style={{ marginVertical: 10 }}>
         <View
           style={{
-            flexDirection: 'row',
-            alignItems: 'flex-start',
-            marginBottom: Theme.innerSpacing
+            borderTopLeftRadius: 5,
+            borderTopRightRadius: 5,
+            overflow: 'hidden'
           }}
         >
-          {prefixComp}
           <TouchableRipple
             style={{
-              flex: 1,
-              borderRadius: Theme.innerBorderRadius,
-              backgroundColor: '#fff',
-              ...Theme.shadow
+              backgroundColor: Theme.pallete.gray
             }}
             onPress={onPress}
           >
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center'
-              }}
-            >
-              <Prefix />
-              <TextInput
+            <View>
+              <Label />
+
+              <View
                 style={{
-                  flex: 1,
-                  paddingVertical: 10,
-                  paddingHorizontal: 15,
-                  fontSize: 15,
-                  ...style
+                  flexDirection: 'row',
+                  alignItems: 'flex-start'
                 }}
-                pointerEvents={onPress ? 'none' : 'auto'}
-                {...props}
-              />
-              <Suffix />
-              <LoadingIndicator />
+              >
+                {prefixComp}
+                <View
+                  style={{
+                    flex: 1,
+                    borderBottomWidth: 2,
+                    borderBottomColor: error
+                      ? Theme.pallete.error
+                      : Theme.pallete.primary
+                  }}
+                >
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center'
+                    }}
+                  >
+                    <Prefix />
+                    <TextInput
+                      style={{
+                        flex: 1,
+                        paddingHorizontal: 15,
+                        paddingVertical: 10,
+                        fontSize: 17,
+                        ...style
+                      }}
+                      pointerEvents={onPress ? 'none' : 'auto'}
+                      {...props}
+                    />
+                    <Suffix />
+                    <LoadingIndicator />
+                  </View>
+                </View>
+                {suffixComp}
+              </View>
             </View>
           </TouchableRipple>
-          {suffixComp}
         </View>
+
+        <ErrorText />
       </View>
     );
   }

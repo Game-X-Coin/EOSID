@@ -50,8 +50,8 @@ export class SelectField extends Component {
       <Text
         style={{
           alignSelf: 'flex-end',
-          fontSize: 12,
-          lineHeight: 12,
+          fontSize: 13,
+          lineHeight: 13,
           ...props.style
         }}
       >
@@ -59,28 +59,25 @@ export class SelectField extends Component {
       </Text>
     );
 
-    const ErrorText = () =>
-      error ? (
-        <HelperText style={{ color: Theme.errorColor }}>{error}</HelperText>
-      ) : null;
-
     const InfoText = () =>
-      !error && info ? (
-        <HelperText style={{ color: Theme.infoColor }}>{info}</HelperText>
+      info ? (
+        <HelperText style={{ color: Theme.pallete.darkGray }}>
+          {info}
+        </HelperText>
       ) : null;
 
     const Label = () =>
       label ? (
         <View
           style={{
+            paddingHorizontal: 15,
+            paddingTop: 15,
             flexDirection: 'row',
-            alignItems: 'flex-start',
-            marginBottom: 10
+            alignItems: 'flex-start'
           }}
         >
-          <Text style={{ flex: 1, fontSize: 14 }}>{label}</Text>
+          <HelperText style={{ flex: 1 }}>{label}</HelperText>
           <InfoText />
-          <ErrorText />
         </View>
       ) : null;
 
@@ -93,15 +90,27 @@ export class SelectField extends Component {
             alignSelf: 'center',
             marginHorizontal: 0,
             marginVertical: 100,
-            width: 250
+            width: 300,
+            overflow: 'hidden'
           }}
         >
           <ScrollView
             contentContainerStyle={{
-              flexGrow: 1,
-              paddingVertical: Theme.innerPadding
+              flexGrow: 1
             }}
           >
+            {label && (
+              <View
+                style={{
+                  padding: 15,
+                  borderBottomColor: Theme.pallete.primary,
+                  borderBottomWidth: 2
+                }}
+              >
+                <Text style={Theme.h5}>{label}</Text>
+              </View>
+            )}
+
             {this.formattedData.map((v, i) => {
               const actived = value === v.value;
 
@@ -110,19 +119,34 @@ export class SelectField extends Component {
                   key={i}
                   onPress={() => this.onChange(v.value)}
                   style={{
-                    paddingVertical: 17,
-                    backgroundColor: actived ? Theme.primary : '#fff'
+                    paddingHorizontal: 25,
+                    paddingVertical: 20,
+                    borderBottomWidth: 1,
+                    borderBottomColor: Theme.pallete.gray
                   }}
                 >
-                  <Text
+                  <View
                     style={{
-                      textAlign: 'center',
-                      fontSize: 17,
-                      color: actived ? '#fff' : Theme.primary
+                      flexDirection: 'row'
                     }}
                   >
-                    {v.label}
-                  </Text>
+                    <Text
+                      style={{
+                        flex: 1,
+                        ...Theme.h5
+                      }}
+                    >
+                      {v.label}
+                    </Text>
+
+                    {actived && (
+                      <Icon.Ionicons
+                        name="md-checkmark"
+                        color={Theme.pallete.primary}
+                        size={25}
+                      />
+                    )}
+                  </View>
                 </TouchableRipple>
               );
             })}
@@ -131,42 +155,62 @@ export class SelectField extends Component {
       </Portal>
     );
     return (
-      <View>
+      <View style={{ marginVertical: 10, ...containerStyle }}>
         <DataDialog />
-
-        <Label />
-
         <View
           style={{
-            borderRadius: Theme.innerBorderRadius,
-            marginBottom: Theme.innerSpacing,
-            backgroundColor: '#fff',
-            overflow: 'hidden',
-            ...Theme.shadow,
-            ...containerStyle
+            borderTopLeftRadius: 5,
+            borderTopRightRadius: 5,
+            overflow: 'hidden'
           }}
         >
-          <TouchableRipple onPress={() => this.toggleDialog()}>
-            <View
-              style={{
-                flex: 1,
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-                paddingHorizontal: 15,
-                height: 48,
-                ...style
-              }}
-              {...props}
-            >
-              <Text style={{ flex: 1, fontSize: 15, paddingRight: 10 }}>
-                {this.selectedItem.label}
-              </Text>
-              <Icon.Ionicons
-                name="md-arrow-dropdown"
-                color={Theme.infoColor}
-                size={25}
-              />
+          <TouchableRipple
+            style={{
+              backgroundColor: Theme.pallete.gray
+            }}
+            onPress={() => this.toggleDialog()}
+          >
+            <View>
+              <Label />
+
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'flex-start'
+                }}
+              >
+                <View
+                  style={{
+                    flex: 1,
+                    borderBottomWidth: 2,
+                    borderBottomColor: error
+                      ? Theme.pallete.error
+                      : Theme.pallete.primary
+                  }}
+                >
+                  <View
+                    style={{
+                      flex: 1,
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      paddingHorizontal: 15,
+                      height: 48,
+                      ...style
+                    }}
+                    {...props}
+                  >
+                    <Text style={{ flex: 1, fontSize: 15, paddingRight: 10 }}>
+                      {this.selectedItem && this.selectedItem.label}
+                    </Text>
+                    <Icon.Ionicons
+                      name="md-arrow-dropdown"
+                      color={Theme.pallete.darkGray}
+                      size={25}
+                    />
+                  </View>
+                </View>
+              </View>
             </View>
           </TouchableRipple>
         </View>
