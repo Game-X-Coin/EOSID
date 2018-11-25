@@ -23,7 +23,7 @@ export class EmptyState extends Component {
           flex: 1,
           justifyContent: 'center',
           alignItems: 'center',
-          backgroundColor: Theme.mainBackgroundColor
+          backgroundColor: Theme.app.backgroundColor
         }}
       >
         <Image
