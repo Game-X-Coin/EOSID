@@ -1,12 +1,10 @@
 import React, { Component, PureComponent } from 'react';
 import { observer, inject } from 'mobx-react';
-import { View, Animated } from 'react-native';
+import { View, Animated, Image } from 'react-native';
 import { Text, TouchableRipple } from 'react-native-paper';
 import bytes from 'bytes';
-import { Svg } from 'expo';
 
 import { Theme } from '../../../constants';
-import { SkeletonIndicator } from '../../../components/Indicator';
 
 // * toLocaleString() is not supported in Android
 // https://github.com/facebook/react-native/issues/15717
@@ -30,26 +28,6 @@ const prettySec = microSec => {
   return `${toNumWithComma(microSec)} µs`;
 };
 
-const ResourceIndicator = () => (
-  <View
-    style={{
-      flexDirection: 'row',
-      marginVertical: 12.5
-    }}
-  >
-    <View style={{ flex: 1, marginRight: 30 }}>
-      <SkeletonIndicator width="100%" height={100}>
-        <Svg.Rect x="0" y="15" rx="4" ry="4" width="30%" height="15" />
-        <Svg.Rect x="0" y="60" rx="4" ry="4" width="100%" height="25" />
-      </SkeletonIndicator>
-    </View>
-
-    <SkeletonIndicator width={100} height={100}>
-      <Svg.Circle cx="50" cy="50" r="50" />
-    </SkeletonIndicator>
-  </View>
-);
-
 class Resource extends PureComponent {
   state = {
     frame: new Animated.Value(0)
@@ -70,61 +48,64 @@ class Resource extends PureComponent {
   }
 
   render() {
-    const { name, description, percent, color, style, onPress } = this.props;
+    const { name, icon, description, percent, color, onPress } = this.props;
     const { frame } = this.state;
 
     return (
-      <View
+      <TouchableRipple
         style={{
-          borderRadius: Theme.innerBorderRadius,
-          overflow: 'hidden',
-          ...style
+          paddingVertical: 15,
+          paddingHorizontal: 20
         }}
+        onPress={onPress}
       >
-        <TouchableRipple
-          style={{
-            paddingVertical: 15,
-            paddingHorizontal: 20,
-            backgroundColor: Theme.mainBackgroundColor
-          }}
-          onPress={onPress}
-        >
-          <View style={{ flexDirection: 'row' }}>
-            <View style={{ flex: 1 }}>
-              <Text style={{ marginBottom: 25 }}>{name}</Text>
-
-              <Text style={{ marginBottom: 3, fontSize: 25 }}>
-                {description}
-              </Text>
-              <Text style={{ fontSize: 15 }}>{percent}% left</Text>
-            </View>
-
+        <View style={{ flexDirection: 'row' }}>
+          <View style={{ flex: 1 }}>
             <View
               style={{
-                position: 'relative',
-                width: 100,
-                height: 100,
-                borderRadius: 99999,
-                overflow: 'hidden'
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginBottom: 25
               }}
             >
-              <Animated.View
-                style={{
-                  position: 'absolute',
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  height: frame.interpolate({
-                    inputRange: [0, 100],
-                    outputRange: ['0%', '100%']
-                  }),
-                  backgroundColor: color
-                }}
+              <Image
+                style={{ width: 20, height: 20, marginRight: 10 }}
+                source={icon}
               />
+              <Text>{name}</Text>
             </View>
+
+            <Text style={{ marginBottom: 3, ...Theme.h4 }}>{description}</Text>
+            <Text style={{ ...Theme.p, opacity: 0.5 }}>{percent}% left</Text>
           </View>
-        </TouchableRipple>
-      </View>
+
+          <View
+            style={{
+              position: 'relative',
+              width: 100,
+              height: 100,
+              borderRadius: 99999,
+              borderWidth: 1,
+              borderColor: Theme.pallete.gray,
+              overflow: 'hidden'
+            }}
+          >
+            <Animated.View
+              style={{
+                position: 'absolute',
+                left: 0,
+                right: 0,
+                bottom: 0,
+                height: frame.interpolate({
+                  inputRange: [0, 100],
+                  outputRange: ['0%', '100%']
+                }),
+                backgroundColor: color
+              }}
+            />
+          </View>
+        </View>
+      </TouchableRipple>
     );
   }
 }
@@ -134,7 +115,7 @@ class Resource extends PureComponent {
 export class ResourceView extends Component {
   render() {
     const {
-      accountStore: { info, fetched },
+      accountStore: { info },
       type,
       onPress
     } = this.props;
@@ -154,34 +135,33 @@ export class ResourceView extends Component {
       CPU: (
         <Resource
           name="CPU"
+          icon={require('../../../assets/icons/cpu.png')}
           description={`${prettySec(usedCpu)} / ${prettySec(maxCpu)}`}
           percent={percentCpu}
-          color={Theme.primary}
+          color={Theme.pallete.secondary}
           onPress={onPress}
         />
       ),
       Network: (
         <Resource
           name="Network"
+          icon={require('../../../assets/icons/network.png')}
           description={`${prettyBytes(usedNet)} / ${prettyBytes(maxNet)}`}
           percent={percentNet}
-          color={Theme.tertiary}
+          color={Theme.pallete.tertiary}
           onPress={onPress}
         />
       ),
       RAM: (
         <Resource
           name="RAM"
+          icon={require('../../../assets/icons/ram.png')}
           description={`${prettyBytes(usedRam)} / ${prettyBytes(usedRam)}`}
           percent={percentRam}
-          color={Theme.secondary}
+          color={Theme.pallete.quaternary}
         />
       )
     };
-
-    if (!fetched) {
-      return <ResourceIndicator />;
-    }
 
     return resourceTypes[type];
   }
