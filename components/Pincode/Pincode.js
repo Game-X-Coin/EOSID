@@ -5,7 +5,7 @@ import { View, Dimensions } from 'react-native';
 import { Text, TouchableRipple, Colors } from 'react-native-paper';
 import { Icon } from 'expo';
 
-import { Theme } from '../../constants';
+import { Theme, DarkTheme } from '../../constants';
 import { BackgroundView } from '../View';
 
 const shuffle = array => {
@@ -118,7 +118,7 @@ export class Pincode extends Component {
             justifyContent: 'center',
             backgroundColor: invisible
               ? 'transparent'
-              : Theme.surface.backgroundColor,
+              : DarkTheme.surface.backgroundColor,
             width: KEY_SIZE,
             height: KEY_SIZE
           }}
@@ -141,7 +141,7 @@ export class Pincode extends Component {
           <Text
             style={{
               fontSize: KEY_FONT_SIZE,
-              color: Theme.surfaceText.color
+              color: DarkTheme.text.color
             }}
           >
             {key}
@@ -170,14 +170,18 @@ export class Pincode extends Component {
           <Key invisible />
           {NumKeys()[9]}
           <Key invisible onPress={() => this.removePincode()}>
-            <Icon.Ionicons color="#fff" name="md-backspace" size={35} />
+            <Icon.Ionicons
+              color={DarkTheme.text.color}
+              name="md-backspace"
+              size={35}
+            />
           </Key>
         </KeyPadRow>
       </View>
     );
 
     return (
-      <BackgroundView>
+      <BackgroundView dark>
         <View
           style={{
             alignItems: 'center',
