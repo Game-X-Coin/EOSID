@@ -144,7 +144,6 @@ export class ImportAccountScreen extends Component {
           pincode: pincode || accountPincode
         });
       } catch (error) {
-        console.log(error);
         setErrors({ importError: true, ...error.errors });
         this.hideDialogs();
         return;
@@ -201,7 +200,6 @@ export class ImportAccountScreen extends Component {
       setFieldTouched,
       isValid
     } = this.props;
-    console.log(errors);
     const { showDialog, showLoadingDialog } = this.state;
 
     const isSignUp =
