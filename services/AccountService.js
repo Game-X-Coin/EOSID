@@ -44,10 +44,17 @@ export default class AccountService {
 
     if (!account) {
       // create new account instance
-      const keys = [
-        { publicKey, encryptedPrivateKey, permission: permissions[0] }
-      ];
-      account = new AccountModel({ ...accountInfo, name, keys });
+      const key = {
+        publicKey,
+        encryptedPrivateKey,
+        permission: permissions[0]
+      };
+
+      account = new AccountModel({
+        ...accountInfo,
+        name,
+        keys: AccountService.setKey([], key)
+      });
       permissions = permissions.slice(1);
       // check duplicated permission in account
     } else if (
