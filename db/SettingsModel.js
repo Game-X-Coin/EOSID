@@ -10,6 +10,9 @@ export class SettingsModel {
   @Column('varchar')
   accountId = '';
 
+  @Column('varchar')
+  chainId = '';
+
   @Column('boolean')
   accountPincodeEnabled = false;
 
@@ -21,12 +24,14 @@ export class SettingsModel {
       const {
         id,
         accountId = '',
+        chainId = '',
         accountPincodeEnabled = false,
         appPincodeEnabled = false
       } = data;
 
       this.id = id;
       this.accountId = accountId;
+      this.chainId = chainId;
       this.accountPincodeEnabled = accountPincodeEnabled;
       this.appPincodeEnabled = appPincodeEnabled;
     }

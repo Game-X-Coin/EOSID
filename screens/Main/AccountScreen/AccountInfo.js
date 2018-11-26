@@ -19,6 +19,7 @@ import { AndroidBackHandler } from 'react-navigation-backhandler';
 import { Theme, DarkTheme } from '../../../constants';
 import { PageIndicator } from '../../../components/Indicator';
 import { BackgroundView, ScrollView } from '../../../components/View';
+import Chains from '../../../constants/Chains';
 
 const STATUS_BAR_HEIGHT = Platform.OS === 'ios' ? 0 : StatusBar.currentHeight;
 
@@ -96,6 +97,7 @@ export class AccountInfo extends Component {
 
   render() {
     const { tokens, fetched, currentAccount } = this.props.accountStore;
+    const chain = Chains.find(chain => chain.id === currentAccount.chainId);
 
     const ActionItem = ({ icon, name, onPress }) => (
       <View

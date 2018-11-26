@@ -387,5 +387,22 @@ export default [
         }
       }
     ]
+  },
+  {
+    name: 'CryptoLions',
+    url: 'http://cryptolions.io',
+    logo: 'https://imgs.cryptolions.io/logo.svg',
+    nodes: [
+      {
+        url: 'http://jungle2.cryptolions.io:80',
+        historyURL: 'http://junglehistory.cryptolions.io:18888',
+        location: {
+          name: 'Germany-Finland',
+          country: 'DE',
+          latitude: 51.2993,
+          longitude: 9.491
+        }
+      }
+    ]
   }
 ];

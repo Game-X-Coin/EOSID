@@ -39,7 +39,7 @@ import Chains from '../../../constants/Chains';
     // form
     privateKey: '',
     publicKey: '',
-    chainId: Chains[0].id // default network
+    chainId: networkStore.currentNetwork.chainId // default network
   }),
   validationSchema: props => {
     const { errors: RequiredFieldErrors } = AccountError.RequiredFields;
@@ -63,12 +63,7 @@ export class ImportAccountScreen extends Component {
   };
 
   async handleSubmit() {
-    const {
-      networkStore: { allNetworks },
-      values,
-      setFieldValue,
-      setErrors
-    } = this.props;
+    const { networkStore, values, setFieldValue, setErrors } = this.props;
     // avoid modal hiding
     Keyboard.dismiss();
 
@@ -80,9 +75,9 @@ export class ImportAccountScreen extends Component {
     this.toggleLoadingDialog();
 
     try {
-      const network = allNetworks.find(
-        ({ chainId }) => chainId === values.chainId
-      );
+      const chain = Chains.find(({ id }) => id === values.chainId);
+      const network = networkStore.getNetwork(chain.id);
+
       const accounts = await AccountService.findKeyAccount(
         publicKey,
         network.historyURL
@@ -106,16 +101,15 @@ export class ImportAccountScreen extends Component {
     const {
       accountStore,
       settingsStore: { settings },
-      networkStore: { allNetworks },
+      networkStore,
       pincodeStore: { accountPincode },
       navigation,
       values,
       setErrors
     } = this.props;
 
-    const network = allNetworks.find(
-      ({ chainId }) => chainId === values.chainId
-    );
+    const chain = Chains.find(({ id }) => id === values.chainId);
+    const network = networkStore.getNetwork(chain.id);
 
     const addAccount = async pincode => {
       // show loading
@@ -144,7 +138,6 @@ export class ImportAccountScreen extends Component {
           pincode: pincode && accountPincode
         });
       } catch (error) {
-        console.log(error);
         setErrors({ importError: true, ...error.errors });
         this.hideDialogs();
         return;
@@ -193,15 +186,12 @@ export class ImportAccountScreen extends Component {
   render() {
     const {
       navigation,
-      networkStore: { allNetworks },
       values,
       errors,
-      touched,
       setFieldValue,
       setFieldTouched,
       isValid
     } = this.props;
-    console.log(errors);
     const { showDialog, showLoadingDialog } = this.state;
 
     const isSignUp =
@@ -257,7 +247,7 @@ export class ImportAccountScreen extends Component {
               label="Private key"
               info="Private key of account to import"
               value={values.privateKey}
-              error={touched.privateKey && errors.privateKey}
+              error={errors.privateKey}
               onChangeText={_ => {
                 setFieldTouched('privateKey', true);
                 setFieldValue('privateKey', _);
@@ -269,8 +259,8 @@ export class ImportAccountScreen extends Component {
               info="Chain of account to import"
               data={chains}
               value={values.chainId}
-              error={touched.chainId && errors.chainId}
-              onChangeText={_ => {
+              error={errors.chainId}
+              onChange={_ => {
                 setFieldTouched('chainId', true);
                 setFieldValue('chainId', _);
               }}
