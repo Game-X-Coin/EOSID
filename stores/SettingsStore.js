@@ -20,7 +20,6 @@ class Store {
   @action
   getSettings() {
     return SettingsService.getSettings().then(settings => {
-      console.log(settings);
       this.setSettings(settings);
     });
   }

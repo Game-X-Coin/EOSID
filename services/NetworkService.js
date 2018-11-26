@@ -7,17 +7,22 @@ import Fetch from '../utils/Fetch';
 import Producers from './../constants/Producers';
 
 export default class NetworkService {
-  static async getDefaultNetworks() {
+  static async getNetworks(chains = {}) {
     const networks = await this.getNodes();
+    networks.forEach(network => {
+      if (!network.success) {
+        return;
+      }
+      if (!chains[network.chainId]) {
+        chains[network.chainId] = { id: network.chainId, name: 'test' };
+      }
+      if (!chains[network.chainId].nodes) {
+        chains[network.chainId].nodes = [];
+      }
+      chains[network.chainId].nodes.push(network);
+    });
 
-    return networks;
-  }
-
-  static async getCustomNetworks() {
-    const NetworkRepo = getRepository(NetworkModel);
-    const networks = await NetworkRepo.find();
-
-    return networks;
+    return chains;
   }
 
   static async addNetwork(networkInfo) {
@@ -78,7 +83,7 @@ export default class NetworkService {
           node.producer
         }`;
         node.chainURL = node.url;
-        node.historyURL = node.url;
+        node.historyURL = node.historyURL ? node.historyURL : node.url;
         node.success = false;
         node.responseTime = 9999;
         const start = new Date().getTime();

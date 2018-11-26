@@ -13,14 +13,15 @@ import {
 import { ScrollView, BackgroundView } from '../../../components/View';
 
 import { Theme } from '../../../constants';
+import Chains from '../../../constants/Chains';
 
 @inject('accountStore', 'networkStore')
 @observer
 export class AccountsScreen extends Component {
   moveScreen = routeName => this.props.navigation.navigate(routeName);
 
-  changeAccount = accoundId => {
-    this.props.accountStore.changeCurrentAccount(accoundId);
+  changeAccount = (accoundId, chainId) => {
+    this.props.accountStore.changeCurrentAccount(accoundId, chainId);
     this.moveScreen('Account');
   };
 
@@ -70,23 +71,25 @@ export class AccountsScreen extends Component {
                 paddingHorizontal: Theme.innerPadding,
                 paddingVertical: 15
               }}
-              onPress={() => this.changeAccount(id)}
+              onPress={() => this.changeAccount(id, chainId)}
               onLongPress={() => this.confirmRemoveAccount(id)}
             >
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <View style={{ flex: 1 }}>
                   <Text>{name}</Text>
                   <Caption>
-                    {allNetworks.find(({ id }) => id === chainId).name}
+                    {Chains.find(({ id }) => id === chainId).name}
                   </Caption>
                 </View>
-                {name === (currentAccount && currentAccount.name) && (
-                  <Icon.Ionicons
-                    name="md-checkmark"
-                    color={Theme.pallete.primary}
-                    size={25}
-                  />
-                )}
+                {currentAccount &&
+                  name === currentAccount.name &&
+                  chainId === currentAccount.chainId && (
+                    <Icon.Ionicons
+                      name="md-checkmark"
+                      color={Theme.pallete.primary}
+                      size={25}
+                    />
+                  )}
               </View>
             </TouchableRipple>
           ))}

@@ -5,9 +5,13 @@ import { AccountModel, AccountError } from '../db';
 import api from '../utils/eos/API';
 
 export default class AccountService {
-  static async getAccounts() {
+  static async getAccounts(chainId) {
     const AccountRepo = getRepository(AccountModel);
-    const accounts = await AccountRepo.find();
+    const where = {};
+    if (chainId) {
+      where.chainId = chainId;
+    }
+    const accounts = await AccountRepo.find(where);
 
     return accounts;
   }
@@ -33,6 +37,7 @@ export default class AccountService {
     permissions,
     publicKey,
     name,
+    chainId,
     ...accountInfo
   }) {
     const AccountRepo = getRepository(AccountModel);
@@ -40,7 +45,7 @@ export default class AccountService {
     // encrypt private key
     const encryptedPrivateKey = AccountService.encryptKey(privateKey, pincode);
 
-    let account = await AccountRepo.findOne({ name });
+    let account = await AccountRepo.findOne({ name, chainId });
 
     if (!account) {
       // create new account instance
@@ -49,7 +54,7 @@ export default class AccountService {
         encryptedPrivateKey,
         permission: permissions[0]
       });
-      account = new AccountModel({ ...accountInfo, name, keys });
+      account = new AccountModel({ ...accountInfo, name, keys, chainId });
       permissions = permissions.slice(1);
       // check duplicated permission in account
     } else if (
