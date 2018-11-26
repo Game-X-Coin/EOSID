@@ -79,9 +79,7 @@ export default class NetworkService {
       nodes.map(async (node, index) => {
         // start[node.url] = new Date().getTime();
         node.id = index;
-        node.name = `[${node.location.country}] ${node.location.name} - ${
-          node.producer
-        }`;
+        node.name = `${node.producer} | ${node.location.country}`;
         node.chainURL = node.url;
         node.historyURL = node.historyURL ? node.historyURL : node.url;
         node.success = false;
