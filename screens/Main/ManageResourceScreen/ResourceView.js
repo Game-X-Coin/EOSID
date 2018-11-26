@@ -63,9 +63,8 @@ class Resource extends PureComponent {
           <View style={{ flex: 1 }}>
             <View
               style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                marginBottom: 25
+                flex: 1,
+                flexDirection: 'row'
               }}
             >
               <Image
@@ -75,8 +74,10 @@ class Resource extends PureComponent {
               <Text>{name}</Text>
             </View>
 
-            <Text style={{ marginBottom: 3, ...Theme.h4 }}>{description}</Text>
-            <Text style={{ ...Theme.p, opacity: 0.5 }}>{percent}% left</Text>
+            <Text style={{ marginBottom: 5, ...Theme.h4 }}>{description}</Text>
+            <Text style={{ ...Theme.p, color: Theme.pallete.darkGray }}>
+              {percent}% left
+            </Text>
           </View>
 
           <View
