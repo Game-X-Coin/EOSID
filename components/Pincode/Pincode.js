@@ -101,7 +101,7 @@ export class Pincode extends Component {
 
     const isFailing = this.state.status === 'failure';
 
-    const KEY_SIZE = Dimensions.get('window').height / 9.5;
+    const KEY_SIZE = Dimensions.get('window').width / 5;
     const KEY_FONT_SIZE = KEY_SIZE * 0.35;
 
     const Key = ({ invisible, onPress, children }) => (
