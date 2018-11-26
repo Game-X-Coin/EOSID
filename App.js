@@ -22,9 +22,10 @@ Sentry.config(process.env.SENTRY_CONFIG).install();
 
 const theme = {
   ...DefaultTheme,
+  ...Theme.paper,
   colors: {
     ...DefaultTheme.colors,
-    ...Theme
+    ...Theme.paper.colors
   }
 };
 

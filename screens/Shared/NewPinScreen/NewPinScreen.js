@@ -11,7 +11,7 @@ export class NewPinScreen extends Component {
     const { params } = navigation.state || {};
 
     await pincodeStore.saveAccountPincode(pincode);
-    params.cb && params.cb();
+    params.cb && params.cb(pincode);
     navigation.goBack(null);
   };
 

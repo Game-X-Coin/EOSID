@@ -14,7 +14,7 @@ export class ConfirmAppPinScreen extends Component {
       await pincodeStore.validateAppPincode(pincode);
       navigation.goBack(null);
 
-      params.cb && params.cb();
+      params.cb && params.cb(pincode);
     } catch (error) {
       setFailure();
     }

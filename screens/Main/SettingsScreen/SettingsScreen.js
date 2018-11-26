@@ -5,14 +5,17 @@ import { Appbar, Text, TouchableRipple, Colors } from 'react-native-paper';
 import { Icon } from 'expo';
 
 import { Theme } from '../../../constants';
-import { ScrollView } from '../../../components/View';
+import { ScrollView, BackgroundView } from '../../../components/View';
 
 const Section = ({ title, children }) => (
   <View>
     <View
-      style={{ backgroundColor: Colors.grey100, height: Theme.innerSpacing }}
+      style={{
+        backgroundColor: Theme.pallete.gray,
+        height: 20
+      }}
     />
-    <View style={{ backgroundColor: Theme.mainBackgroundColor }}>
+    <View style={{ backgroundColor: Theme.surface.backgroundColor }}>
       <Text
         style={{
           marginTop: 15,
@@ -71,8 +74,10 @@ export class SettingsScreen extends Component {
     const { settings } = this.props.settingsStore;
 
     return (
-      <View style={{ flex: 1, backgroundColor: Theme.mainBackgroundColor }}>
-        <Appbar.Header style={{ backgroundColor: Theme.headerBackgroundColor }}>
+      <BackgroundView>
+        <Appbar.Header
+          style={{ backgroundColor: Theme.header.backgroundColor }}
+        >
           <Appbar.Content title="Settings" />
         </Appbar.Header>
         <ScrollView style={{ paddingBottom: 50 }}>
@@ -94,8 +99,7 @@ export class SettingsScreen extends Component {
               title="Networks"
               onPress={() => this.moveScreen('SettingsNetwork')}
             />
-            <Item title="Language" />
-
+            {/* <Item title="Language" /> */}
             <Item
               title="App Pincode"
               onPress={() => this.moveScreen('SettingsAppPin')}
@@ -105,7 +109,7 @@ export class SettingsScreen extends Component {
             <Item title="Support" />
           </Section>
         </ScrollView>
-      </View>
+      </BackgroundView>
     );
   }
 }

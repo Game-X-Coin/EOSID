@@ -135,7 +135,7 @@ export class ImportAccountScreen extends Component {
           privateKey: values.privateKey,
           chainId: values.chainId,
           permissions: foundPerms,
-          pincode: pincode || accountPincode
+          pincode: pincode && accountPincode
         });
       } catch (error) {
         setErrors({ importError: true, ...error.errors });
@@ -160,7 +160,7 @@ export class ImportAccountScreen extends Component {
         }
       });
     } else {
-      await addAccount();
+      await addAccount(accountPincode);
     }
   }
 
@@ -221,7 +221,9 @@ export class ImportAccountScreen extends Component {
 
     return (
       <BackgroundView>
-        <Appbar.Header style={{ backgroundColor: Theme.headerBackgroundColor }}>
+        <Appbar.Header
+          style={{ backgroundColor: Theme.header.backgroundColor }}
+        >
           {!isSignUp && (
             <Appbar.BackAction onPress={() => navigation.goBack(null)} />
           )}

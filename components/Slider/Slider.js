@@ -89,7 +89,7 @@ export class Slider extends React.Component {
     const { value, deltaValue, barWidth } = this.state;
     const {
       trackColor = '#ebebeb',
-      slidedTrackColor = Theme.primary,
+      slidedTrackColor = Theme.pallete.primary,
       thumbColor = '#fff'
     } = this.props;
 
