@@ -66,27 +66,27 @@ import { Theme } from '../../../constants';
         title: 'Confirm Transfer',
         description: `Transfer ${fixedAmount} ${values.symbol}`
       },
-      async cb() {
+      async cb(pincode) {
         // show transfer loading dialog
         setFieldValue('showDialog', true);
 
-        const result = await accountStore.transfer(values);
+        try {
+          const result = await accountStore.transfer({ ...values, pincode });
 
-        // hide dialog
-        setFieldValue('showDialog', false);
-
-        if (result.code === 500) {
-          navigation.navigate('ShowError', {
-            title: 'Transfer Failed',
-            description: 'Please check the error, it may be a network error.',
-            error: result
-          });
-        } else {
           navigation.navigate('TransferResult', {
             ...values,
             amount: fixedAmount,
             result
           });
+        } catch ({ message }) {
+          navigation.navigate('ShowError', {
+            title: 'Transfer Failed',
+            description: 'Please check the error, it may be a network error.',
+            error: message
+          });
+        } finally {
+          // hide dialog
+          setFieldValue('showDialog', false);
         }
       }
     });
@@ -117,7 +117,9 @@ export class TransferAmountScreen extends Component {
 
     return (
       <BackgroundView>
-        <Appbar.Header style={{ backgroundColor: Theme.headerBackgroundColor }}>
+        <Appbar.Header
+          style={{ backgroundColor: Theme.header.backgroundColor }}
+        >
           <Appbar.BackAction onPress={() => navigation.goBack(null)} />
           <Appbar.Content title="Transfer" />
         </Appbar.Header>
@@ -143,6 +145,7 @@ export class TransferAmountScreen extends Component {
             <TextField
               autoFocus
               label="Transfer Amount"
+              textAlign="right"
               keyboardType="numeric"
               value={values.amount}
               info={`${availableAmount} ${values.symbol} available`}
@@ -153,12 +156,12 @@ export class TransferAmountScreen extends Component {
               }}
               prefixComp={
                 <SelectField
-                  value={values.symbol}
                   data={tokenData}
+                  value={values.symbol}
+                  error={touched.amount && errors.amount}
                   onChange={_ => setFieldValue('symbol', _)}
                   containerStyle={{
-                    marginBottom: 0,
-                    marginRight: 15,
+                    marginVertical: 0,
                     width: values.symbol.length * 10 + 60
                   }}
                 />

@@ -2,7 +2,7 @@ import { getRepository } from 'typeorm-expo/browser';
 
 import { SettingsModel } from '../db';
 
-export class SettingsService {
+export default class SettingsService {
   static async getSettings() {
     const SettingsRepo = getRepository(SettingsModel);
     const settings = await SettingsRepo.find();

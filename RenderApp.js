@@ -45,6 +45,8 @@ export default class RenderApp extends Component {
       accountStore.getAccounts()
     ]);
 
+    networkStore.setCurrentNetwork(accountStore.currentAccount);
+
     this.isLoadingComplete = true;
   }
 

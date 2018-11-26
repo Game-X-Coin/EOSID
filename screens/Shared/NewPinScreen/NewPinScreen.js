@@ -10,13 +10,9 @@ export class NewPinScreen extends Component {
     const { pincodeStore, navigation } = this.props;
     const { params } = navigation.state || {};
 
-    try {
-      await pincodeStore.saveAccountPincode(pincode);
-      params.cb && params.cb();
-      navigation.goBack(null);
-    } catch (error) {
-      console.log(error);
-    }
+    await pincodeStore.saveAccountPincode(pincode);
+    params.cb && params.cb(pincode);
+    navigation.goBack(null);
   };
 
   render() {

@@ -22,13 +22,13 @@ export class ActivityEmptyState extends Component {
   render() {
     return (
       <EmptyState
-        image={require('../../../assets/example.png')}
-        title="No activities yet"
+        image={require('../../../assets/images/no_account.png')}
+        title="No activity yet"
         description="Looks like you have not done anything yet, If not, please press the refresh button."
       >
         <Button
           icon="refresh"
-          mode="outlined"
+          mode="contained"
           loading={this.refreshing}
           onPress={this.onRefresh}
         >

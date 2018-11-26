@@ -1,6 +1,6 @@
 import React from 'react';
 import { observer, inject } from 'mobx-react';
-import { Animated, Easing, Linking } from 'react-native';
+import { Linking } from 'react-native';
 import { createStackNavigator } from 'react-navigation';
 import { createMaterialBottomTabNavigator } from 'react-navigation-material-bottom-tabs';
 import { Icon, Linking as ExpoLinking } from 'expo';
@@ -27,6 +27,7 @@ import {
 import {
   ImportAccountScreen,
   ShowErrorScreen,
+  ShowSuccessScreen,
   ConfirmPinScreen,
   ConfirmAppPinScreen,
   NewPinScreen,
@@ -61,8 +62,9 @@ const DetailScreens = {
   NewAppPin: NewAppPinScreen,
   // confirm dapp sign
   PermissionRequest: PermissionRequestScreen,
-  // show error
-  ShowError: ShowErrorScreen
+  // show result status
+  ShowError: ShowErrorScreen,
+  ShowSuccess: ShowSuccessScreen
 };
 
 // for tab icons
@@ -94,10 +96,10 @@ const MainTabNavigator = createMaterialBottomTabNavigator(
       }
     }),
     shifting: true,
-    activeColor: Theme.activeColor,
-    inactiveColor: Theme.inActiveColor,
+    activeColor: Theme.pallete.active,
+    inactiveColor: Theme.pallete.inActive,
     barStyle: {
-      backgroundColor: Theme.mainBackgroundColor
+      backgroundColor: Theme.tab.backgroundColor
     }
   }
 );
@@ -155,8 +157,8 @@ export const MainStackNavigator = createStackNavigator(
   },
   {
     headerMode: 'none',
-    cardStyle: { backgroundColor: '#fff' },
-    transitionConfig: () => ({
+    cardStyle: { backgroundColor: '#fff' }
+    /* transitionConfig: () => ({
       transitionSpec: {
         duration: 300,
         easing: Easing.out(Easing.bezier(0.42, 0, 1, 1)),
@@ -179,6 +181,6 @@ export const MainStackNavigator = createStackNavigator(
 
         return { opacity, transform: [{ translateX }] };
       }
-    })
+    }) */
   }
 );

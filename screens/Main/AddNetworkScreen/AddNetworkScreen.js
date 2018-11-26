@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { Keyboard } from 'react-native';
+import { Keyboard, SafeAreaView } from 'react-native';
 import { Appbar, Button } from 'react-native-paper';
 import { withFormik } from 'formik';
 import * as Yup from 'yup';
@@ -83,7 +83,9 @@ export class AddNetworkScreen extends Component {
 
     return (
       <BackgroundView>
-        <Appbar.Header style={{ backgroundColor: Theme.headerBackgroundColor }}>
+        <Appbar.Header
+          style={{ backgroundColor: Theme.header.backgroundColor }}
+        >
           <Appbar.BackAction onPress={() => navigation.goBack(null)} />
           <Appbar.Content title="Add Network" />
         </Appbar.Header>
@@ -120,14 +122,16 @@ export class AddNetworkScreen extends Component {
             />
           </ScrollView>
 
-          <Button
-            mode="contained"
-            disabled={!isValid}
-            onPress={handleSubmit}
-            style={{ padding: 5, borderRadius: 0 }}
-          >
-            Add network
-          </Button>
+          <SafeAreaView>
+            <Button
+              mode="contained"
+              disabled={!isValid}
+              onPress={handleSubmit}
+              style={{ padding: 5, borderRadius: 0 }}
+            >
+              Add network
+            </Button>
+          </SafeAreaView>
         </KeyboardAvoidingView>
       </BackgroundView>
     );

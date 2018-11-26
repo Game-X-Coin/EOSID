@@ -16,7 +16,9 @@ export class ActivityScreen extends Component {
 
     return (
       <BackgroundView>
-        <Appbar.Header style={{ backgroundColor: Theme.headerBackgroundColor }}>
+        <Appbar.Header
+          style={{ backgroundColor: Theme.header.backgroundColor }}
+        >
           <Appbar.Content title="Recent Activity" />
         </Appbar.Header>
 

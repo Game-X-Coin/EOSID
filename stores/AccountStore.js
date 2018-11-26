@@ -1,8 +1,10 @@
 import { observable, action, computed } from 'mobx';
 
-import { AccountService, TransferLogService } from '../services';
+import AccountService from '../services/AccountService';
+import TransferLogService from '../services/TransferLogService';
 
-import { SettingsStore, PincodeStore } from './';
+import NetworkStore from './NetworkStore';
+import SettingsStore from './SettingsStore';
 
 import api from '../utils/eos/API';
 
@@ -47,14 +49,20 @@ class Store {
   get currentAccount() {
     const { accountId } = SettingsStore.settings;
 
-    return this.accounts.find(account => account.id === accountId);
+    let account = this.accounts.find(account => account.id === accountId);
+    if (!account && this.accounts.length) {
+      account = this.accounts[0];
+    }
+    return account;
   }
 
   @action
-  async changeCurrentAccount(accountId) {
+  async changeCurrentAccount(accountId, chainId) {
     if (accountId !== (this.currentAccount && this.currentAccount.accountId)) {
       // update settings
-      await SettingsStore.updateSettings({ accountId });
+      await SettingsStore.updateSettings({ accountId, chainId });
+      // set current network
+      NetworkStore.setCurrentNetwork(this.currentAccount);
       // fetch account info
       await this.getAccountInfo();
     }
@@ -67,7 +75,8 @@ class Store {
 
   @action
   async getAccounts() {
-    return AccountService.getAccounts().then(accounts => {
+    const currentNetwork = NetworkStore.currentNetwork;
+    return AccountService.getAccounts(currentNetwork.chainId).then(accounts => {
       this.setAccounts(accounts);
     });
   }
@@ -75,17 +84,17 @@ class Store {
   @action
   async addAccount(accountInfo) {
     return AccountService.addAccount({
-      ...accountInfo,
-      pincode: PincodeStore.accountPincode
+      ...accountInfo
     }).then(async account => {
       // remove duplicate entity
       const accounts = this.accounts.filter(
-        entity => entity.name !== account.name
+        entity =>
+          entity.name !== account.name && entity.chainId !== account.chainId
       );
       accounts.push(account);
 
       this.setAccounts(accounts);
-      await this.changeCurrentAccount(account.id);
+      await this.changeCurrentAccount(account.id, account.chainId);
       await this.getAccountInfo();
     });
   }
@@ -108,7 +117,8 @@ class Store {
 
       this.setAccounts(filterDeletedAccount);
       this.changeCurrentAccount(
-        this.accounts.length ? this.accounts[0].id : ''
+        this.accounts.length ? this.accounts[0].id : '',
+        this.accounts.length ? this.accounts[0].chainId : ''
       );
     });
   }
@@ -187,13 +197,12 @@ class Store {
 
     return AccountService.transfer({
       ...params,
-      sender: name,
+      from: name,
       encryptedPrivateKey: key.encryptedPrivateKey,
-      permission: key.permission,
-      pincode: PincodeStore.accountPincode
+      permission: key.permission
     }).then(async tx => {
       await this.getTokens();
-      await this.getActions();
+      this.getActions();
       // log transfer
       TransferLogService.addTransferLog({ ...params, accountId: id });
 
@@ -209,18 +218,17 @@ class Store {
 
     return AccountService.manageResource({
       ...params,
-      sender: name,
+      from: name,
       encryptedPrivateKey: key.encryptedPrivateKey,
-      permission: key.permission,
-      pincode: PincodeStore.accountPincode
+      permission: key.permission
     }).then(async tx => {
       await this.getInfo();
-      await this.getTokens();
-      await this.getActions();
+      this.getTokens();
+      this.getActions();
 
       return tx;
     });
   }
 }
 
-export const AccountStore = new Store();
+export default new Store();

@@ -23,7 +23,7 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "build:android": "expo build:android",
-    "build:ios": "expo build:ios",
+    "build:ios": "expo build:ios --apple-enterprise-account",
     "test": "jest --u",
     "eject": "expo eject",
     "lint-js": "eslint --ignore-path .gitignore --ignore-pattern \"!**/.*\" ."
@@ -45,6 +45,7 @@
     "react-native-paper": "^2.2.4",
     "react-native-sqlite-storage": "^3.3.5",
     "react-navigation": "^2.18.2",
+    "react-navigation-backhandler": "^1.2.0",
     "react-navigation-material-bottom-tabs": "^0.4.0",
     "sentry-expo": "^1.10.0",
     "text-encoding": "^0.7.0",
@@ -53,6 +54,7 @@
   },
   "devDependencies": {
     "babel-eslint": "^10.0.1",
+    "babel-plugin-inline-dotenv": "^1.2.0",
     "babel-plugin-transform-remove-console": "^6.9.4",
     "babel-preset-expo": "^5.0.0",
     "eslint": "^5.6.1",
