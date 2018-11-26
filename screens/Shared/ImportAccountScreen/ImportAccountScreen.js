@@ -135,7 +135,7 @@ export class ImportAccountScreen extends Component {
           privateKey: values.privateKey,
           chainId: values.chainId,
           permissions: foundPerms,
-          pincode: pincode && accountPincode
+          pincode
         });
       } catch (error) {
         setErrors({ importError: true, ...error.errors });
