@@ -4,7 +4,7 @@ import { observable, computed } from 'mobx';
 import { observer, inject } from 'mobx-react';
 import { Text, TouchableRipple, Colors } from 'react-native-paper';
 import { withNavigation } from 'react-navigation';
-import moment from 'moment';
+import moment from '../../../utils/moment';
 import { Svg } from 'expo';
 
 import { ActivityEmptyState } from './ActivityEmptyState';

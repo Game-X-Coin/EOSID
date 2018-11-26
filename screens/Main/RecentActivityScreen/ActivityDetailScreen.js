@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { View } from 'react-native';
 import { Appbar, Text } from 'react-native-paper';
-import moment from 'moment';
+import moment from '../../../utils/moment';
 
 import { BackgroundView, ScrollView } from '../../../components/View';
 import { Theme } from '../../../constants';

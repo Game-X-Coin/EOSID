@@ -40,12 +40,16 @@ export class NetworkScreen extends Component {
                       key={id}
                       title={name}
                       description={`${chainURL}`}
-                      right={props => (
-                        <Text {...props}>
-                          {responseTime && responseTime !== 9999
-                            ? `${responseTime} ms`
-                            : 'delayed'}{' '}
-                          {success ? 'alive' : 'disalive'}
+                      right={() => (
+                        <Text
+                          style={{
+                            alignSelf: 'center',
+                            paddingRight: 5,
+                            coor: Theme.pallete.darkGray
+                          }}
+                        >
+                          {responseTime ? `${responseTime} ms` : ''}
+                          {success ? '' : 'no response'}
                         </Text>
                       )}
                       style={
