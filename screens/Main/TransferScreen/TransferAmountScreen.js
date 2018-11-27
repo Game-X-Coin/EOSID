@@ -132,7 +132,7 @@ export class TransferAmountScreen extends Component {
         <KeyboardAvoidingView>
           <ScrollView
             style={{
-              marginHorizontal: Theme.innerSpacing
+              margin: Theme.innerSpacing
             }}
           >
             <TextField

@@ -151,8 +151,7 @@ export class TransferScreen extends Component {
           <ScrollView>
             <View
               style={{
-                marginHorizontal: Theme.innerSpacing,
-                marginBottom: Theme.innerSpacing
+                margin: Theme.innerSpacing
               }}
             >
               <TextField
@@ -175,7 +174,7 @@ export class TransferScreen extends Component {
                   marginBottom: 20,
                   padding: 5
                 }}
-                disabled={!receiver.length || loading || error}
+                disabled={!receiver.length || loading || Boolean(error)}
                 onPress={() => this.handleSubmit()}
               >
                 Next
