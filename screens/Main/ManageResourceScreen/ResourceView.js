@@ -157,7 +157,7 @@ export class ResourceView extends Component {
         <Resource
           name="RAM"
           icon={require('../../../assets/icons/ram.png')}
-          description={`${prettyBytes(usedRam)} / ${prettyBytes(usedRam)}`}
+          description={`${prettyBytes(usedRam)} / ${prettyBytes(maxRam)}`}
           percent={percentRam}
           color={Theme.palette.quaternary}
         />
