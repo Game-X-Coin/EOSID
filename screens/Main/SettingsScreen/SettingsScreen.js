@@ -11,7 +11,7 @@ const Section = ({ title, children }) => (
   <View>
     <View
       style={{
-        backgroundColor: Theme.pallete.gray,
+        backgroundColor: Theme.palette.gray,
         height: 20
       }}
     />

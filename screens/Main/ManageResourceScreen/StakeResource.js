@@ -127,7 +127,7 @@ export class StakeResource extends Component {
               }
             />
 
-            <Paragraph style={{ color: Theme.pallete.primary }}>
+            <Paragraph style={{ color: Theme.palette.primary }}>
               You can unstake the resources at any time, but there will be a
               three-day waiting period
             </Paragraph>

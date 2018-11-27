@@ -31,7 +31,7 @@ export class TransferResultScreen extends Component {
           style={{
             marginBottom: 7,
             fontSize: 17,
-            color: Theme.pallete.quaternary
+            color: Theme.palette.quaternary
           }}
         >
           {title}
@@ -62,7 +62,7 @@ export class TransferResultScreen extends Component {
                 style={{
                   marginBottom: 7,
                   fontSize: 20,
-                  color: Theme.pallete.quaternary
+                  color: Theme.palette.quaternary
                 }}
               >
                 {receiver}

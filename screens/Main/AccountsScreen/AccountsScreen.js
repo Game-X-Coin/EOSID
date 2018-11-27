@@ -86,7 +86,7 @@ export class AccountsScreen extends Component {
                   chainId === currentAccount.chainId && (
                     <Icon.Ionicons
                       name="md-checkmark"
-                      color={Theme.pallete.primary}
+                      color={Theme.palette.primary}
                       size={25}
                     />
                   )}

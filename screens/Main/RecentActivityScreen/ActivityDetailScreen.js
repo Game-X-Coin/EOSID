@@ -65,7 +65,7 @@ export class ActivityDetailScreen extends Component {
           <PageIndicator />
         ) : (
           <ScrollView>
-            <View style={{ height: 20, backgroundColor: Theme.pallete.gray }} />
+            <View style={{ height: 20, backgroundColor: Theme.palette.gray }} />
             <View
               style={{
                 flexDirection: 'row',
@@ -91,13 +91,13 @@ export class ActivityDetailScreen extends Component {
               </View>
 
               <View>
-                <Text style={{ fontSize: 13, color: Theme.pallete.darkGray }}>
+                <Text style={{ fontSize: 13, color: Theme.palette.darkGray }}>
                   {moment(block_time).format('lll')}
                 </Text>
               </View>
             </View>
 
-            <View style={{ height: 20, backgroundColor: Theme.pallete.gray }} />
+            <View style={{ height: 20, backgroundColor: Theme.palette.gray }} />
 
             {Object.keys(act.data).map(key => {
               const data = act.data[key];

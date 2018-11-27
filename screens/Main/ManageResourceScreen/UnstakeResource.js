@@ -135,10 +135,10 @@ export class UnstakeResource extends Component {
                 )
               }
             />
-            <Paragraph style={{ color: Theme.pallete.primary }}>
+            <Paragraph style={{ color: Theme.palette.primary }}>
               All resources must have a minimum stake amount (0.1 EOS)
             </Paragraph>
-            <Paragraph style={{ color: Theme.pallete.primary }}>
+            <Paragraph style={{ color: Theme.palette.primary }}>
               All the refunding EOS will be returned 3 days after the last
               unstake
             </Paragraph>

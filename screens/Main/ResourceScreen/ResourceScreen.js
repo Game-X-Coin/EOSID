@@ -43,7 +43,7 @@ export class ResourceScreen extends Component {
           <PageIndicator />
         ) : (
           <View>
-            <View style={{ height: 20, backgroundColor: Theme.pallete.gray }} />
+            <View style={{ height: 20, backgroundColor: Theme.palette.gray }} />
 
             <ResourceView
               type="CPU"
@@ -51,7 +51,7 @@ export class ResourceScreen extends Component {
                 this.moveScreen('ManageResource', { resourceName: 'CPU' })
               }
             />
-            <View style={{ height: 20, backgroundColor: Theme.pallete.gray }} />
+            <View style={{ height: 20, backgroundColor: Theme.palette.gray }} />
 
             <ResourceView
               type="Network"
@@ -59,10 +59,10 @@ export class ResourceScreen extends Component {
                 this.moveScreen('ManageResource', { resourceName: 'Network' })
               }
             />
-            <View style={{ height: 20, backgroundColor: Theme.pallete.gray }} />
+            <View style={{ height: 20, backgroundColor: Theme.palette.gray }} />
 
             <ResourceView type="RAM" />
-            <View style={{ height: 20, backgroundColor: Theme.pallete.gray }} />
+            <View style={{ height: 20, backgroundColor: Theme.palette.gray }} />
 
             <View
               style={{

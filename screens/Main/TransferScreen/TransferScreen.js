@@ -57,7 +57,7 @@ export class TransferLogs extends Component {
         <View style={{ paddingHorizontal: Theme.innerSpacing }}>
           <Text>Recent History</Text>
           <Divider
-            style={{ marginTop: 10, backgroundColor: Theme.pallete.darkGray }}
+            style={{ marginTop: 10, backgroundColor: Theme.palette.darkGray }}
           />
         </View>
 

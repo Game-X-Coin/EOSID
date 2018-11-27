@@ -42,7 +42,7 @@ export class ResourceTextField extends Component {
                   marginRight: 10,
                   overflow: 'hidden',
                   ...Theme.surface,
-                  backgroundColor: Theme.pallete.gray
+                  backgroundColor: Theme.palette.gray
                 }}
               >
                 <TouchableRipple
@@ -64,7 +64,7 @@ export class ResourceTextField extends Component {
             );
           })}
 
-          <Text style={{ fontSize: 13, color: Theme.pallete.darkGray }}>%</Text>
+          <Text style={{ fontSize: 13, color: Theme.palette.darkGray }}>%</Text>
         </View>
       </View>
     );
