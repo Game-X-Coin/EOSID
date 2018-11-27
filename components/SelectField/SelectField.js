@@ -61,7 +61,7 @@ export class SelectField extends Component {
 
     const InfoText = () =>
       info ? (
-        <HelperText style={{ color: Theme.pallete.darkGray }}>
+        <HelperText style={{ color: Theme.palette.darkGray }}>
           {info}
         </HelperText>
       ) : null;
@@ -103,7 +103,7 @@ export class SelectField extends Component {
               <View
                 style={{
                   padding: 15,
-                  borderBottomColor: Theme.pallete.primary,
+                  borderBottomColor: Theme.palette.primary,
                   borderBottomWidth: 2
                 }}
               >
@@ -122,7 +122,7 @@ export class SelectField extends Component {
                     paddingHorizontal: 25,
                     paddingVertical: 20,
                     borderBottomWidth: 1,
-                    borderBottomColor: Theme.pallete.gray
+                    borderBottomColor: Theme.palette.gray
                   }}
                 >
                   <View
@@ -142,7 +142,7 @@ export class SelectField extends Component {
                     {actived && (
                       <Icon.Ionicons
                         name="md-checkmark"
-                        color={Theme.pallete.primary}
+                        color={Theme.palette.primary}
                         size={25}
                       />
                     )}
@@ -166,7 +166,7 @@ export class SelectField extends Component {
         >
           <TouchableRipple
             style={{
-              backgroundColor: Theme.pallete.gray
+              backgroundColor: Theme.palette.gray
             }}
             onPress={() => this.toggleDialog()}
           >
@@ -184,8 +184,8 @@ export class SelectField extends Component {
                     flex: 1,
                     borderBottomWidth: 2,
                     borderBottomColor: error
-                      ? Theme.pallete.error
-                      : Theme.pallete.primary
+                      ? Theme.palette.error
+                      : Theme.palette.primary
                   }}
                 >
                   <View
@@ -205,7 +205,7 @@ export class SelectField extends Component {
                     </Text>
                     <Icon.Ionicons
                       name="md-arrow-dropdown"
-                      color={Theme.pallete.darkGray}
+                      color={Theme.palette.darkGray}
                       size={25}
                     />
                   </View>

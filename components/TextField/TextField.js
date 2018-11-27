@@ -45,7 +45,7 @@ export class TextField extends Component {
         <HelperText
           style={{
             width: '100%',
-            color: Theme.pallete.error
+            color: Theme.palette.error
           }}
         >
           {error}
@@ -55,7 +55,7 @@ export class TextField extends Component {
 
     const InfoText = () =>
       info ? (
-        <HelperText style={{ color: Theme.pallete.darkGray }}>
+        <HelperText style={{ color: Theme.palette.darkGray }}>
           {info}
         </HelperText>
       ) : null;
@@ -81,7 +81,7 @@ export class TextField extends Component {
           style={{
             paddingRight: 15,
             fontSize: 15,
-            color: Theme.pallete.darkGray
+            color: Theme.palette.darkGray
           }}
         >
           {prefix}
@@ -94,7 +94,7 @@ export class TextField extends Component {
           style={{
             paddingRight: 15,
             fontSize: 15,
-            color: Theme.pallete.darkGray
+            color: Theme.palette.darkGray
           }}
         >
           {suffix}
@@ -119,7 +119,7 @@ export class TextField extends Component {
         >
           <TouchableRipple
             style={{
-              backgroundColor: Theme.pallete.gray
+              backgroundColor: Theme.palette.gray
             }}
             onPress={onPress}
           >
@@ -138,8 +138,8 @@ export class TextField extends Component {
                     flex: 1,
                     borderBottomWidth: 2,
                     borderBottomColor: error
-                      ? Theme.pallete.error
-                      : Theme.pallete.primary
+                      ? Theme.palette.error
+                      : Theme.palette.primary
                   }}
                 >
                   <View

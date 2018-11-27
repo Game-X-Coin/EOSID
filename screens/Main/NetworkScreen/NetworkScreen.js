@@ -19,6 +19,7 @@ export class NetworkScreen extends Component {
   render() {
     const { networkStore, navigation } = this.props;
     const { chains } = networkStore;
+    console.log(networkStore.currentNetwork.id);
 
     return (
       <BackgroundView>
@@ -45,7 +46,7 @@ export class NetworkScreen extends Component {
                           style={{
                             alignSelf: 'center',
                             paddingRight: 5,
-                            coor: Theme.pallete.darkGray
+                            color: Theme.palette.primary
                           }}
                         >
                           {responseTime ? `${responseTime} ms` : ''}
@@ -54,7 +55,7 @@ export class NetworkScreen extends Component {
                       )}
                       style={
                         networkStore.currentNetwork.id === id
-                          ? { backgroundColor: Theme.primary }
+                          ? { backgroundColor: Theme.palette.inActive }
                           : {}
                       }
                       disabled={networkStore.currentNetwork.id === id}

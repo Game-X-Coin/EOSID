@@ -5,7 +5,7 @@ import { Theme } from '../../constants';
 
 export class Indicator extends Component {
   render() {
-    const { color = Theme.pallete.primary, size = 'large' } = this.props;
+    const { color = Theme.palette.primary, size = 'large' } = this.props;
 
     return <ActivityIndicator color={color} size={size} />;
   }

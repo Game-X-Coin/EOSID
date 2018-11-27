@@ -96,8 +96,8 @@ const MainTabNavigator = createMaterialBottomTabNavigator(
       }
     }),
     shifting: true,
-    activeColor: Theme.pallete.active,
-    inactiveColor: Theme.pallete.inActive,
+    activeColor: Theme.palette.active,
+    inactiveColor: Theme.palette.inActive,
     barStyle: {
       backgroundColor: Theme.tab.backgroundColor
     }

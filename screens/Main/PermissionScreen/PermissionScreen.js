@@ -40,7 +40,7 @@ export class PermissionScreen extends Component {
         <Toast ref={c => (this.toast = c)} />
 
         <ScrollView>
-          <View style={{ height: 20, backgroundColor: Theme.pallete.gray }} />
+          <View style={{ height: 20, backgroundColor: Theme.palette.gray }} />
 
           <View
             style={{
@@ -75,7 +75,7 @@ export class PermissionScreen extends Component {
             return (
               <View
                 key={permission}
-                style={{ backgroundColor: Theme.pallete.gray }}
+                style={{ backgroundColor: Theme.palette.gray }}
               >
                 <View style={{ height: 20 }} />
 

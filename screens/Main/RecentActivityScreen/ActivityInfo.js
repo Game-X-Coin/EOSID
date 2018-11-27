@@ -17,7 +17,7 @@ const ActivityIndicator = () => (
     style={{
       padding: 17,
       borderBottomWidth: 1,
-      borderBottomColor: Theme.pallete.gray
+      borderBottomColor: Theme.palette.gray
     }}
   >
     <SkeletonIndicator width="100%" height={40}>
@@ -29,7 +29,7 @@ const ActivityIndicator = () => (
 
 const ActivityGroupIndicator = () => (
   <View>
-    <View style={{ height: 20, backgroundColor: Theme.pallete.gray }} />
+    <View style={{ height: 20, backgroundColor: Theme.palette.gray }} />
 
     <View
       style={{
@@ -150,7 +150,7 @@ export class ActivityInfo extends Component {
         ListFooterComponent={this.renderFooter}
         renderItem={({ item: key }) => (
           <View style={{ backgroundColor: '#fff' }}>
-            <View style={{ height: 20, backgroundColor: Theme.pallete.gray }} />
+            <View style={{ height: 20, backgroundColor: Theme.palette.gray }} />
 
             <View
               style={{
@@ -166,7 +166,7 @@ export class ActivityInfo extends Component {
               <Text style={{ flex: 1, ...Theme.h5 }}>
                 {moment(key).fromNow()}
               </Text>
-              <Text style={{ color: Theme.pallete.darkGray, ...Theme.text }}>
+              <Text style={{ color: Theme.palette.darkGray, ...Theme.text }}>
                 {moment(key).format('ll')}
               </Text>
             </View>
@@ -179,7 +179,7 @@ export class ActivityInfo extends Component {
                     style={{
                       padding: 17,
                       borderBottomWidth: 1,
-                      borderBottomColor: Theme.pallete.gray
+                      borderBottomColor: Theme.palette.gray
                     }}
                     onPress={() =>
                       this.props.navigation.navigate('ActivityDetail', {
@@ -211,7 +211,7 @@ export class ActivityInfo extends Component {
                         style={{
                           paddingLeft: 15,
                           fontSize: 13,
-                          color: Theme.pallete.darkGray
+                          color: Theme.palette.darkGray
                         }}
                       >
                         {moment(block_time).format('A hh:mm')}

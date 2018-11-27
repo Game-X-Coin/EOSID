@@ -24,7 +24,7 @@ const TopTabNavigator = createMaterialTopTabNavigator(
         backgroundColor: Theme.app.backgroundColor
       },
       indicatorStyle: {
-        backgroundColor: Theme.pallete.primary,
+        backgroundColor: Theme.palette.primary,
         height: 3
       }
     }

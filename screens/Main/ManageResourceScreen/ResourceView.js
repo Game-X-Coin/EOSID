@@ -75,7 +75,7 @@ class Resource extends PureComponent {
             </View>
 
             <Text style={{ marginBottom: 5, ...Theme.h4 }}>{description}</Text>
-            <Text style={{ ...Theme.p, color: Theme.pallete.darkGray }}>
+            <Text style={{ ...Theme.p, color: Theme.palette.darkGray }}>
               {percent}% left
             </Text>
           </View>
@@ -87,7 +87,7 @@ class Resource extends PureComponent {
               height: 100,
               borderRadius: 99999,
               borderWidth: 1,
-              borderColor: Theme.pallete.gray,
+              borderColor: Theme.palette.gray,
               overflow: 'hidden'
             }}
           >
@@ -139,7 +139,7 @@ export class ResourceView extends Component {
           icon={require('../../../assets/icons/cpu.png')}
           description={`${prettySec(usedCpu)} / ${prettySec(maxCpu)}`}
           percent={percentCpu}
-          color={Theme.pallete.secondary}
+          color={Theme.palette.secondary}
           onPress={onPress}
         />
       ),
@@ -149,7 +149,7 @@ export class ResourceView extends Component {
           icon={require('../../../assets/icons/network.png')}
           description={`${prettyBytes(usedNet)} / ${prettyBytes(maxNet)}`}
           percent={percentNet}
-          color={Theme.pallete.tertiary}
+          color={Theme.palette.tertiary}
           onPress={onPress}
         />
       ),
@@ -159,7 +159,7 @@ export class ResourceView extends Component {
           icon={require('../../../assets/icons/ram.png')}
           description={`${prettyBytes(usedRam)} / ${prettyBytes(usedRam)}`}
           percent={percentRam}
-          color={Theme.pallete.quaternary}
+          color={Theme.palette.quaternary}
         />
       )
     };

@@ -33,7 +33,7 @@ export class ShowErrorScreen extends Component {
               marginBottom: 35,
               padding: 15,
               width: '80%',
-              backgroundColor: Theme.pallete.gray,
+              backgroundColor: Theme.palette.gray,
               borderRadius: 5
             }}
           >
