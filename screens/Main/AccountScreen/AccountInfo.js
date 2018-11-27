@@ -19,7 +19,6 @@ import { AndroidBackHandler } from 'react-navigation-backhandler';
 import { Theme, DarkTheme } from '../../../constants';
 import { PageIndicator } from '../../../components/Indicator';
 import { BackgroundView, ScrollView } from '../../../components/View';
-import Chains from '../../../constants/Chains';
 
 const STATUS_BAR_HEIGHT = Platform.OS === 'ios' ? 0 : StatusBar.currentHeight;
 
@@ -28,6 +27,9 @@ const STATUS_BAR_HEIGHT = Platform.OS === 'ios' ? 0 : StatusBar.currentHeight;
 @observer
 export class AccountInfo extends Component {
   @observable
+  refreshing = false;
+
+  @observable
   drawerVisible = false;
 
   @observable
@@ -35,6 +37,14 @@ export class AccountInfo extends Component {
 
   // animate drawer
   drawerFrame = new Animated.Value(0);
+
+  onRefresh = async () => {
+    this.refreshing = true;
+
+    await this.props.accountStore.getTokens();
+
+    this.refreshing = false;
+  };
 
   panResponder = PanResponder.create({
     onMoveShouldSetPanResponder: () => true,
@@ -330,7 +340,10 @@ export class AccountInfo extends Component {
                   {!fetched ? (
                     <PageIndicator />
                   ) : (
-                    <ScrollView>
+                    <ScrollView
+                      refreshing={this.refreshing}
+                      onRefresh={this.onRefresh}
+                    >
                       {Object.keys(tokens).map(symbol => (
                         <TouchableRipple
                           key={symbol}
