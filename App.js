@@ -18,15 +18,14 @@ import {
 // Sentry.enableInExpoDevelopment = true;
 
 // initialize sentry
-Sentry.config(
-  'https://55321a0b2afa487c9b6ae9d5d1fa5ea9@sentry.io/1314438'
-).install();
+Sentry.config(process.env.SENTRY_CONFIG).install();
 
 const theme = {
   ...DefaultTheme,
+  ...Theme.paper,
   colors: {
     ...DefaultTheme.colors,
-    ...Theme
+    ...Theme.paper.colors
   }
 };
 

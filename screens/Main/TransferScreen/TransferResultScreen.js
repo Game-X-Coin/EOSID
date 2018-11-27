@@ -1,118 +1,108 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { View } from 'react-native';
-import { Colors, Button, Text, Appbar } from 'react-native-paper';
-import { TextField } from 'react-native-material-textfield';
+import { Button, Text, Appbar } from 'react-native-paper';
+import { AndroidBackHandler } from 'react-navigation-backhandler';
 
-import { Theme } from '../../../constants';
-
-import { EmptyState } from '../../../components/EmptyState';
-import { ScrollView } from '../../../components/View';
+import { Theme, DarkTheme } from '../../../constants';
+import { BackgroundView } from '../../../components/View';
 
 @inject('accountStore')
 @observer
 export class TransferResultScreen extends Component {
-  confirm() {
-    this.props.navigation.navigate('Account');
-  }
+  moveToActivity = () => {
+    this.props.navigation.navigate('Activity');
+  };
+
+  onBackPress = () => {
+    this.moveToActivity();
+    return true;
+  };
 
   render() {
     const { navigation, accountStore } = this.props;
-    const { error, amount, symbol, receiver, memo } =
-      navigation.state.params || {};
+    const { amount, symbol, receiver, memo } = navigation.state.params || {};
 
     const balance = symbol && accountStore.tokens[symbol];
 
-    if (error) {
-      return (
-        <EmptyState
-          image={require('../../../assets/example.png')}
-          title="Transfer Failed"
-          description="Please check the error, it may be a network error."
-          descriptionStyle={{ marginBottom: 20 }}
+    const SubItem = ({ title, description }) => (
+      <View style={{ marginBottom: Theme.innerSpacing }}>
+        <Text
+          style={{
+            marginBottom: 7,
+            fontSize: 17,
+            color: Theme.pallete.quaternary
+          }}
         >
-          <View
-            style={{
-              marginBottom: 25,
-              marginHorizontal: 30,
-              height: 150,
-              backgroundColor: Colors.grey300,
-              borderRadius: 5
-            }}
-          >
-            <ScrollView style={{ padding: 10 }}>
-              <Text style={{ color: Colors.grey700 }}>
-                {JSON.stringify(this.error)}
-              </Text>
-            </ScrollView>
-          </View>
-
-          <Button mode="outlined" onPress={() => this.confirm()}>
-            Close
-          </Button>
-        </EmptyState>
-      );
-    }
+          {title}
+        </Text>
+        <Text style={DarkTheme.h5}>{description}</Text>
+      </View>
+    );
 
     return (
-      <View style={{ flex: 1, backgroundColor: Theme.primary }}>
-        <Appbar.Header dark style={{ backgroundColor: 'transparent' }}>
-          <Appbar.Action icon="close" onPress={() => this.confirm()} />
-          <Appbar.Content title="Transfer Result" />
-        </Appbar.Header>
+      <AndroidBackHandler onBackPress={this.onBackPress}>
+        <BackgroundView dark>
+          <Appbar.Header
+            style={{ backgroundColor: DarkTheme.header.backgroundColor }}
+            dark
+          >
+            <Appbar.Content title="Transfer Result" />
+          </Appbar.Header>
 
-        <View style={{ flex: 1, padding: 20, paddingTop: 30 }}>
-          <View style={{ flex: 1 }}>
-            <Text style={{ paddingBottom: 10, fontSize: 20, color: '#fff' }}>
-              {receiver}
-            </Text>
-            <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
-              <Text style={{ fontSize: 30, marginRight: 5, color: '#fff' }}>
-                {amount}
-              </Text>
+          <View
+            style={{
+              flex: 1,
+              margin: Theme.innerSpacing,
+              paddingTop: 50
+            }}
+          >
+            <View style={{ flex: 1 }}>
               <Text
                 style={{
-                  fontSize: 15,
-                  marginRight: 5,
-                  lineHeight: 30,
-                  color: '#fff'
+                  marginBottom: 7,
+                  fontSize: 20,
+                  color: Theme.pallete.quaternary
                 }}
               >
-                {symbol}
+                {receiver}
               </Text>
+
+              <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
+                <Text style={{ marginRight: 7, ...DarkTheme.h1 }}>
+                  {amount}
+                </Text>
+                <Text
+                  style={{
+                    lineHeight: 30,
+                    ...DarkTheme.h5
+                  }}
+                >
+                  {symbol}
+                </Text>
+              </View>
             </View>
+
+            {(memo || '') !== '' && (
+              <SubItem title="Memo" description={memo || ''} />
+            )}
+
+            <SubItem
+              title="Remaining Amount"
+              description={`${balance} ${symbol}`}
+            />
           </View>
 
-          {(memo || '') !== '' && (
-            <TextField
-              multiline
-              label="Memo"
-              baseColor="#fff"
-              textColor="#fff"
-              value={memo || ''}
-              editable={false}
-            />
-          )}
-
-          <TextField
-            multiline
-            label="Remaining amount"
-            baseColor="#fff"
-            textColor="#fff"
-            value={`${balance} ${symbol}`}
-            editable={false}
-          />
-        </View>
-
-        <Button
-          style={{ padding: 5, margin: 20 }}
-          mode="contained"
-          color="#fff"
-          onPress={() => this.confirm()}
-        >
-          Close
-        </Button>
-      </View>
+          <Button
+            mode="contained"
+            color="#fff"
+            onPress={this.moveToActivity}
+            style={{ padding: 5, margin: Theme.innerSpacing }}
+          >
+            Close
+          </Button>
+        </BackgroundView>
+      </AndroidBackHandler>
     );
   }
 }

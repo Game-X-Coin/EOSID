@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { View, Clipboard } from 'react-native';
-import { Appbar, Button, Text } from 'react-native-paper';
+import { Appbar, Button, Text, Colors } from 'react-native-paper';
+import { Icon } from 'expo';
 import Toast from '@rimiti/react-native-toastify';
 
 import { Theme } from '../../../constants';
@@ -29,7 +30,9 @@ export class PermissionScreen extends Component {
 
     return (
       <BackgroundView>
-        <Appbar.Header style={{ backgroundColor: Theme.headerBackgroundColor }}>
+        <Appbar.Header
+          style={{ backgroundColor: Theme.header.backgroundColor }}
+        >
           <Appbar.BackAction onPress={() => navigation.goBack(null)} />
           <Appbar.Content title="Permission" />
         </Appbar.Header>
@@ -37,18 +40,31 @@ export class PermissionScreen extends Component {
         <Toast ref={c => (this.toast = c)} />
 
         <ScrollView>
+          <View style={{ height: 20, backgroundColor: Theme.pallete.gray }} />
+
           <View
             style={{
               flexDirection: 'row',
-              margin: Theme.innerSpacing,
-              padding: 20,
-              backgroundColor: Theme.mainBackgroundColor,
-              borderRadius: Theme.innerBorderRadius,
-              ...Theme.shadow
+              alignItems: 'center',
+              padding: 15,
+              ...Theme.surface
             }}
           >
-            <Text style={{ flex: 1, fontSize: 17 }}>Account</Text>
-            <Text style={{ fontSize: 17 }}>{name}</Text>
+            <View
+              style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}
+            >
+              <Icon.Ionicons name="md-contact" size={30} />
+              <Text
+                style={{
+                  marginLeft: 20,
+                  ...Theme.h5
+                }}
+              >
+                Account
+              </Text>
+            </View>
+
+            <Text style={Theme.h5}>{name}</Text>
           </View>
 
           {keys.map(key => {
@@ -59,40 +75,50 @@ export class PermissionScreen extends Component {
             return (
               <View
                 key={permission}
-                style={{
-                  marginHorizontal: Theme.innerSpacing,
-                  marginBottom: Theme.innerSpacing
-                }}
+                style={{ backgroundColor: Theme.pallete.gray }}
               >
-                <View style={{ paddingBottom: 15 }}>
-                  <Text style={{ fontSize: 17 }}>{capitalizedPerm} Key</Text>
-                </View>
+                <View style={{ height: 20 }} />
 
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    backgroundColor: Theme.mainBackgroundColor,
-                    borderRadius: Theme.innerBorderRadius,
-                    ...Theme.shadow
-                  }}
-                >
+                <View style={Theme.surface}>
                   <Text
                     style={{
-                      flex: 1,
-                      padding: 20,
-                      fontSize: 15,
-                      fontFamily: 'monospace'
+                      ...Theme.p,
+                      marginTop: 15,
+                      marginHorizontal: 20,
+                      paddingVertical: 10,
+                      fontSize: 13,
+                      borderBottomWidth: 1,
+                      borderColor: Colors.grey200,
+                      color: Colors.grey700
                     }}
                   >
-                    {publicKey}
+                    {capitalizedPerm} Key
                   </Text>
-                  <View style={{ width: 1, backgroundColor: '#d0d0d0' }} />
-                  <Button
-                    style={{ paddingVertical: 20, fontSize: 17 }}
-                    onPress={() => this.copy(publicKey)}
+
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      paddingHorizontal: 15
+                    }}
                   >
-                    copy
-                  </Button>
+                    <Text
+                      style={{
+                        flex: 1,
+                        paddingVertical: 20,
+                        marginRight: 30,
+                        ...Theme.p
+                      }}
+                    >
+                      {publicKey}
+                    </Text>
+                    <Button
+                      mode="contained"
+                      onPress={() => this.copy(publicKey)}
+                    >
+                      copy
+                    </Button>
+                  </View>
                 </View>
               </View>
             );

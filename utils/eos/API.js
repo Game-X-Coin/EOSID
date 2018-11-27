@@ -1,11 +1,11 @@
 import { Api, JsSignatureProvider, JsonRpc, Serialize } from 'eosjs-rn';
 import ecc from 'eosjs-ecc-rn';
 import { TextDecoder, TextEncoder } from 'text-encoding';
-import { AccountStore, NetworkStore } from '../../stores';
-import { AccountService } from '../../services';
 import Fetch from '../Fetch';
+import { DEFAULT_NETWORKS } from '../../constants';
 
 class EosApi {
+  static currentNetwork = DEFAULT_NETWORKS ? DEFAULT_NETWORKS[0] : null;
   static FetchChain = null;
   static FetchHistory = null;
   static isJungleNet = false;
@@ -21,8 +21,10 @@ class EosApi {
     if (url) {
       return new Fetch({ baseURL: url });
     }
-    const network = NetworkStore.currentNetwork;
-    EosApi.FetchChain = EosApi.API(network.chainURL, EosApi.FetchChain);
+    EosApi.FetchChain = EosApi.API(
+      EosApi.currentNetwork.chainURL,
+      EosApi.FetchChain
+    );
     return EosApi.FetchChain;
   }
 
@@ -30,30 +32,19 @@ class EosApi {
     if (url) {
       return new Fetch({ baseURL: url });
     }
-    const network = NetworkStore.currentNetwork;
-    EosApi.FetchHistory = EosApi.API(network.historyURL, EosApi.FetchHistory);
+    EosApi.FetchHistory = EosApi.API(
+      EosApi.currentNetwork.historyURL,
+      EosApi.FetchHistory
+    );
     return EosApi.FetchHistory;
   }
 
   static get Rpc() {
-    const network = NetworkStore.currentNetwork;
-    return new JsonRpc(network.chainURL, { fetch });
+    return new JsonRpc(EosApi.currentNetwork.chainURL, { fetch });
   }
 
-  static getApi({
-    accountName,
-    privateKey,
-    pincode,
-    permission = 'active',
-    sign = true
-  } = {}) {
-    const network = NetworkStore.currentNetwork;
-    if (sign && !privateKey && pincode) {
-      const account = AccountStore.findAccount(accountName);
-      const key = AccountService.getKey(account, permission);
-      privateKey = AccountService.decryptKey(key.encryptedPrivateKey, pincode);
-    }
-
+  static getApi({ privateKey, sign = true } = {}) {
+    const network = EosApi.currentNetwork;
     const signatureProvider = new JsSignatureProvider(sign ? [privateKey] : []);
 
     return new Api({
@@ -154,12 +145,7 @@ class EosApi {
         return data;
       },
       validateAuthorization: params => {
-        let { actor, permission = 'active' } = params;
-
-        if (!actor) {
-          const foundAccount = AccountStore.findAccount();
-          actor = foundAccount.name;
-        }
+        const { actor, permission } = params;
 
         const authorization = [];
         authorization.push({ actor, permission });
@@ -175,17 +161,17 @@ class EosApi {
       }) => {
         try {
           const { account, name } = params;
+          params.actor = params.actor ? params.actor : params.from;
+
           const data = await this.transactions.validateData(params);
           const authorization = this.transactions.validateAuthorization(params);
-
-          const accountName = params.actor ? params.actor : params.from;
 
           if (proposal) {
             broadcast = false;
             sign = false;
           }
 
-          const api = EosApi.getApi({ ...params, accountName, sign });
+          const api = EosApi.getApi({ ...params, sign });
           const result = api.transact(
             { actions: [{ account, name, authorization, data }] },
             { broadcast, sign, blocksBehind, expireSeconds }
@@ -220,8 +206,7 @@ class EosApi {
         }
 
         if (!params.from) {
-          const foundAccount = AccountStore.findAccount();
-          params.from = foundAccount.name;
+          throw new Error("It should needed 'from' data");
         }
 
         if (!params.actor && params.from) {
@@ -261,8 +246,7 @@ class EosApi {
         }
 
         if (!params.from) {
-          const foundAccount = AccountStore.findAccount();
-          params.from = foundAccount.name;
+          throw new Error("It should needed 'from' data");
         }
 
         if (!params.receiver) {
@@ -311,8 +295,7 @@ class EosApi {
         }
 
         if (!params.from) {
-          const foundAccount = AccountStore.findAccount();
-          params.from = foundAccount.name;
+          throw new Error("It should needed 'from' data");
         }
 
         if (!params.receiver) {
@@ -366,8 +349,7 @@ class EosApi {
         }
 
         if (!params.proposer) {
-          const foundAccount = AccountStore.findAccount();
-          params.proposer = foundAccount.name;
+          throw new Error("It should needed 'proposer' data");
         }
 
         if (!params.requested) {
@@ -410,10 +392,13 @@ class EosApi {
       }
     };
   }
-  get producers() {
+  static get producers() {
     return {
-      get: ({ id }) =>
-        EosApi.HistoryAPI().post('/v1/history/get_transaction', { id })
+      get: async ({ json = true, limit = 21 } = {}) =>
+        await EosApi.ChainAPI().post('/v1/chain/get_producers', {
+          json,
+          limit
+        })
     };
   }
   static get code() {
@@ -434,7 +419,7 @@ class EosApi {
   static get blocks() {
     return {
       get: ({ block_num_or_id }) =>
-        EosApi.ChainAPI().post('/v1/chain/block', { block_num_or_id }),
+        EosApi.ChainAPI().post('/v1/chain/get_block', { block_num_or_id }),
       getHeaderState: ({ block_num_or_id }) =>
         EosApi.ChainAPI().post('/v1/chain/get_block_header_state', {
           block_num_or_id

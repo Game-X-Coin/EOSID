@@ -6,9 +6,8 @@
     "privacy": "public",
     "sdkVersion": "31.0.0",
     "platforms": ["ios", "android"],
-    "version": "0.1.0",
+    "version": "0.1.2",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "cover",
@@ -20,11 +19,13 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "io.gamexcoin.eosid"
+      "bundleIdentifier": "io.gamexcoin.eosid",
+      "icon": "./assets/images/icon_ios.png"
     },
     "android": {
-      "versionCode": 2,
+      "versionCode": 4,
       "package": "io.gamexcoin.eosid",
+      "icon": "./assets/images/icon_android.png",
       "intentFilters": [{
         "action": "VIEW",
         "autoVerify": true,

@@ -1,53 +1,88 @@
 import { observable, action, computed } from 'mobx';
 
-import { NetworkService } from '../services';
+import NetworkService from '../services/NetworkService';
 
-import { AccountStore } from './AccountStore';
-
-import { DEFAULT_NETWORKS } from '../constants';
+import { DEFAULT_NETWORKS, DEFAULT_CHAIN } from '../constants';
+import Chains from '../constants/Chains';
 
 import api from '../utils/eos/API';
 
 class Store {
+  @observable
+  chains = Chains.reduce((ac, chain) => {
+    ac[chain.id] = chain;
+    return ac;
+  }, {});
+
   @observable
   defaultNetworks = DEFAULT_NETWORKS;
 
   @observable
   customNetworks = [];
 
-  @computed
-  get eos() {
-    return api;
-  }
+  @observable
+  currentNetwork = this.defaultNetworks[0];
+
+  @observable
+  currentChain = DEFAULT_CHAIN;
 
   @computed
   get allNetworks() {
     return [...this.defaultNetworks, ...this.customNetworks];
   }
 
-  @computed
-  get currentNetwork() {
-    const { currentAccount } = AccountStore;
-
-    if (currentAccount) {
-      return this.allNetworks.find(
-        network => network.id === currentAccount.networkId
-      );
+  @action
+  getNetwork(chainId) {
+    if (
+      chainId &&
+      (!this.currentNetwork.nodes || this.currentNetwork.chainId !== chainId)
+    ) {
+      const chain = this.chains[chainId];
+      this.currentNetwork = chain.nodes
+        ? chain.nodes[0]
+        : this.defaultNetworks[0];
+    } else {
+      this.currentNetwork =
+        (this.chains[chainId || this.currentChain || 0].nodes || [])[0] ||
+        this.defaultNetworks[0];
     }
-    // return default network
-    return this.defaultNetworks[0];
+
+    return this.currentNetwork;
+  }
+
+  @action
+  setCurrentNetwork(account) {
+    api.currentNetwork = this.getNetwork(account && account.chainId);
+  }
+
+  @action
+  changeNetwork(chainId, networkId) {
+    const network = this.chains[chainId].nodes.find(
+      node => node.id === networkId
+    );
+    this.currentNetwork = network;
+    api.currentNetwork = network;
+  }
+
+  @action
+  setChains(chains) {
+    this.chains = chains;
+  }
+
+  @action
+  setDefaultNetworks(networks) {
+    this.defaultNetworks = networks;
   }
 
   @action
   setCustomNetworks(networks) {
-    console.log('networks', networks);
     this.customNetworks = networks;
   }
 
   @action
   async getNetworks() {
-    return NetworkService.getNetworks().then(networks => {
-      this.setCustomNetworks(networks);
+    return await NetworkService.getNetworks(this.chains).then(chains => {
+      this.setChains(chains);
     });
   }
 
@@ -71,4 +106,4 @@ class Store {
   }
 }
 
-export const NetworkStore = new Store();
+export default new Store();

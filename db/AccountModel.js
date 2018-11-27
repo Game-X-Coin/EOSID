@@ -1,5 +1,4 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm-expo/browser';
-import { AccountService } from '../services';
 
 export const ACCOUNT_KEY = 'Account';
 
@@ -18,7 +17,8 @@ export class AccountError {
     return new AccountError({
       errors: {
         privateKey: 'Please enter your private key',
-        networkId: 'Please select account network'
+        networkId: 'Please select account network',
+        chainId: 'Please select account chain'
       }
     });
   }
@@ -58,28 +58,19 @@ export class AccountModel {
   name = '';
 
   @Column('varchar')
-  networkId = '';
+  chainId = '';
 
   @Column('simple-array')
   keys = [];
 
   constructor(data) {
     if (data) {
-      const {
-        id,
-        name,
-        publicKey,
-        encryptedPrivateKey,
-        networkId,
-        permission
-      } = data;
+      const { id, name, chainId, keys = [] } = data;
 
       this.id = id;
       this.name = name;
-      this.networkId = networkId;
-
-      const key = { publicKey, encryptedPrivateKey, permission };
-      this.keys = AccountService.setKey(this.keys, key);
+      this.chainId = chainId;
+      this.keys = keys;
     }
   }
 

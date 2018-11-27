@@ -4,10 +4,14 @@ import { AES, enc } from 'crypto-js';
 import { AccountModel, AccountError } from '../db';
 import api from '../utils/eos/API';
 
-export class AccountService {
-  static async getAccounts() {
+export default class AccountService {
+  static async getAccounts(chainId) {
     const AccountRepo = getRepository(AccountModel);
-    const accounts = await AccountRepo.find();
+    const where = {};
+    if (chainId) {
+      where.chainId = chainId;
+    }
+    const accounts = await AccountRepo.find(where);
 
     return accounts;
   }
@@ -33,6 +37,7 @@ export class AccountService {
     permissions,
     publicKey,
     name,
+    chainId,
     ...accountInfo
   }) {
     const AccountRepo = getRepository(AccountModel);
@@ -40,17 +45,16 @@ export class AccountService {
     // encrypt private key
     const encryptedPrivateKey = AccountService.encryptKey(privateKey, pincode);
 
-    let account = await AccountRepo.findOne({ name });
+    let account = await AccountRepo.findOne({ name, chainId });
 
     if (!account) {
       // create new account instance
-      account = new AccountModel({
-        ...accountInfo,
-        name,
+      const keys = AccountService.setKey({
         publicKey,
         encryptedPrivateKey,
         permission: permissions[0]
       });
+      account = new AccountModel({ ...accountInfo, name, keys, chainId });
       permissions = permissions.slice(1);
       // check duplicated permission in account
     } else if (
@@ -67,7 +71,7 @@ export class AccountService {
         permission
       };
 
-      return AccountService.setKey(pv, key);
+      return AccountService.setKey(key, pv);
     }, []);
 
     if (keys.length) {
@@ -147,12 +151,13 @@ export class AccountService {
     return JSON.parse(key);
   }
 
-  static getKey(account, permission = 'active') {
-    let foundKey;
+  static getKey(account, permission) {
+    let foundKey = false;
+
     account.keys.some(key => {
       const parsedKey = AccountService.getParsingKey(key);
       return (foundKey =
-        parsedKey.permission === permission ? parsedKey : false);
+        !permission || parsedKey.permission === permission ? parsedKey : false);
     });
 
     return foundKey;
@@ -165,10 +170,7 @@ export class AccountService {
     return replaced;
   }
 
-  static setKey(keys, key) {
-    if (!keys) {
-      keys = [];
-    }
+  static setKey(key, keys = []) {
     const stringifiedKey = AccountService.stringifyKey(key);
     keys.push(stringifiedKey);
     return keys;
@@ -176,7 +178,7 @@ export class AccountService {
 
   static async transfer({
     pincode,
-    sender,
+    from,
     receiver,
     encryptedPrivateKey,
     ...transferInfo
@@ -189,7 +191,7 @@ export class AccountService {
       privateKey,
       pincode,
       to: receiver,
-      from: sender
+      from
     });
   }
 

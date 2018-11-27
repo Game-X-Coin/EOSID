@@ -68,7 +68,10 @@ export class PermissionRequestInfo extends Component {
 
     this.loadAccount = true;
     if (currentAccount.id !== account.id) {
-      await this.props.accountStore.changeCurrentAccount(account.id);
+      await this.props.accountStore.changeCurrentAccount(
+        account.id,
+        account.chainId
+      );
     }
     if (currentPermission !== permission) {
       this.setState({ currentPermission: permission });

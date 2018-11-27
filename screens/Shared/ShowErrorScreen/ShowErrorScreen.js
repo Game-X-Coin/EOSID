@@ -1,47 +1,46 @@
 import React, { Component } from 'react';
 import { View } from 'react-native';
-import { Colors, Text, Button } from 'react-native-paper';
+import { Text, Appbar } from 'react-native-paper';
 
 import { EmptyState } from '../../../components/EmptyState';
-import { ScrollView } from '../../../components/View';
+import { Theme } from '../../../constants';
 
 export class ShowErrorScreen extends Component {
   render() {
-    const {
-      title,
-      description,
-      error,
-      onPress = () => this.props.navigation.navigate('Account')
-    } = this.props.navigation.state.params || {};
+    const { navigation } = this.props;
+    const { title, description, error, onPress = () => navigation.goBack() } =
+      navigation.state.params || {};
 
     return (
-      <EmptyState
-        image={require('../../../assets/example.png')}
-        title={title}
-        description={description}
-        descriptionStyle={{ marginBottom: 20 }}
-      >
-        <View
+      <View style={{ flex: 1 }}>
+        <Appbar.Header
           style={{
-            alignSelf: 'stretch',
-            marginBottom: 25,
-            marginHorizontal: 30,
-            height: 150,
-            backgroundColor: Colors.grey300,
-            borderRadius: 5
+            justifyContent: 'flex-end',
+            backgroundColor: Theme.header.backgroundColor
           }}
         >
-          <ScrollView style={{ padding: 10 }}>
-            <Text style={{ color: Colors.grey700 }}>
-              {JSON.stringify(error)}
-            </Text>
-          </ScrollView>
-        </View>
+          <Appbar.Action icon="close" onPress={onPress} />
+        </Appbar.Header>
 
-        <Button mode="outlined" onPress={() => onPress()}>
-          Confirm
-        </Button>
-      </EmptyState>
+        <EmptyState
+          image={require('../../../assets/images/error.png')}
+          title={title}
+          description={description}
+          descriptionStyle={{ marginBottom: 20 }}
+        >
+          <View
+            style={{
+              marginBottom: 35,
+              padding: 15,
+              width: '80%',
+              backgroundColor: Theme.pallete.gray,
+              borderRadius: 5
+            }}
+          >
+            <Text>{error}</Text>
+          </View>
+        </EmptyState>
+      </View>
     );
   }
 }

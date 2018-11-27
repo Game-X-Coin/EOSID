@@ -10,19 +10,18 @@ import {
   Caption,
   TouchableRipple
 } from 'react-native-paper';
-import { TextField } from 'react-native-material-textfield';
+import moment from 'moment';
 
 import api from '../../../utils/eos/API';
 import { TransferLogService } from '../../../services';
+import { Theme } from '../../../constants';
 
 import {
   KeyboardAvoidingView,
   ScrollView,
   BackgroundView
 } from '../../../components/View';
-
-import { Indicator } from '../../../components/Indicator';
-import { Theme } from '../../../constants';
+import { TextField } from '../../../components/TextField';
 
 const debounce = (func, wait) => {
   let timeout;
@@ -54,19 +53,20 @@ export class TransferLogs extends Component {
 
   render() {
     return (
-      <View>
-        <View style={{ paddingHorizontal: 20 }}>
+      <View style={{ paddingBottom: Theme.innerPadding }}>
+        <View style={{ paddingHorizontal: Theme.innerSpacing }}>
           <Text>Recent History</Text>
-          <Divider style={{ marginVertical: 10 }} />
+          <Divider
+            style={{ marginTop: 10, backgroundColor: Theme.pallete.darkGray }}
+          />
         </View>
 
         {this.transferLogs.map(log => (
           <TouchableRipple
             key={log.id}
             style={{
-              paddingHorizontal: 20,
-              paddingVertical: 5,
-              marginBottom: 5
+              paddingHorizontal: Theme.innerSpacing,
+              paddingVertical: 10
             }}
             onPress={() => this.props.onLogPress(log)}
           >
@@ -78,7 +78,7 @@ export class TransferLogs extends Component {
             >
               <View style={{ flex: 1 }}>
                 <Text>{log.receiver}</Text>
-                <Caption>{log.createdAt}</Caption>
+                <Caption>{moment(log.createdAt).format('YYYY/MM/DD')}</Caption>
               </View>
               <Text style={{ fontSize: 15 }}>
                 {log.amount} {log.symbol}
@@ -140,38 +140,43 @@ export class TransferScreen extends Component {
 
     return (
       <BackgroundView>
-        <Appbar.Header style={{ backgroundColor: Theme.headerBackgroundColor }}>
+        <Appbar.Header
+          style={{ backgroundColor: Theme.header.backgroundColor }}
+        >
           <Appbar.BackAction onPress={() => navigation.goBack(null)} />
-          <Appbar.Content title="Receiver" />
+          <Appbar.Content title="Transfer" />
         </Appbar.Header>
 
         <KeyboardAvoidingView>
           <ScrollView>
-            <View style={{ padding: 20 }}>
+            <View
+              style={{
+                marginHorizontal: Theme.innerSpacing,
+                marginBottom: Theme.innerSpacing
+              }}
+            >
               <TextField
                 autoFocus
-                label="Enter receiver's account"
-                title="example: eosauthority"
+                label="Receiver's account"
+                info={loading ? 'Searching account...' : ''}
+                placeholder="iameosiduser"
                 value={receiver}
                 error={error}
-                renderAccessory={() =>
-                  loading && (
-                    <View style={{ paddingHorizontal: 5 }}>
-                      <Indicator size="small" />
-                    </View>
-                  )
-                }
-                onChangeText={v => this.onChangeReceiver(v)}
+                loading={loading}
+                onChangeText={v => {
+                  this.loading = true;
+                  this.onChangeReceiver(v);
+                }}
               />
 
               <Button
                 mode="contained"
                 style={{
-                  marginVertical: 20,
+                  marginBottom: 20,
                   padding: 5
                 }}
-                disabled={!receiver.length}
-                onPress={() => !loading && !error && this.handleSubmit()}
+                disabled={!receiver.length || loading || error}
+                onPress={() => this.handleSubmit()}
               >
                 Next
               </Button>

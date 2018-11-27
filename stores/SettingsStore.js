@@ -20,7 +20,6 @@ class Store {
   @action
   getSettings() {
     return SettingsService.getSettings().then(settings => {
-      console.log(settings);
       this.setSettings(settings);
     });
   }
@@ -47,4 +46,4 @@ class Store {
   }
 }
 
-export const SettingsStore = new Store();
+export default new Store();

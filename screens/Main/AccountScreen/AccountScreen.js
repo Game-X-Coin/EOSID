@@ -20,13 +20,9 @@ export class AccountScreen extends Component {
       <BackgroundView>
         {!currentAccount && (
           <Appbar.Header
-            style={{ backgroundColor: Theme.headerBackgroundColor }}
+            style={{ backgroundColor: Theme.header.backgroundColor }}
           >
             <Appbar.Content title="Account" />
-            <Appbar.Action
-              icon="add"
-              onPress={() => this.moveScreen('ImportAccount')}
-            />
           </Appbar.Header>
         )}
 

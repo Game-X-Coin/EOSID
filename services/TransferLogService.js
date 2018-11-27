@@ -2,7 +2,7 @@ import { getRepository } from 'typeorm-expo/browser';
 
 import { TransferLogModel } from '../db';
 
-export class TransferLogService {
+export default class TransferLogService {
   static async getTransferLogsByAcocuntId(accountId) {
     const TransferLogRepo = getRepository(TransferLogModel);
     const transferLogs = await TransferLogRepo.find({ accountId });

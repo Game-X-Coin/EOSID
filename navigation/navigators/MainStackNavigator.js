@@ -18,12 +18,16 @@ import {
   ManageResourceScreen,
   PermissionScreen,
   ActivityScreen,
-  ActivityDetailScreen
+  ActivityDetailScreen,
+  ResourceScreen,
+  SettingsAppPinScreen,
+  SettingsAccountPinScreen
 } from '../../screens/Main';
 
 import {
   ImportAccountScreen,
   ShowErrorScreen,
+  ShowSuccessScreen,
   ConfirmPinScreen,
   ConfirmAppPinScreen,
   NewPinScreen,
@@ -36,6 +40,7 @@ import { Theme } from '../../constants';
 const DetailScreens = {
   // accounts
   ImportAccount: ImportAccountScreen,
+  Resource: ResourceScreen,
   ManageResource: ManageResourceScreen,
   Transfer: TransferScreen,
   TransferAmount: TransferAmountScreen,
@@ -43,6 +48,8 @@ const DetailScreens = {
   Permission: PermissionScreen,
   // settings
   SettingsNetwork: SettingsNetworkScreen,
+  SettingsAppPin: SettingsAppPinScreen,
+  SettingsAccountPin: SettingsAccountPinScreen,
   AddNetwork: AddNetworkScreen,
   Accounts: AccountsScreen,
   // activity
@@ -55,8 +62,9 @@ const DetailScreens = {
   NewAppPin: NewAppPinScreen,
   // confirm dapp sign
   PermissionRequest: PermissionRequestScreen,
-  // show error
-  ShowError: ShowErrorScreen
+  // show result status
+  ShowError: ShowErrorScreen,
+  ShowSuccess: ShowSuccessScreen
 };
 
 // for tab icons
@@ -88,10 +96,10 @@ const MainTabNavigator = createMaterialBottomTabNavigator(
       }
     }),
     shifting: true,
-    activeColor: Theme.activeColor,
-    inactiveColor: Theme.inActiveColor,
+    activeColor: Theme.pallete.active,
+    inactiveColor: Theme.pallete.inActive,
     barStyle: {
-      backgroundColor: Theme.mainBackgroundColor
+      backgroundColor: Theme.tab.backgroundColor
     }
   }
 );
@@ -150,5 +158,29 @@ export const MainStackNavigator = createStackNavigator(
   {
     headerMode: 'none',
     cardStyle: { backgroundColor: '#fff' }
+    /* transitionConfig: () => ({
+      transitionSpec: {
+        duration: 300,
+        easing: Easing.out(Easing.bezier(0.42, 0, 1, 1)),
+        timing: Animated.timing,
+        useNativeDriver: true
+      },
+      screenInterpolator: ({ layout, position, scene }) => {
+        const { index } = scene;
+        const { initWidth } = layout;
+
+        const translateX = position.interpolate({
+          inputRange: [index - 1, index, index + 1],
+          outputRange: [initWidth, 0, -30]
+        });
+
+        const opacity = position.interpolate({
+          inputRange: [index - 1, index - 0.99, index],
+          outputRange: [0, 1, 1]
+        });
+
+        return { opacity, transform: [{ translateX }] };
+      }
+    }) */
   }
 );

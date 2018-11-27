@@ -1,9 +1,6 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { View } from 'react-native';
 import { Appbar, Button } from 'react-native-paper';
-import { TextField } from 'react-native-material-textfield';
-import { Dropdown } from 'react-native-material-dropdown';
 import { withFormik } from 'formik';
 import * as Yup from 'yup';
 
@@ -13,6 +10,9 @@ import {
   ScrollView,
   BackgroundView
 } from '../../../components/View';
+import { TextField } from '../../../components/TextField';
+import { SelectField } from '../../../components/SelectField';
+
 import { Theme } from '../../../constants';
 
 @inject('accountStore')
@@ -66,27 +66,27 @@ import { Theme } from '../../../constants';
         title: 'Confirm Transfer',
         description: `Transfer ${fixedAmount} ${values.symbol}`
       },
-      async cb() {
+      async cb(pincode) {
         // show transfer loading dialog
         setFieldValue('showDialog', true);
 
-        const result = await accountStore.transfer(values);
+        try {
+          const result = await accountStore.transfer({ ...values, pincode });
 
-        // hide dialog
-        setFieldValue('showDialog', false);
-
-        if (result.code === 500) {
-          navigation.navigate('ShowError', {
-            title: 'Transfer Failed',
-            description: 'Please check the error, it may be a network error.',
-            error: result
-          });
-        } else {
           navigation.navigate('TransferResult', {
             ...values,
             amount: fixedAmount,
             result
           });
+        } catch ({ message }) {
+          navigation.navigate('ShowError', {
+            title: 'Transfer Failed',
+            description: 'Please check the error, it may be a network error.',
+            error: message
+          });
+        } finally {
+          // hide dialog
+          setFieldValue('showDialog', false);
         }
       }
     });
@@ -117,7 +117,9 @@ export class TransferAmountScreen extends Component {
 
     return (
       <BackgroundView>
-        <Appbar.Header style={{ backgroundColor: Theme.headerBackgroundColor }}>
+        <Appbar.Header
+          style={{ backgroundColor: Theme.header.backgroundColor }}
+        >
           <Appbar.BackAction onPress={() => navigation.goBack(null)} />
           <Appbar.Content title="Transfer" />
         </Appbar.Header>
@@ -128,44 +130,48 @@ export class TransferAmountScreen extends Component {
         />
 
         <KeyboardAvoidingView>
-          <ScrollView style={{ padding: 20 }}>
+          <ScrollView
+            style={{
+              marginHorizontal: Theme.innerSpacing
+            }}
+          >
             <TextField
               label="Receiver"
               value={values.receiver}
               editable={false}
+              onPress={() => navigation.goBack(null)}
             />
 
-            <View style={{ flexDirection: 'row' }}>
-              <View style={{ flex: 1 }}>
-                <TextField
-                  autoFocus
-                  label="Enter transfer amount"
-                  keyboardType="numeric"
-                  value={values.amount}
-                  title={`${availableAmount} ${values.symbol} available`}
-                  error={touched.amount && errors.amount}
-                  onChangeText={_ => {
-                    setFieldTouched('amount', true);
-                    setFieldValue('amount', _);
-                  }}
-                />
-              </View>
-
-              <View style={{ width: 90, marginLeft: 8 }}>
-                <Dropdown
-                  value={values.symbol}
+            <TextField
+              autoFocus
+              label="Transfer Amount"
+              textAlign="right"
+              keyboardType="numeric"
+              value={values.amount}
+              info={`${availableAmount} ${values.symbol} available`}
+              error={touched.amount && errors.amount}
+              onChangeText={_ => {
+                setFieldTouched('amount', true);
+                setFieldValue('amount', _);
+              }}
+              prefixComp={
+                <SelectField
                   data={tokenData}
-                  onChangeText={_ => {
-                    setFieldValue('symbol', _);
+                  value={values.symbol}
+                  error={touched.amount && errors.amount}
+                  onChange={_ => setFieldValue('symbol', _)}
+                  containerStyle={{
+                    marginVertical: 0,
+                    width: values.symbol.length * 10 + 60
                   }}
                 />
-              </View>
-            </View>
+              }
+            />
 
             <TextField
               multiline
-              label="Enter memo (optional)"
-              suffix={`${values.memo.length} / 256`}
+              label="Memo (optional)"
+              info={`${values.memo.length} / 256`}
               value={values.memo}
               error={touched.memo && errors.memo}
               onChangeText={_ => {
@@ -184,7 +190,7 @@ export class TransferAmountScreen extends Component {
             disabled={!isValid}
             onPress={handleSubmit}
           >
-            Transfer
+            Next
           </Button>
         </KeyboardAvoidingView>
       </BackgroundView>

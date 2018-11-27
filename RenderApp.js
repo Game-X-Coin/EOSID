@@ -45,6 +45,8 @@ export default class RenderApp extends Component {
       accountStore.getAccounts()
     ]);
 
+    networkStore.setCurrentNetwork(accountStore.currentAccount);
+
     this.isLoadingComplete = true;
   }
 
@@ -61,7 +63,7 @@ export default class RenderApp extends Component {
 
     return (
       <View style={styles.container}>
-        {Platform.OS === 'ios' && <StatusBar barStyle="light-content" />}
+        {Platform.OS === 'ios' && <StatusBar />}
         <AppNavigator />
       </View>
     );
