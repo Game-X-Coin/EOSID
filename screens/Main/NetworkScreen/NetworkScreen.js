@@ -19,7 +19,6 @@ export class NetworkScreen extends Component {
   render() {
     const { networkStore, navigation } = this.props;
     const { chains } = networkStore;
-    console.log(networkStore.currentNetwork.id);
 
     return (
       <BackgroundView>
