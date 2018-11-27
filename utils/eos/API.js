@@ -2,10 +2,9 @@ import { Api, JsSignatureProvider, JsonRpc, Serialize } from 'eosjs-rn';
 import ecc from 'eosjs-ecc-rn';
 import { TextDecoder, TextEncoder } from 'text-encoding';
 import Fetch from '../Fetch';
-import { DEFAULT_NETWORKS } from '../../constants';
 
 class EosApi {
-  static currentNetwork = DEFAULT_NETWORKS ? DEFAULT_NETWORKS[0] : null;
+  static currentNetwork = null;
   static FetchChain = null;
   static FetchHistory = null;
   static isJungleNet = false;

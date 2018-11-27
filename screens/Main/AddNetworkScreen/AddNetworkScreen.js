@@ -98,6 +98,18 @@ export class AddNetworkScreen extends Component {
         <KeyboardAvoidingView>
           <ScrollView style={{ paddingHorizontal: 20 }}>
             <TextField
+              label="URL"
+              placeholder="http://my.eos.net"
+              info="url requires /bp.json on request."
+              value={values.url}
+              error={touched.url && errors.url}
+              onChangeText={_ => {
+                setFieldTouched('url', true);
+                setFieldValue('url', _);
+              }}
+            />
+
+            <TextField
               autoFocus
               label="Name"
               placeholder="MyEoS"
@@ -107,17 +119,6 @@ export class AddNetworkScreen extends Component {
               onChangeText={_ => {
                 setFieldTouched('name', true);
                 setFieldValue('name', _);
-              }}
-            />
-
-            <TextField
-              label="URL"
-              placeholder="http://my.eos.net"
-              value={values.url}
-              error={touched.url && errors.url}
-              onChangeText={_ => {
-                setFieldTouched('url', true);
-                setFieldValue('url', _);
               }}
             />
           </ScrollView>

@@ -175,7 +175,7 @@ export class TransferScreen extends Component {
                   marginBottom: 20,
                   padding: 5
                 }}
-                disabled={!receiver.length || loading || error}
+                disabled={!receiver.length || loading || !!error}
                 onPress={() => this.handleSubmit()}
               >
                 Next
