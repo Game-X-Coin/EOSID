@@ -19,7 +19,7 @@ const app = {
 };
 
 const header = {
-  backgroundColor: palette.transparent
+  backgroundColor: palette.primary
 };
 
 const tab = {

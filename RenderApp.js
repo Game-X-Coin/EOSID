@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observable } from 'mobx';
 import { observer, inject } from 'mobx-react/native';
-import { Platform, StatusBar, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { AppLoading, Font, Icon } from 'expo';
 
 import AppNavigator from './navigation/AppNavigator';
@@ -63,7 +63,6 @@ export default class RenderApp extends Component {
 
     return (
       <View style={styles.container}>
-        {Platform.OS === 'ios' && <StatusBar />}
         <AppNavigator />
       </View>
     );

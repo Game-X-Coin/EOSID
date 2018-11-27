@@ -9,7 +9,7 @@ export class BackgroundView extends Component {
 
     return (
       <React.Fragment>
-        <StatusBar barStyle={dark ? 'light-content' : 'dark-content'} />
+        <StatusBar barStyle="light-content" />
         <View
           style={{
             flex: 1,
