@@ -14,7 +14,11 @@ export class NetworkScreen extends Component {
   changeNetwork = async (chainId, networkId) => {
     const { accountStore, networkStore } = this.props;
     networkStore.changeNetwork(chainId, networkId);
-    accountStore.getAccounts();
+    const accounts = await accountStore.getAccounts(chainId);
+    await accountStore.changeCurrentAccount(
+      accounts && accounts.length ? accounts[0] : null,
+      chainId
+    );
   };
 
   render() {

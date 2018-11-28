@@ -302,7 +302,7 @@ export class AccountInfo extends Component {
                             }}
                           >
                             <Text style={{ marginRight: 7, ...DarkTheme.h1 }}>
-                              {tokens.EOS}
+                              {tokens.EOS.amount}
                             </Text>
                             <Text
                               style={{
@@ -363,7 +363,9 @@ export class AccountInfo extends Component {
                             >
                               {symbol}
                             </Title>
-                            <Title style={Theme.h5}>{tokens[symbol]}</Title>
+                            <Title style={Theme.h5}>
+                              {tokens[symbol].amount}
+                            </Title>
                           </View>
                         </TouchableRipple>
                       ))}

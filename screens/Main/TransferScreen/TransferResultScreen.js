@@ -23,7 +23,7 @@ export class TransferResultScreen extends Component {
     const { navigation, accountStore } = this.props;
     const { amount, symbol, receiver, memo } = navigation.state.params || {};
 
-    const balance = symbol && accountStore.tokens[symbol];
+    const balance = symbol && accountStore.tokens[symbol].amount;
 
     const SubItem = ({ title, description }) => (
       <View style={{ marginBottom: Theme.innerSpacing }}>
