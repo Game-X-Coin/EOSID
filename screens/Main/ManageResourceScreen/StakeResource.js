@@ -20,7 +20,7 @@ import { ResourceTextField } from './ResourceTextField';
   mapPropsToValues: ({ accountStore: { tokens } }) => {
     return {
       amount: '',
-      stakableAmount: tokens.EOS ? parseFloat(tokens.EOS) : 0,
+      stakableAmount: tokens.EOS ? parseFloat(tokens.EOS.amount) : 0,
 
       dialogVisible: false
     };
