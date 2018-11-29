@@ -6,10 +6,15 @@ export default {
     'parslseed123',
     'betdicetoken',
     'everipediaiq',
-    'prospectorsg',
     'eosiotptoken',
-    'ptitokenhome',
-    'octtothemoon'
+    'octtothemoon',
+    'eosiochaince',
+    'eosiomeetone',
+    'horustokenio',
+    'therealkarma',
+    'trybenetwork',
+    'eosdactokens',
+    'eosadddddddd'
   ],
   e70aaab8997e1dfce58fbfac80cbbb8fecec7b99cf982a9444273cbc64c41473: [
     'eosio.token'
