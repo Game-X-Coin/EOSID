@@ -10,3 +10,4 @@ export * from './ManageResourceScreen';
 export * from './PermissionScreen';
 export * from './ResourceScreen';
 export * from './SettingsPinScreen';
+export * from './AboutUsScreen';
