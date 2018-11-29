@@ -10,7 +10,7 @@ import {
   Caption,
   TouchableRipple
 } from 'react-native-paper';
-import moment from 'moment';
+import moment from '../../../utils/moment';
 
 import api from '../../../utils/eos/API';
 import { TransferLogService } from '../../../services';
