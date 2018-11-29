@@ -103,12 +103,7 @@ export class SettingsAppPinScreen extends Component {
           <Appbar.Content title="App Pincode" />
         </Appbar.Header>
         <ScrollView>
-          <Item
-            title={
-              !settings.appPincodeEnabled ? 'Enable Pincode' : 'Disable Pincode'
-            }
-            onPress={this.toggleAppPincode}
-          >
+          <Item title="Lock Apps" onPress={this.toggleAppPincode}>
             <Switch
               value={this.appPincodeEnabled}
               onValueChange={this.toggleAppPincode}
