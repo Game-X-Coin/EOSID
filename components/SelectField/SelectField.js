@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { View, Keyboard, ScrollView } from 'react-native';
 import { Text, TouchableRipple, Portal, Dialog } from 'react-native-paper';
 import { Icon } from 'expo';
+import { AndroidBackHandler } from 'react-navigation-backhandler';
 
 import { Theme } from '../../constants';
 
@@ -33,13 +34,27 @@ export class SelectField extends Component {
   onChange(v) {
     const { onChange = () => null } = this.props;
 
-    this.toggleDialog();
+    this.hideDialog();
     onChange(v);
   }
 
-  toggleDialog() {
+  showDialog() {
     Keyboard.dismiss();
-    this.setState(state => ({ dialogVisible: !state.dialogVisible }));
+    this.setState({ dialogVisible: true });
+  }
+
+  hideDialog() {
+    Keyboard.dismiss();
+    this.setState({ dialogVisible: false });
+  }
+
+  onBackPress() {
+    if (this.state.dialogVisible) {
+      this.hideDialog();
+      return true;
+    }
+
+    return false;
   }
 
   render() {
@@ -85,7 +100,7 @@ export class SelectField extends Component {
       <Portal>
         <Dialog
           visible={dialogVisible}
-          onDismiss={() => this.toggleDialog()}
+          onDismiss={() => this.hideDialog()}
           style={{
             alignSelf: 'center',
             marginHorizontal: 0,
@@ -155,66 +170,68 @@ export class SelectField extends Component {
       </Portal>
     );
     return (
-      <View style={{ marginVertical: 10, ...containerStyle }}>
-        <DataDialog />
-        <View
-          style={{
-            borderTopLeftRadius: 5,
-            borderTopRightRadius: 5,
-            overflow: 'hidden'
-          }}
-        >
-          <TouchableRipple
+      <AndroidBackHandler onBackPress={() => this.onBackPress()}>
+        <View style={{ marginVertical: 10, ...containerStyle }}>
+          <DataDialog />
+          <View
             style={{
-              backgroundColor: Theme.palette.gray
+              borderTopLeftRadius: 5,
+              borderTopRightRadius: 5,
+              overflow: 'hidden'
             }}
-            onPress={() => this.toggleDialog()}
           >
-            <View>
-              <Label />
+            <TouchableRipple
+              style={{
+                backgroundColor: Theme.palette.gray
+              }}
+              onPress={() => this.showDialog()}
+            >
+              <View>
+                <Label />
 
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'flex-start'
-                }}
-              >
                 <View
                   style={{
-                    flex: 1,
-                    borderBottomWidth: 2,
-                    borderBottomColor: error
-                      ? Theme.palette.error
-                      : Theme.palette.primary
+                    flexDirection: 'row',
+                    alignItems: 'flex-start'
                   }}
                 >
                   <View
                     style={{
                       flex: 1,
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      paddingHorizontal: 15,
-                      height: 48,
-                      ...style
+                      borderBottomWidth: 2,
+                      borderBottomColor: error
+                        ? Theme.palette.error
+                        : Theme.palette.primary
                     }}
-                    {...props}
                   >
-                    <Text style={{ flex: 1, fontSize: 15, paddingRight: 10 }}>
-                      {this.selectedItem && this.selectedItem.label}
-                    </Text>
-                    <Icon.Ionicons
-                      name="md-arrow-dropdown"
-                      color={Theme.palette.darkGray}
-                      size={25}
-                    />
+                    <View
+                      style={{
+                        flex: 1,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        paddingHorizontal: 15,
+                        height: 48,
+                        ...style
+                      }}
+                      {...props}
+                    >
+                      <Text style={{ flex: 1, fontSize: 15, paddingRight: 10 }}>
+                        {this.selectedItem && this.selectedItem.label}
+                      </Text>
+                      <Icon.Ionicons
+                        name="md-arrow-dropdown"
+                        color={Theme.palette.darkGray}
+                        size={25}
+                      />
+                    </View>
                   </View>
                 </View>
               </View>
-            </View>
-          </TouchableRipple>
+            </TouchableRipple>
+          </View>
         </View>
-      </View>
+      </AndroidBackHandler>
     );
   }
 }

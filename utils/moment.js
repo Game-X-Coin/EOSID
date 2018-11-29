@@ -1,7 +1,10 @@
 import moment from 'moment-timezone';
+import { Localization } from 'expo-localization';
 
-// moment.tz('America/Los_Angeles').format();
-// moment.tz.setDefault('Asia/Seoul');
-moment.tz.setDefault('GMT');
+console.log(Localization.timezone);
+
+moment.tz.setDefault(Localization.timezone);
+
+console.log(moment.tz);
 
 export default moment;

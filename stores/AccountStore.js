@@ -164,9 +164,12 @@ class Store {
   async getTokens() {
     const account = this.currentAccount;
     const chain = NetworkStore.currentChain;
-    this.tokens = {
-      EOS: { amount: '0.0000', code: 'eosio.token' }
-    };
+
+    if (!Object.keys(this.tokens).length) {
+      this.tokens = {
+        EOS: { amount: '0.0000', code: 'eosio.token' }
+      };
+    }
 
     TokenContracts[chain].forEach(async contract => {
       const balances = await api.currency.balance({
