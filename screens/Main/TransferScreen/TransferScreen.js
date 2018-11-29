@@ -91,6 +91,7 @@ export class TransferLogs extends Component {
   }
 }
 
+@inject('accountStore')
 @observer
 export class TransferScreen extends Component {
   @observable
@@ -108,17 +109,25 @@ export class TransferScreen extends Component {
 
   onChangeReceiver(v) {
     this.receiver = v;
-    this.error = '';
     this.checkReceiver(v);
   }
 
   async checkReceiver(v) {
+    const { currentAccount } = this.props.accountStore;
     this.loading = true;
+
+    if (currentAccount.name === v) {
+      this.error = 'The receiver and sender can not be the same.';
+      this.loading = false;
+      return;
+    }
 
     const result = await api.accounts.get({ account_name: v });
 
     if (result.error) {
       this.error = 'The account you entered does not exist.';
+    } else {
+      this.error = '';
     }
 
     this.loading = false;

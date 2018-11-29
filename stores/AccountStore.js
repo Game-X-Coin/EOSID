@@ -7,6 +7,7 @@ import NetworkStore from './NetworkStore';
 import SettingsStore from './SettingsStore';
 
 import api from '../utils/eos/API';
+import TokenContracts from '../constants/TokenContracts';
 
 class Store {
   @observable
@@ -58,6 +59,12 @@ class Store {
 
   @action
   async changeCurrentAccount(accountId, chainId) {
+    if (!chainId) {
+      chainId = NetworkStore.currentChain;
+    }
+    if (!accountId) {
+      accountId = this.accounts[0].id;
+    }
     if (accountId !== (this.currentAccount && this.currentAccount.accountId)) {
       // update settings
       await SettingsStore.updateSettings({ accountId, chainId });
@@ -74,10 +81,13 @@ class Store {
   }
 
   @action
-  async getAccounts() {
-    const currentNetwork = NetworkStore.currentNetwork;
-    return AccountService.getAccounts(currentNetwork.chainId).then(accounts => {
+  async getAccounts(chainId) {
+    return AccountService.getAccounts().then(accounts => {
       this.setAccounts(accounts);
+      if (chainId) {
+        return this.accounts.filter(account => account.chainId === chainId);
+      }
+      return accounts;
     });
   }
 
@@ -135,7 +145,11 @@ class Store {
       return;
     }
 
-    await Promise.all([this.getInfo(), this.getTokens(), this.getActions()]);
+    await Promise.all([
+      this.getInfo(),
+      await this.getTokens(),
+      await this.getActions()
+    ]);
 
     this.fetched = true;
   }
@@ -149,16 +163,28 @@ class Store {
 
   async getTokens() {
     const account = this.currentAccount;
-
-    const tokens = await api.currency.balance({ account: account.name });
-
+    const chain = NetworkStore.currentChain;
     this.tokens = {
-      EOS: '0.0000',
-      ...tokens.reduce((ac, v) => {
-        const [amount, symbol] = v.split(' ');
-        return { ...ac, [symbol]: amount };
-      }, {})
+      EOS: { amount: '0.0000', code: 'eosio.token' }
     };
+
+    TokenContracts[chain].forEach(async contract => {
+      const balances = await api.currency.balance({
+        code: contract,
+        account: account.name
+      });
+      if (balances && balances.length) {
+        const tokens = balances.reduce((ac, v) => {
+          const [amount, symbol] = v.split(' ');
+          const precision = amount.split('.')[1].length;
+          return { ...ac, [symbol]: { amount, code: contract, precision } };
+        }, {});
+        this.tokens = {
+          ...this.tokens,
+          ...tokens
+        };
+      }
+    });
   }
 
   async getActions(page = 1) {
@@ -202,7 +228,7 @@ class Store {
       permission: key.permission
     }).then(async tx => {
       await this.getTokens();
-      this.getActions();
+      await this.getActions();
       // log transfer
       TransferLogService.addTransferLog({ ...params, accountId: id });
 
@@ -223,8 +249,8 @@ class Store {
       permission: key.permission
     }).then(async tx => {
       await this.getInfo();
-      this.getTokens();
-      this.getActions();
+      await this.getTokens();
+      await this.getActions();
 
       return tx;
     });

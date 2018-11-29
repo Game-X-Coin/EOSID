@@ -20,6 +20,7 @@ import { Theme, DarkTheme } from '../../../constants';
 import { PageIndicator } from '../../../components/Indicator';
 import { BackgroundView, ScrollView } from '../../../components/View';
 import { ArrowIcon } from '../../../components/SVG';
+import TokenLogo from '../../../constants/TokenLogo';
 
 const WINDOW_HEIGHT = Dimensions.get('window').height;
 const STATUS_BAR_HEIGHT = Platform.OS === 'ios' ? 0 : StatusBar.currentHeight;
@@ -487,10 +488,27 @@ export class AccountInfo extends Component {
                               alignItems: 'center'
                             }}
                           >
-                            <Image
-                              style={{ marginRight: 15, width: 40, height: 40 }}
-                              source={require('../../../assets/logos/eos.png')}
-                            />
+                            {TokenLogo[tokens[symbol].code] &&
+                            TokenLogo[tokens[symbol].code][symbol] ? (
+                              <Image
+                                style={{
+                                  marginRight: 15,
+                                  width: 40,
+                                  height: 40,
+                                  borderRadius: 20
+                                }}
+                                source={TokenLogo[tokens[symbol].code][symbol]}
+                              />
+                            ) : (
+                              <Image
+                                style={{
+                                  marginRight: 15,
+                                  width: 40,
+                                  height: 40
+                                }}
+                                source={require('../../../assets/images/token_logo/eos.png')}
+                              />
+                            )}
                             <Title
                               style={{
                                 flex: 1,
@@ -500,7 +518,9 @@ export class AccountInfo extends Component {
                             >
                               {symbol}
                             </Title>
-                            <Title style={Theme.h5}>{tokens[symbol]}</Title>
+                            <Title style={Theme.h5}>
+                              {tokens[symbol].amount}
+                            </Title>
                           </View>
                         </TouchableRipple>
                       ))}

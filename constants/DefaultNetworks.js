@@ -1,4 +1,5 @@
 import { NetworkModel } from '../db';
+import Chains from '../constants/Chains';
 
 const JUNGLE = new NetworkModel({
   id: 'jungle',
@@ -9,4 +10,4 @@ const JUNGLE = new NetworkModel({
 });
 
 export const DEFAULT_NETWORKS = [JUNGLE];
-export const DEFAULT_CHAIN = JUNGLE.chainId;
+export const DEFAULT_CHAIN = Chains[0].id;
