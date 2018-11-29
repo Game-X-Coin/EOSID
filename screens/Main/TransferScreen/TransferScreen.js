@@ -91,6 +91,7 @@ export class TransferLogs extends Component {
   }
 }
 
+@inject('accountStore')
 @observer
 export class TransferScreen extends Component {
   @observable
@@ -113,7 +114,14 @@ export class TransferScreen extends Component {
   }
 
   async checkReceiver(v) {
+    const { currentAccount } = this.props.accountStore;
     this.loading = true;
+
+    if (currentAccount.name === v) {
+      this.error = 'The receiver and sender can not be the same.';
+      this.loading = false;
+      return;
+    }
 
     const result = await api.accounts.get({ account_name: v });
 
