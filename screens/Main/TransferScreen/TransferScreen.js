@@ -127,6 +127,8 @@ export class TransferScreen extends Component {
 
     if (result.error) {
       this.error = 'The account you entered does not exist.';
+    } else {
+      this.error = '';
     }
 
     this.loading = false;
