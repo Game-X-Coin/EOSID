@@ -6,6 +6,7 @@ import { AndroidBackHandler } from 'react-navigation-backhandler';
 
 import { Theme, DarkTheme } from '../../../constants';
 import { BackgroundView } from '../../../components/View';
+import { MemoIcon, AccountIcon, WalletIcon } from '../../../components/SVG';
 
 @inject('accountStore')
 @observer
@@ -25,18 +26,30 @@ export class TransferResultScreen extends Component {
 
     const balance = symbol && accountStore.tokens[symbol];
 
-    const SubItem = ({ title, description }) => (
-      <View style={{ marginBottom: Theme.innerSpacing }}>
-        <Text
-          style={{
-            marginBottom: 7,
-            fontSize: 17,
-            color: Theme.palette.quaternary
-          }}
-        >
-          {title}
-        </Text>
-        <Text style={DarkTheme.h5}>{description}</Text>
+    const Item = ({ title, description, icon }) => (
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          marginBottom: 10,
+          padding: 20,
+          ...DarkTheme.surface
+        }}
+      >
+        {icon}
+
+        <View style={{ flex: 1 }}>
+          <Text
+            style={{
+              marginBottom: 2,
+              ...DarkTheme.p,
+              color: Theme.palette.info
+            }}
+          >
+            {title}
+          </Text>
+          <Text style={DarkTheme.p}>{description}</Text>
+        </View>
       </View>
     );
 
@@ -44,8 +57,8 @@ export class TransferResultScreen extends Component {
       <AndroidBackHandler onBackPress={this.onBackPress}>
         <BackgroundView dark>
           <Appbar.Header
-            style={{ backgroundColor: DarkTheme.header.backgroundColor }}
             dark
+            style={{ backgroundColor: DarkTheme.header.backgroundColor }}
           >
             <Appbar.Content title="Transfer Result" />
           </Appbar.Header>
@@ -61,11 +74,11 @@ export class TransferResultScreen extends Component {
               <Text
                 style={{
                   marginBottom: 7,
-                  fontSize: 20,
-                  color: Theme.palette.quaternary
+                  ...Theme.h5,
+                  color: Theme.palette.info
                 }}
               >
-                {receiver}
+                Transferred amount
               </Text>
 
               <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
@@ -74,8 +87,8 @@ export class TransferResultScreen extends Component {
                 </Text>
                 <Text
                   style={{
-                    lineHeight: 30,
-                    ...DarkTheme.h5
+                    lineHeight: DarkTheme.h1.fontSize,
+                    ...DarkTheme.h4
                   }}
                 >
                   {symbol}
@@ -83,24 +96,53 @@ export class TransferResultScreen extends Component {
               </View>
             </View>
 
+            <Item
+              title="Receiver"
+              description={receiver}
+              icon={
+                <AccountIcon
+                  scale={1.5}
+                  color={Theme.palette.inActive}
+                  style={{ marginRight: 15 }}
+                />
+              }
+            />
+
             {(memo || '') !== '' && (
-              <SubItem title="Memo" description={memo || ''} />
+              <Item
+                title="Memo"
+                description={memo || ''}
+                icon={
+                  <MemoIcon
+                    scale={1.5}
+                    color={Theme.palette.inActive}
+                    style={{ marginRight: 15 }}
+                  />
+                }
+              />
             )}
 
-            <SubItem
+            <Item
               title="Remaining Amount"
               description={`${balance} ${symbol}`}
+              icon={
+                <WalletIcon
+                  scale={1.5}
+                  color={Theme.palette.inActive}
+                  style={{ marginRight: 15 }}
+                />
+              }
             />
-          </View>
 
-          <Button
-            mode="contained"
-            color="#fff"
-            onPress={this.moveToActivity}
-            style={{ padding: 5, margin: Theme.innerSpacing }}
-          >
-            Close
-          </Button>
+            <Button
+              mode="contained"
+              color="#fff"
+              onPress={this.moveToActivity}
+              style={{ padding: 5, marginTop: 15 }}
+            >
+              Close
+            </Button>
+          </View>
         </BackgroundView>
       </AndroidBackHandler>
     );
