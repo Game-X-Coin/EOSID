@@ -109,7 +109,6 @@ export class TransferScreen extends Component {
 
   onChangeReceiver(v) {
     this.receiver = v;
-    this.error = '';
     this.checkReceiver(v);
   }
 
@@ -127,6 +126,8 @@ export class TransferScreen extends Component {
 
     if (result.error) {
       this.error = 'The account you entered does not exist.';
+    } else {
+      this.error = '';
     }
 
     this.loading = false;
