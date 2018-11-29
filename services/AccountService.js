@@ -24,7 +24,7 @@ export default class AccountService {
     );
 
     // invalid account
-    if (!account_names.length) {
+    if (!account_names || !account_names.length) {
       return Promise.reject(AccountError.AccountNotAvailable);
     }
 
