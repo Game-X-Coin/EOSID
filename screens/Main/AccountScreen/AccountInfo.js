@@ -129,6 +129,9 @@ export class AccountInfo extends Component {
     } = this.props.accountStore;
 
     const stakedBalance = parseFloat(cpu_weight) + parseFloat(net_weight);
+    const unstakedBalance = tokens.EOS
+      ? parseFloat(tokens.EOS.amount).toFixed(4)
+      : 0;
 
     const ActionItem = ({ icon, name, description, onPress }) => (
       <View
@@ -254,7 +257,7 @@ export class AccountInfo extends Component {
                           color: DarkTheme.text.color
                         }}
                       >
-                        {tokens.EOS}
+                        {unstakedBalance}
                       </Text>
                       <Text
                         style={{
@@ -423,7 +426,7 @@ export class AccountInfo extends Component {
                                 color: DarkTheme.text.color
                               }}
                             >
-                              {tokens.EOS}
+                              {unstakedBalance}
                             </Text>
                             <Text
                               style={{
