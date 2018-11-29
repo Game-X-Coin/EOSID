@@ -109,7 +109,6 @@ export class TransferScreen extends Component {
 
   onChangeReceiver(v) {
     this.receiver = v;
-    this.error = '';
     this.checkReceiver(v);
   }
 
