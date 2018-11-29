@@ -116,9 +116,7 @@ export class Pincode extends Component {
           style={{
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: invisible
-              ? 'transparent'
-              : DarkTheme.surface.backgroundColor,
+            backgroundColor: invisible ? 'transparent' : '#3a3a3a',
             width: KEY_SIZE,
             height: KEY_SIZE
           }}
