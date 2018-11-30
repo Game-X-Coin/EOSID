@@ -380,10 +380,12 @@ class EosApi {
         }),
       getsLastest: ({ account_name }) =>
         EosApi.actions.gets({ pos: -1, offset: -1, account_name }),
-      gets: ({ lastestSeq, pos, page = 1, offset = 9, account_name }) => {
+      gets: ({ lastestSeq, pos, page = 1, offset = 10, account_name }) => {
         if (!pos) {
           pos = lastestSeq - page * offset;
+          offset = offset - 1;
         }
+
         return EosApi.HistoryAPI().post('/v1/history/get_actions', {
           pos,
           offset: offset - 1,

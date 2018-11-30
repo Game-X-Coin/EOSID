@@ -96,7 +96,7 @@ export class AccountInfo extends Component {
 
     Animated.timing(this.drawerFrame, {
       toValue: 1,
-      duration: 150
+      duration: 200
     }).start();
   }
 
@@ -105,7 +105,7 @@ export class AccountInfo extends Component {
 
     Animated.timing(this.drawerFrame, {
       toValue: 0,
-      duration: 150
+      duration: 200
     }).start();
   }
 
@@ -193,15 +193,7 @@ export class AccountInfo extends Component {
                   opacity: this.drawerFrame.interpolate({
                     inputRange: [0, 1],
                     outputRange: [1, 0]
-                  }),
-                  transform: [
-                    {
-                      translateY: this.drawerFrame.interpolate({
-                        inputRange: [0, 1],
-                        outputRange: [0, 50]
-                      })
-                    }
-                  ]
+                  })
                 }}
               >
                 <View
@@ -322,29 +314,30 @@ export class AccountInfo extends Component {
               <Animated.View
                 style={{
                   position: 'absolute',
-                  bottom: 0,
                   left: 0,
                   right: 0,
-                  top: this.drawerFrame.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [
-                      this.innerHeight - SWIPABLE_HEIGHT,
-                      STATUS_BAR_HEIGHT
-                    ]
-                  }),
+                  bottom: 0,
+                  top: 0,
                   zIndex: 9999,
                   marginHorizontal: this.drawerFrame.interpolate({
                     inputRange: [0, 1],
                     outputRange: [Theme.innerSpacing, 0]
                   }),
-                  borderTopLeftRadius: this.drawerFrame.interpolate({
+                  borderRadius: this.drawerFrame.interpolate({
                     inputRange: [0, 1],
                     outputRange: [10, 0]
                   }),
-                  borderTopRightRadius: this.drawerFrame.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [10, 0]
-                  }),
+                  transform: [
+                    {
+                      translateY: this.drawerFrame.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [
+                          this.innerHeight - SWIPABLE_HEIGHT,
+                          STATUS_BAR_HEIGHT
+                        ]
+                      })
+                    }
+                  ],
                   overflow: 'hidden'
                 }}
               >

@@ -47,9 +47,9 @@ export class EmptyState extends Component {
             marginBottom: 35,
             paddingHorizontal: 30,
             textAlign: 'center',
-            ...descriptionStyle,
-            ...(dark ? DarkTheme.text : Theme.text),
-            color: Theme.palette.gray
+            fontSize: Theme.text.fontSize,
+            color: dark && Theme.palette.gray,
+            ...descriptionStyle
           }}
         >
           {description}

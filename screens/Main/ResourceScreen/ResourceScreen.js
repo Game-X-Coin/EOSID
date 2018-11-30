@@ -24,7 +24,7 @@ export class ResourceScreen extends Component {
     const { refund_request } = info;
 
     const requestTime = refund_request && refund_request.request_time;
-    const refundTime = moment(requestTime).add(3, 'day');
+    const refundTime = moment(new Date(requestTime)).add(3, 'day');
     const refundAmount =
       refund_request &&
       parseFloat(refund_request.cpu_amount) +
