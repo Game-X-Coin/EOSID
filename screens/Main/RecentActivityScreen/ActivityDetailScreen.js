@@ -92,7 +92,7 @@ export class ActivityDetailScreen extends Component {
 
               <View>
                 <Text style={{ fontSize: 13, color: Theme.palette.darkGray }}>
-                  {moment(block_time).format('lll')}
+                  {moment(new Date(block_time)).format('lll')}
                 </Text>
               </View>
             </View>

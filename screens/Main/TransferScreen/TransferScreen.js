@@ -78,7 +78,9 @@ export class TransferLogs extends Component {
             >
               <View style={{ flex: 1 }}>
                 <Text>{log.receiver}</Text>
-                <Caption>{moment(log.createdAt).format('YYYY/MM/DD')}</Caption>
+                <Caption>
+                  {moment(new Date(log.createdAt)).format('YYYY/MM/DD')}
+                </Caption>
               </View>
               <Text style={{ fontSize: 15 }}>
                 {log.amount} {log.symbol}

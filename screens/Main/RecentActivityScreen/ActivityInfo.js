@@ -148,81 +148,87 @@ export class ActivityInfo extends Component {
         onRefresh={this.onRefresh}
         onEndReached={this.onEndReached}
         ListFooterComponent={this.renderFooter}
-        renderItem={({ item: key }) => (
-          <View style={{ backgroundColor: '#fff' }}>
-            <View style={{ height: 20, backgroundColor: Theme.palette.gray }} />
+        renderItem={({ item: key }) => {
+          const list = groupedActions[key];
 
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'flex-end',
-                marginTop: 15,
-                marginHorizontal: 20,
-                paddingVertical: 10,
-                borderBottomWidth: 1,
-                borderColor: Colors.grey200
-              }}
-            >
-              <Text style={{ flex: 1, ...Theme.h5 }}>
-                {moment(key).fromNow()}
-              </Text>
-              <Text style={{ color: Theme.palette.darkGray, ...Theme.text }}>
-                {moment(key).format('ll')}
-              </Text>
-            </View>
+          return (
+            <View style={{ backgroundColor: '#fff' }}>
+              <View
+                style={{ height: 20, backgroundColor: Theme.palette.gray }}
+              />
 
-            <View>
-              {groupedActions[key].map(
-                ({ account_action_seq, action_trace, block_time }) => (
-                  <TouchableRipple
-                    key={account_action_seq}
-                    style={{
-                      padding: 17,
-                      borderBottomWidth: 1,
-                      borderBottomColor: Theme.palette.gray
-                    }}
-                    onPress={() =>
-                      this.props.navigation.navigate('ActivityDetail', {
-                        actionSeq: account_action_seq
-                      })
-                    }
-                  >
-                    <View
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'flex-end',
+                  marginTop: 15,
+                  marginHorizontal: 20,
+                  paddingVertical: 10,
+                  borderBottomWidth: 1,
+                  borderColor: Colors.grey200
+                }}
+              >
+                <Text style={{ flex: 1, ...Theme.h5 }}>
+                  {list.length} {list.length === 1 ? 'activity' : 'activities'}
+                </Text>
+                <Text style={{ color: Theme.palette.darkGray, ...Theme.text }}>
+                  {moment(key).format('YYYY/MM/DD')}
+                </Text>
+              </View>
+
+              <View>
+                {list.map(
+                  ({ account_action_seq, action_trace, block_time }) => (
+                    <TouchableRipple
+                      key={account_action_seq}
                       style={{
-                        flexDirection: 'row',
-                        alignItems: 'center'
+                        padding: 17,
+                        borderBottomWidth: 1,
+                        borderBottomColor: Theme.palette.gray
                       }}
+                      onPress={() =>
+                        this.props.navigation.navigate('ActivityDetail', {
+                          actionSeq: account_action_seq
+                        })
+                      }
                     >
-                      <View style={{ flex: 1 }}>
-                        <Text
-                          style={{
-                            marginBottom: 5,
-                            fontSize: 18,
-                            lineHeight: 18
-                          }}
-                        >
-                          {action_trace.act.name}
-                        </Text>
-                        <Text style={{ fontSize: 13 }}>
-                          by {action_trace.act.account}
-                        </Text>
-                      </View>
-                      <Text
+                      <View
                         style={{
-                          paddingLeft: 15,
-                          fontSize: 13,
-                          color: Theme.palette.darkGray
+                          flexDirection: 'row',
+                          alignItems: 'center'
                         }}
                       >
-                        {moment(block_time).format('A hh:mm')}
-                      </Text>
-                    </View>
-                  </TouchableRipple>
-                )
-              )}
+                        <View style={{ flex: 1 }}>
+                          <Text
+                            style={{
+                              marginBottom: 5,
+                              fontSize: 18,
+                              lineHeight: 18
+                            }}
+                          >
+                            {action_trace.act.name}
+                          </Text>
+                          <Text style={{ fontSize: 13 }}>
+                            by {action_trace.act.account}
+                          </Text>
+                        </View>
+                        <Text
+                          style={{
+                            paddingLeft: 15,
+                            fontSize: 13,
+                            color: Theme.palette.darkGray
+                          }}
+                        >
+                          {moment(block_time).format('HH:mm')}
+                        </Text>
+                      </View>
+                    </TouchableRipple>
+                  )
+                )}
+              </View>
             </View>
-          </View>
-        )}
+          );
+        }}
       />
     );
   }
