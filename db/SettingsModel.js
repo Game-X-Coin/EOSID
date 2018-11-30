@@ -7,7 +7,7 @@ export class SettingsModel {
   @PrimaryGeneratedColumn('uuid')
   id = undefined;
 
-  @Column('varchar')
+  @Column('varchar', { nullable: true })
   accountId = '';
 
   @Column('varchar')

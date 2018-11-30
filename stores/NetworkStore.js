@@ -6,6 +6,7 @@ import { DEFAULT_CHAIN } from '../constants';
 import Chains from '../constants/Chains';
 
 import api from '../utils/eos/API';
+import SettingsStore from './SettingsStore';
 
 class Store {
   @observable
@@ -20,9 +21,6 @@ class Store {
   @observable
   currentNetwork = null;
 
-  @observable
-  currentChain = DEFAULT_CHAIN;
-
   @computed
   get allNetworks() {
     const keys = Object.keys(this.chains);
@@ -31,24 +29,31 @@ class Store {
 
   @action
   getNetwork(chainId) {
-    if (
-      chainId &&
-      this.currentNetwork &&
-      (!this.currentNetwork.nodes || this.currentNetwork.chainId !== chainId)
-    ) {
+    const { currentChainId } = SettingsStore.settings;
+    if (chainId && currentChainId && currentChainId !== chainId) {
       const chain = this.chains[chainId];
       this.currentNetwork = chain.nodes ? chain.nodes[0] : null;
     } else {
       this.currentNetwork =
-        (this.chains[chainId || this.currentChain || 0].nodes || [])[0] || null;
+        (this.chains[chainId || currentChainId || DEFAULT_CHAIN].nodes ||
+          [])[0] || null;
     }
 
     return this.currentNetwork;
   }
 
   @action
-  setCurrentNetwork(account) {
-    api.currentNetwork = this.getNetwork(account && account.chainId);
+  setCurrentNetwork(account, chainId, networkId) {
+    let network = null;
+    if (chainId && typeof networkId !== 'undefined') {
+      network = (this.chains[chainId].nodes || []).find(
+        node => node.id === networkId
+      );
+    } else {
+      network = this.getNetwork(account && account.chainId);
+    }
+    api.currentNetwork = network;
+    this.currentNetwork = network;
   }
 
   @action

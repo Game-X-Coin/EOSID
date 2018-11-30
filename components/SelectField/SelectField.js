@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Keyboard, ScrollView } from 'react-native';
+import { View, Keyboard, ScrollView, Platform } from 'react-native';
 import { Text, TouchableRipple, Portal, Dialog } from 'react-native-paper';
 import { Icon } from 'expo';
 import { AndroidBackHandler } from 'react-navigation-backhandler';
@@ -211,7 +211,7 @@ export class SelectField extends Component {
                         alignItems: 'center',
                         justifyContent: 'center',
                         paddingHorizontal: 15,
-                        height: 48,
+                        height: Platform.OS === 'ios' ? 40.3 : 48,
                         ...style
                       }}
                       {...props}
