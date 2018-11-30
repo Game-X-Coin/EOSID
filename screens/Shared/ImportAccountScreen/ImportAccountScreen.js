@@ -188,6 +188,7 @@ export class ImportAccountScreen extends Component {
       navigation,
       values,
       errors,
+      touched,
       setFieldValue,
       setFieldTouched,
       isValid
@@ -240,14 +241,14 @@ export class ImportAccountScreen extends Component {
         />
 
         <KeyboardAvoidingView>
-          <ScrollView style={{ paddingHorizontal: 20, paddingBottom: 60 }}>
+          <ScrollView style={{ margin: Theme.innerSpacing, paddingBottom: 60 }}>
             <TextField
               autoFocus
               multiline
               label="Private key"
               info="Private key of account to import"
               value={values.privateKey}
-              error={errors.privateKey}
+              error={touched.privateKey && errors.privateKey}
               onChangeText={_ => {
                 setFieldTouched('privateKey', true);
                 setFieldValue('privateKey', _);
@@ -259,7 +260,7 @@ export class ImportAccountScreen extends Component {
               info="Chain of account to import"
               data={chains}
               value={values.chainId}
-              error={errors.chainId}
+              error={touched.chainId && errors.chainId}
               onChange={_ => {
                 setFieldTouched('chainId', true);
                 setFieldValue('chainId', _);

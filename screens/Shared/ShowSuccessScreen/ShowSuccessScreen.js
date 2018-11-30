@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { View } from 'react-native';
-import { Text, Appbar } from 'react-native-paper';
+import { Appbar } from 'react-native-paper';
 
 import { EmptyState } from '../../../components/EmptyState';
 import { Theme } from '../../../constants';
@@ -14,6 +14,7 @@ export class ShowSuccessScreen extends Component {
     return (
       <View style={{ flex: 1 }}>
         <Appbar.Header
+          dark
           style={{
             justifyContent: 'flex-end',
             backgroundColor: Theme.header.backgroundColor
@@ -23,10 +24,10 @@ export class ShowSuccessScreen extends Component {
         </Appbar.Header>
 
         <EmptyState
+          dark
           image={require('../../../assets/images/success.png')}
           title={title}
           description={description}
-          descriptionStyle={{ marginBottom: 20 }}
         />
       </View>
     );

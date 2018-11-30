@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { View, Image } from 'react-native';
 import { Appbar, Text } from 'react-native-paper';
-import moment from 'moment';
+import moment from '../../../utils/moment';
 
 import { BackgroundView } from '../../../components/View';
 
@@ -75,6 +75,7 @@ export class ResourceScreen extends Component {
                 style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}
               >
                 <Image
+                  resizeMode="contain"
                   style={{ width: 20, height: 20, marginRight: 10 }}
                   source={require('../../../assets/icons/refund.png')}
                 />

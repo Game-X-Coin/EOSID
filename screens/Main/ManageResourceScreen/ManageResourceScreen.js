@@ -17,6 +17,7 @@ const TopTabNavigator = createMaterialTopTabNavigator(
   },
   {
     swipeEnabled: false,
+    backBehavior: null,
     tabBarOptions: {
       activeTintColor: 'black',
       inactiveTintColor: 'black',

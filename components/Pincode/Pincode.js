@@ -101,7 +101,7 @@ export class Pincode extends Component {
 
     const isFailing = this.state.status === 'failure';
 
-    const KEY_SIZE = Dimensions.get('window').width / 5;
+    const KEY_SIZE = Dimensions.get('window').width / 5.5;
     const KEY_FONT_SIZE = KEY_SIZE * 0.35;
 
     const Key = ({ invisible, onPress, children }) => (
@@ -116,9 +116,7 @@ export class Pincode extends Component {
           style={{
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: invisible
-              ? 'transparent'
-              : DarkTheme.surface.backgroundColor,
+            backgroundColor: invisible ? 'transparent' : '#3a3a3a',
             width: KEY_SIZE,
             height: KEY_SIZE
           }}
@@ -184,41 +182,49 @@ export class Pincode extends Component {
       <BackgroundView dark>
         <View
           style={{
+            flex: 1,
             alignItems: 'center',
-            justifyContent: 'center',
-            marginVertical: 70
+            justifyContent: 'center'
           }}
         >
-          <Text
+          <View
             style={{
-              paddingHorizontal: 30,
-              marginBottom: 40,
-              fontSize: 18,
-              textAlign: 'center',
-              color: isFailing ? Colors.yellow500 : '#fff'
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginBottom: 70
             }}
           >
-            {isFailing ? 'Passwords do not match' : description}
-          </Text>
+            <Text
+              style={{
+                paddingHorizontal: 30,
+                marginBottom: 40,
+                fontSize: 18,
+                textAlign: 'center',
+                color: isFailing ? Colors.yellow500 : '#fff'
+              }}
+            >
+              {isFailing ? 'Passwords do not match' : description}
+            </Text>
 
-          <View style={{ flexDirection: 'row' }}>
-            {Array.from({ length: availableLength }, (v, k) => (
-              <View
-                key={k}
-                style={{
-                  marginLeft: k === 0 ? 0 : 25,
-                  width: 12,
-                  height: 12,
-                  borderRadius: 12,
-                  backgroundColor: '#fff',
-                  opacity: k < pincode.length ? 1 : 0.3
-                }}
-              />
-            ))}
+            <View style={{ flexDirection: 'row' }}>
+              {Array.from({ length: availableLength }, (v, k) => (
+                <View
+                  key={k}
+                  style={{
+                    marginLeft: k === 0 ? 0 : 25,
+                    width: 12,
+                    height: 12,
+                    borderRadius: 12,
+                    backgroundColor: '#fff',
+                    opacity: k < pincode.length ? 1 : 0.3
+                  }}
+                />
+              ))}
+            </View>
           </View>
-        </View>
 
-        <KeyPad />
+          <KeyPad />
+        </View>
       </BackgroundView>
     );
   }

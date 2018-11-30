@@ -3,7 +3,7 @@ import { observer, inject } from 'mobx-react';
 import { Linking } from 'react-native';
 import { createStackNavigator } from 'react-navigation';
 import { createMaterialBottomTabNavigator } from 'react-navigation-material-bottom-tabs';
-import { Icon, Linking as ExpoLinking } from 'expo';
+import { Linking as ExpoLinking } from 'expo';
 
 import {
   AccountScreen,
@@ -21,7 +21,8 @@ import {
   ActivityDetailScreen,
   ResourceScreen,
   SettingsAppPinScreen,
-  SettingsAccountPinScreen
+  SettingsAccountPinScreen,
+  AboutUsScreen
 } from '../../screens/Main';
 
 import {
@@ -35,6 +36,7 @@ import {
 } from '../../screens/Shared';
 
 import { Theme } from '../../constants';
+import { WalletIcon, ActivityIcon, SettingsIcon } from '../../components/SVG';
 
 // detail screens
 const DetailScreens = {
@@ -50,6 +52,7 @@ const DetailScreens = {
   SettingsNetwork: SettingsNetworkScreen,
   SettingsAppPin: SettingsAppPinScreen,
   SettingsAccountPin: SettingsAccountPinScreen,
+  SettingsAboutUs: AboutUsScreen,
   AddNetwork: AddNetworkScreen,
   Accounts: AccountsScreen,
   // activity
@@ -67,11 +70,16 @@ const DetailScreens = {
   ShowSuccess: ShowSuccessScreen
 };
 
-// for tab icons
 const iconMap = {
-  Account: 'md-contact',
-  Activity: 'md-filing',
-  Settings: 'md-settings'
+  Account: WalletIcon,
+  Activity: ActivityIcon,
+  Settings: SettingsIcon
+};
+
+const labelMap = {
+  Account: 'Wallet',
+  Activity: 'Activity',
+  Settings: 'Settings'
 };
 
 // tab navigator
@@ -82,20 +90,16 @@ const MainTabNavigator = createMaterialBottomTabNavigator(
     Settings: SettingsScreen
   },
   {
-    navigationOptions: ({ navigation }) => ({
+    navigationOptions: ({
+      navigation: {
+        state: { routeName }
+      }
+    }) => ({
+      title: labelMap[routeName],
       tabBarIcon: ({ tintColor }) => {
-        const { routeName } = navigation.state;
-
-        return (
-          <Icon.Ionicons
-            size={26}
-            name={iconMap[routeName]}
-            color={tintColor}
-          />
-        );
+        return iconMap[routeName]({ color: tintColor });
       }
     }),
-    shifting: true,
     activeColor: Theme.palette.active,
     inactiveColor: Theme.palette.inActive,
     barStyle: {

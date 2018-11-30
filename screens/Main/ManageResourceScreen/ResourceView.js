@@ -1,7 +1,8 @@
 import React, { Component, PureComponent } from 'react';
 import { observer, inject } from 'mobx-react';
-import { View, Animated, Image } from 'react-native';
+import { View, Image } from 'react-native';
 import { Text, TouchableRipple } from 'react-native-paper';
+import { Svg } from 'expo';
 import bytes from 'bytes';
 
 import { Theme } from '../../../constants';
@@ -29,27 +30,16 @@ const prettySec = microSec => {
 };
 
 class Resource extends PureComponent {
-  state = {
-    frame: new Animated.Value(0)
-  };
-
-  componentDidUpdate() {
-    Animated.timing(this.state.frame, {
-      toValue: this.props.percent,
-      duration: 1000
-    }).start();
-  }
-
-  componentDidMount() {
-    Animated.timing(this.state.frame, {
-      toValue: this.props.percent,
-      duration: 1000
-    }).start();
-  }
-
   render() {
-    const { name, icon, description, percent, color, onPress } = this.props;
-    const { frame } = this.state;
+    const {
+      name,
+      icon,
+      weight,
+      value,
+      percent,
+      gradient,
+      onPress
+    } = this.props;
 
     return (
       <TouchableRipple
@@ -64,7 +54,8 @@ class Resource extends PureComponent {
             <View
               style={{
                 flex: 1,
-                flexDirection: 'row'
+                flexDirection: 'row',
+                marginTop: 5
               }}
             >
               <Image
@@ -74,37 +65,57 @@ class Resource extends PureComponent {
               <Text>{name}</Text>
             </View>
 
-            <Text style={{ marginBottom: 5, ...Theme.h4 }}>{description}</Text>
-            <Text style={{ ...Theme.p, color: Theme.palette.darkGray }}>
-              {percent}% left
-            </Text>
+            <Text style={{ marginBottom: 5, ...Theme.h4 }}>{value}</Text>
+            {weight && (
+              <Text style={{ ...Theme.p, color: Theme.palette.darkGray }}>
+                {weight.toFixed(4)} EOS
+              </Text>
+            )}
           </View>
 
-          <View
-            style={{
-              position: 'relative',
-              width: 100,
-              height: 100,
-              borderRadius: 99999,
-              borderWidth: 1,
-              borderColor: Theme.palette.gray,
-              overflow: 'hidden'
-            }}
-          >
-            <Animated.View
-              style={{
-                position: 'absolute',
-                left: 0,
-                right: 0,
-                bottom: 0,
-                height: frame.interpolate({
-                  inputRange: [0, 100],
-                  outputRange: ['0%', '100%']
-                }),
-                backgroundColor: color
-              }}
+          <Svg width="100" height="100" viewBox="0 0 36 36">
+            <Svg.Defs>
+              <Svg.LinearGradient
+                id="gradient"
+                x1="0%"
+                y1="0%"
+                x2="0%"
+                y2="100%"
+              >
+                <Svg.Stop offset="0%" stopColor={gradient[0]} />
+                <Svg.Stop offset="100%" stopColor={gradient[1]} />
+              </Svg.LinearGradient>
+            </Svg.Defs>
+
+            <Svg.Path
+              fill="none"
+              stroke={Theme.palette.gray}
+              strokeWidth="3"
+              d="M18 2.0845
+                a 15.9155 15.9155 0 0 1 0 31.831
+                a 15.9155 15.9155 0 0 1 0 -31.831"
             />
-          </View>
+            <Svg.Path
+              stroke="url(#gradient)"
+              fill="none"
+              strokeWidth="3"
+              strokeLinecap="round"
+              strokeDasharray={`${percent}, 100`}
+              d="M18 2.0845
+                a 15.9155 15.9155 0 0 1 0 31.831
+                a 15.9155 15.9155 0 0 1 0 -31.831"
+            />
+            <Svg.Text
+              x="19"
+              y="19"
+              fill="#666"
+              fontSize="7"
+              alignmentBaseline="middle"
+              textAnchor="middle"
+            >
+              {`${percent.toFixed(0)}%`}
+            </Svg.Text>
+          </Svg>
         </View>
       </TouchableRipple>
     );
@@ -125,21 +136,25 @@ export class ResourceView extends Component {
       cpu_limit: { max: maxCpu = 0, used: usedCpu = 0 } = {},
       net_limit: { max: maxNet = 0, used: usedNet = 0 } = {},
       ram_quota: maxRam = 0,
-      ram_usage: usedRam = 0
+      ram_usage: usedRam = 0,
+      total_resources: { cpu_weight = 0, net_weight = 0 } = {}
     } = info;
 
-    const percentCpu = (((maxCpu - usedCpu) / maxCpu) * 100).toFixed(0);
-    const percentNet = (((maxNet - usedNet) / maxNet) * 100).toFixed(0);
-    const percentRam = (((maxRam - usedRam) / maxRam) * 100).toFixed(0);
+    const percentCpu = ((maxCpu - usedCpu) / maxCpu) * 100;
+    const percentNet = ((maxNet - usedNet) / maxNet) * 100;
+    const percentRam = ((maxRam - usedRam) / maxRam) * 100;
+    const weightCpu = parseFloat(cpu_weight);
+    const weightNet = parseFloat(net_weight);
 
     const resourceTypes = {
       CPU: (
         <Resource
           name="CPU"
           icon={require('../../../assets/icons/cpu.png')}
-          description={`${prettySec(usedCpu)} / ${prettySec(maxCpu)}`}
+          value={`${prettySec(usedCpu)} / ${prettySec(maxCpu)}`}
           percent={percentCpu}
-          color={Theme.palette.secondary}
+          weight={weightCpu}
+          gradient={[Theme.palette.secondary, '#ffa2a6']}
           onPress={onPress}
         />
       ),
@@ -147,9 +162,10 @@ export class ResourceView extends Component {
         <Resource
           name="Network"
           icon={require('../../../assets/icons/network.png')}
-          description={`${prettyBytes(usedNet)} / ${prettyBytes(maxNet)}`}
+          value={`${prettyBytes(usedNet)} / ${prettyBytes(maxNet)}`}
           percent={percentNet}
-          color={Theme.palette.tertiary}
+          weight={weightNet}
+          gradient={[Theme.palette.tertiary, '#93efdd']}
           onPress={onPress}
         />
       ),
@@ -157,9 +173,9 @@ export class ResourceView extends Component {
         <Resource
           name="RAM"
           icon={require('../../../assets/icons/ram.png')}
-          description={`${prettyBytes(usedRam)} / ${prettyBytes(usedRam)}`}
+          value={`${prettyBytes(usedRam)} / ${prettyBytes(maxRam)}`}
           percent={percentRam}
-          color={Theme.palette.quaternary}
+          gradient={[Theme.palette.quaternary, '#fbd035']}
         />
       )
     };

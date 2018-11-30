@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Svg } from 'expo';
 
-export default class Logo extends Component {
+export class Logo extends Component {
   render() {
     const { width = 1, height = 1 } = this.props;
     return (

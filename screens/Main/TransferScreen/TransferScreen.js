@@ -10,7 +10,7 @@ import {
   Caption,
   TouchableRipple
 } from 'react-native-paper';
-import moment from 'moment';
+import moment from '../../../utils/moment';
 
 import api from '../../../utils/eos/API';
 import { TransferLogService } from '../../../services';
@@ -160,8 +160,7 @@ export class TransferScreen extends Component {
           <ScrollView>
             <View
               style={{
-                marginHorizontal: Theme.innerSpacing,
-                marginBottom: Theme.innerSpacing
+                margin: Theme.innerSpacing
               }}
             >
               <TextField
@@ -184,7 +183,7 @@ export class TransferScreen extends Component {
                   marginBottom: 20,
                   padding: 5
                 }}
-                disabled={!receiver.length || loading || !!error}
+                disabled={!receiver.length || loading || Boolean(error)}
                 onPress={() => this.handleSubmit()}
               >
                 Next
