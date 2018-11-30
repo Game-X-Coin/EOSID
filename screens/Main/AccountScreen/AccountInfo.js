@@ -356,6 +356,7 @@ export class AccountInfo extends Component {
                                   height: 40,
                                   borderRadius: 20
                                 }}
+                                resizeMode="contain"
                                 source={TokenLogo[tokens[symbol].code][symbol]}
                               />
                             ) : (
