@@ -48,28 +48,35 @@ class Store {
 
   @computed
   get currentAccount() {
-    const { accountId } = SettingsStore.settings;
-
-    let account = this.accounts.find(account => account.id === accountId);
-    if (!account && this.accounts.length) {
-      account = this.accounts[0];
+    const { accountId, chainId } = SettingsStore.settings;
+    let accounts = this.accounts.filter(account => account.chainId === chainId);
+    let account = accounts.find(account => account.id === accountId);
+    if (!account && accounts.length) {
+      account = accounts[0];
     }
     return account;
   }
 
   @action
-  async changeCurrentAccount(accountId, chainId) {
+  async changeCurrentAccount(accountId, chainId, networkId) {
     if (!chainId) {
-      chainId = NetworkStore.currentChain;
+      chainId = SettingsStore.settings.chainId;
     }
-    if (!accountId) {
-      accountId = this.accounts[0].id;
+    if (!accountId && this.accounts) {
+      accountId = (
+        this.accounts.find(account => account.chainId === chainId) || {}
+      ).id;
     }
-    if (accountId !== (this.currentAccount && this.currentAccount.accountId)) {
+
+    if (
+      !accountId ||
+      accountId !== (this.currentAccount && this.currentAccount.accountId)
+    ) {
       // update settings
       await SettingsStore.updateSettings({ accountId, chainId });
+
       // set current network
-      NetworkStore.setCurrentNetwork(this.currentAccount);
+      NetworkStore.setCurrentNetwork(this.currentAccount, chainId, networkId);
       // fetch account info
       await this.getAccountInfo();
     }
@@ -99,7 +106,7 @@ class Store {
       // remove duplicate entity
       const accounts = this.accounts.filter(
         entity =>
-          entity.name !== account.name && entity.chainId !== account.chainId
+          entity.name !== account.name || entity.chainId !== account.chainId
       );
       accounts.push(account);
 
@@ -163,7 +170,7 @@ class Store {
 
   async getTokens() {
     const account = this.currentAccount;
-    const chain = NetworkStore.currentChain;
+    const { chainId } = SettingsStore.settings;
 
     if (!Object.keys(this.tokens).length) {
       this.tokens = {
@@ -171,7 +178,7 @@ class Store {
       };
     }
 
-    TokenContracts[chain].forEach(async contract => {
+    TokenContracts[chainId].forEach(async contract => {
       const balances = await api.currency.balance({
         code: contract,
         account: account.name

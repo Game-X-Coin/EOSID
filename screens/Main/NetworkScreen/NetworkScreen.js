@@ -12,12 +12,12 @@ export class NetworkScreen extends Component {
   moveScreen = routeName => this.props.navigation.navigate(routeName);
 
   changeNetwork = async (chainId, networkId) => {
-    const { accountStore, networkStore } = this.props;
-    networkStore.changeNetwork(chainId, networkId);
+    const { accountStore } = this.props;
     const accounts = await accountStore.getAccounts(chainId);
     await accountStore.changeCurrentAccount(
       accounts && accounts.length ? accounts[0] : null,
-      chainId
+      chainId,
+      networkId
     );
   };
 
