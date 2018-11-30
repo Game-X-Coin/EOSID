@@ -152,11 +152,7 @@ class Store {
       return;
     }
 
-    await Promise.all([
-      this.getInfo(),
-      await this.getTokens(),
-      await this.getActions()
-    ]);
+    await Promise.all([this.getInfo(), this.getTokens(), this.getActions()]);
 
     this.fetched = true;
   }
@@ -238,7 +234,7 @@ class Store {
       permission: key.permission
     }).then(async tx => {
       await this.getTokens();
-      await this.getActions();
+      this.getActions();
       // log transfer
       TransferLogService.addTransferLog({ ...params, accountId: id });
 
@@ -260,7 +256,7 @@ class Store {
     }).then(async tx => {
       await this.getInfo();
       await this.getTokens();
-      await this.getActions();
+      this.getActions();
 
       return tx;
     });
