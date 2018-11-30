@@ -386,7 +386,7 @@ class EosApi {
         }
         return EosApi.HistoryAPI().post('/v1/history/get_actions', {
           pos,
-          offset,
+          offset: offset - 1,
           account_name
         });
       }
