@@ -36,7 +36,7 @@ export class ResourceScreen extends Component {
           style={{ backgroundColor: Theme.header.backgroundColor }}
         >
           <Appbar.BackAction onPress={() => navigation.goBack(null)} />
-          <Appbar.Content title="Resource" />
+          <Appbar.Content title="Resources" />
         </Appbar.Header>
 
         {!fetched ? (

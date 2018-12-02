@@ -78,7 +78,7 @@ const iconMap = {
 
 const labelMap = {
   Account: 'Wallet',
-  Activity: 'Activity',
+  Activity: 'Activities',
   Settings: 'Settings'
 };
 
