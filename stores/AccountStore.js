@@ -205,11 +205,15 @@ class Store {
       ? lastestActions[0].account_action_seq
       : 0;
 
-    const { actions = [] } = await api.actions.gets({
+    let { actions = [] } = await api.actions.gets({
       account_name: account.name,
       lastestSeq,
       page
     });
+
+    actions = actions.filter(
+      action => action.action_trace.receipt.receiver === account.name
+    );
 
     // when refresh actions
     if (page === 1) {
