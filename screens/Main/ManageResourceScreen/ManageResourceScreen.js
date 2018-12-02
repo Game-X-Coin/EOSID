@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { View } from 'react-native';
 import { createMaterialTopTabNavigator } from 'react-navigation';
 import { Appbar } from 'react-native-paper';
 
@@ -8,7 +7,7 @@ import { UnstakeResource } from './UnstakeResource';
 
 import { Theme } from '../../../constants';
 import { ResourceView } from './ResourceView';
-import { BackgroundView } from '../../../components/View';
+import { BackgroundView, KeyboardAvoidingView } from '../../../components/View';
 
 const TopTabNavigator = createMaterialTopTabNavigator(
   {
@@ -49,8 +48,10 @@ class ManageResourceScreen extends Component {
           <Appbar.Content title={`Manage ${resourceName}`} />
         </Appbar.Header>
 
-        <ResourceView type={resourceName} />
-        <TopTabNavigator navigation={navigation} />
+        <KeyboardAvoidingView>
+          <ResourceView type={resourceName} />
+          <TopTabNavigator navigation={navigation} />
+        </KeyboardAvoidingView>
       </BackgroundView>
     );
   }

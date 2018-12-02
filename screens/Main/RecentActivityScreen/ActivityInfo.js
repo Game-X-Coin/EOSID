@@ -119,7 +119,12 @@ export class ActivityInfo extends Component {
      *    ],
      *  };
      */
-    const groupedActions = actions.reduce((pv, action) => {
+    const groupedActions = actions.reduce((pv, { block_time, ...rest }) => {
+      const action = {
+        ...rest,
+        block_time: new Date(block_time)
+      };
+
       const time = moment(action.block_time).format('YYYY-MM-DD');
 
       return { ...pv, [time]: pv[time] ? [...pv[time], action] : [action] };
@@ -219,7 +224,7 @@ export class ActivityInfo extends Component {
                             color: Theme.palette.darkGray
                           }}
                         >
-                          {moment(block_time).format('HH:mm')}
+                          {moment(block_time).format('h:mm A')}
                         </Text>
                       </View>
                     </TouchableRipple>

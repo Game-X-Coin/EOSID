@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import { View } from 'react-native';
-import { Icon } from 'expo';
-import { Appbar, Text, TouchableRipple } from 'react-native-paper';
+import { Appbar, Text, TouchableRipple, Title } from 'react-native-paper';
+import { Icon, WebBrowser } from 'expo';
 
 import { ScrollView, BackgroundView } from '../../../components/View';
 
 import { Theme } from '../../../constants';
+import { Logo } from '../../../components/SVG';
 
 const Item = ({ title, onPress }) => (
   <TouchableRipple
@@ -26,7 +27,7 @@ const Item = ({ title, onPress }) => (
 );
 
 export class AboutUsScreen extends Component {
-  moveScreen = routeName => this.props.navigation.navigate(routeName);
+  openBrowser = link => WebBrowser.openBrowserAsync(link);
 
   render() {
     const { navigation } = this.props;
@@ -41,9 +42,41 @@ export class AboutUsScreen extends Component {
         </Appbar.Header>
 
         <ScrollView>
-          <Item title="Homepage" onPress={this.changeAppPincode} />
-          <Item title="Telegram" onPress={this.changeAppPincode} />
-          <Item title="Github" onPress={this.changeAppPincode} />
+          <View
+            style={{
+              justifyContent: 'center',
+              alignItems: 'center',
+              paddingVertical: 50
+            }}
+          >
+            <Logo scale="3" />
+
+            <Title style={{ marginTop: 15, ...Theme.h4 }}>GameXCoin</Title>
+            <Text style={{ color: Theme.palette.darkGray, ...Theme.text }}>
+              The Universal Game Currency
+            </Text>
+          </View>
+
+          <View
+            style={{
+              borderTopWidth: 1,
+              borderBottomWidth: 1,
+              borderColor: Theme.palette.gray
+            }}
+          >
+            <Item
+              title="Homepage"
+              onPress={() => this.openBrowser('https://gamexcoin.io')}
+            />
+            <Item
+              title="Telegram"
+              onPress={() => this.openBrowser('https://t.me/GXC_EN')}
+            />
+            <Item
+              title="Github"
+              onPress={() => this.openBrowser('https://github.com/game-x-coin')}
+            />
+          </View>
         </ScrollView>
       </BackgroundView>
     );

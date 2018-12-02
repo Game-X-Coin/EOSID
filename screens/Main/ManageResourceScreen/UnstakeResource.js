@@ -117,45 +117,45 @@ export class UnstakeResource extends Component {
           title="Preparing to unstake resource..."
         />
 
-        <KeyboardAvoidingView>
-          <ScrollView style={{ margin: Theme.innerSpacing }}>
-            <ResourceTextField
-              label="Unstakable Amount"
-              info={`${values.unstakableAmount.toFixed(4)} EOS available`}
-              value={values.amount}
-              error={touched.amount && errors.amount}
-              onChangeText={_ => {
-                setFieldTouched('amount', true);
-                setFieldValue('amount', _);
-              }}
-              onChangePercent={percent =>
-                setFieldValue(
-                  'amount',
-                  (values.unstakableAmount * percent).toFixed(4)
-                )
-              }
-            />
-            <Paragraph style={{ color: Theme.palette.primary }}>
-              All resources must have a minimum stake amount (0.1 EOS)
-            </Paragraph>
-            <Paragraph style={{ color: Theme.palette.primary }}>
-              All the refunding EOS will be returned 3 days after the last
-              unstake
-            </Paragraph>
-          </ScrollView>
-
-          <Button
-            mode="contained"
-            style={{
-              padding: 5,
-              borderRadius: 0
+        <ScrollView
+          keyboardShouldPersistTaps="never"
+          style={{ margin: Theme.innerSpacing }}
+        >
+          <ResourceTextField
+            label="Unstakable Amount"
+            info={`${values.unstakableAmount.toFixed(4)} EOS available`}
+            value={values.amount}
+            error={touched.amount && errors.amount}
+            onChangeText={_ => {
+              setFieldTouched('amount', true);
+              setFieldValue('amount', _);
             }}
-            disabled={!isValid}
-            onPress={handleSubmit}
-          >
-            Continue
-          </Button>
-        </KeyboardAvoidingView>
+            onChangePercent={percent =>
+              setFieldValue(
+                'amount',
+                (values.unstakableAmount * percent).toFixed(4)
+              )
+            }
+          />
+          <Paragraph style={{ color: Theme.palette.primary }}>
+            All resources must have a minimum stake amount (0.1 EOS)
+          </Paragraph>
+          <Paragraph style={{ color: Theme.palette.primary }}>
+            All the refunding EOS will be returned 3 days after the last unstake
+          </Paragraph>
+        </ScrollView>
+
+        <Button
+          mode="contained"
+          style={{
+            padding: 5,
+            borderRadius: 0
+          }}
+          disabled={!isValid}
+          onPress={handleSubmit}
+        >
+          Continue
+        </Button>
       </BackgroundView>
     );
   }

@@ -19,7 +19,7 @@ export class ActivityScreen extends Component {
         <Appbar.Header
           style={{ backgroundColor: Theme.header.backgroundColor }}
         >
-          <Appbar.Content title="Recent Activity" />
+          <Appbar.Content title="Recent Activities" />
         </Appbar.Header>
 
         {currentAccount ? (
