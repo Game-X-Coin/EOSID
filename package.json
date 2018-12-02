@@ -45,6 +45,7 @@
     "react-native": "https://github.com/expo/react-native/archive/sdk-31.0.0.tar.gz",
     "react-native-paper": "^2.2.4",
     "react-native-sqlite-storage": "^3.3.5",
+    "react-native-swiper": "^1.5.14",
     "react-navigation": "^2.18.2",
     "react-navigation-backhandler": "^1.2.0",
     "react-navigation-material-bottom-tabs": "^0.4.0",

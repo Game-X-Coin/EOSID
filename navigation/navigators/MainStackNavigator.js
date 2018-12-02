@@ -108,14 +108,13 @@ const MainTabNavigator = createMaterialBottomTabNavigator(
   }
 );
 
-@inject('accountStore')
+@inject('accountStore', 'settingsStore')
 @observer
 class MainTabNavigatorWrapper extends React.Component {
   constructor(params) {
     super(params);
 
     this.addLinkingListener();
-    this.state = { redirectData: null, initialLinkingUri: '' };
   }
 
   handleLinkingHandler = event => {
@@ -123,7 +122,6 @@ class MainTabNavigatorWrapper extends React.Component {
     if (data.path && data.path !== '') {
       this.props.navigation.navigate(data.path, data.queryParams);
     }
-    this.setState({ redirectData: data });
   };
 
   addLinkingListener = () => {
@@ -131,12 +129,27 @@ class MainTabNavigatorWrapper extends React.Component {
   };
 
   async componentWillMount() {
-    const initialLinkingUri = await Linking.getInitialURL();
-    const data = ExpoLinking.parse(initialLinkingUri);
-    if (data.path && data.path !== '') {
-      this.props.navigation.navigate(data.path, data.queryParams);
+    const { navigation, settingsStore } = this.props;
+
+    const findLinking = async () => {
+      const initialLinkingUri = await Linking.getInitialURL();
+      const data = ExpoLinking.parse(initialLinkingUri);
+
+      if (data.path && data.path !== '') {
+        navigation.navigate(data.path, data.queryParams);
+      }
+    };
+
+    if (settingsStore.settings.appPincodeEnabled) {
+      navigation.navigate('ConfirmAppPin', {
+        cantBack: true,
+        cb: async () => {
+          findLinking();
+        }
+      });
+    } else {
+      findLinking();
     }
-    this.setState({ initialLinkingUri });
   }
 
   componentWillUnmount() {
