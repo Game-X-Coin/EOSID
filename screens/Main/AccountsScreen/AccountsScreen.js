@@ -14,6 +14,7 @@ import { ScrollView, BackgroundView } from '../../../components/View';
 
 import { Theme } from '../../../constants';
 import Chains from '../../../constants/Chains';
+import { AccountEmptyState } from '../AccountScreen';
 
 @inject('accountStore', 'networkStore')
 @observer
@@ -50,9 +51,8 @@ export class AccountsScreen extends Component {
   };
 
   render() {
-    const { accountStore, networkStore, navigation } = this.props;
+    const { accountStore, navigation } = this.props;
     const { accounts, currentAccount } = accountStore;
-    const { allNetworks } = networkStore;
 
     return (
       <BackgroundView>
@@ -63,45 +63,51 @@ export class AccountsScreen extends Component {
           <Appbar.Content title="Accounts" />
         </Appbar.Header>
 
-        <ScrollView>
-          {accounts.map(({ id, name, chainId }) => (
-            <TouchableRipple
-              key={id}
-              style={{
-                paddingHorizontal: Theme.innerPadding,
-                paddingVertical: 15
-              }}
-              onPress={() => this.changeAccount(id, chainId)}
-              onLongPress={() => this.confirmRemoveAccount(id)}
-            >
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <View style={{ flex: 1 }}>
-                  <Text>{name}</Text>
-                  <Caption>
-                    {Chains.find(({ id }) => id === chainId).name}
-                  </Caption>
-                </View>
-                {currentAccount &&
-                  name === currentAccount.name &&
-                  chainId === currentAccount.chainId && (
-                    <Icon.Ionicons
-                      name="md-checkmark"
-                      color={Theme.palette.primary}
-                      size={25}
-                    />
-                  )}
-              </View>
-            </TouchableRipple>
-          ))}
-        </ScrollView>
+        {!accounts.length ? (
+          <AccountEmptyState />
+        ) : (
+          <React.Fragment>
+            <ScrollView>
+              {accounts.map(({ id, name, chainId }) => (
+                <TouchableRipple
+                  key={id}
+                  style={{
+                    paddingHorizontal: Theme.innerPadding,
+                    paddingVertical: 15
+                  }}
+                  onPress={() => this.changeAccount(id, chainId)}
+                  onLongPress={() => this.confirmRemoveAccount(id)}
+                >
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <View style={{ flex: 1 }}>
+                      <Text>{name}</Text>
+                      <Caption>
+                        {Chains.find(({ id }) => id === chainId).name}
+                      </Caption>
+                    </View>
+                    {currentAccount &&
+                      name === currentAccount.name &&
+                      chainId === currentAccount.chainId && (
+                        <Icon.Ionicons
+                          name="md-checkmark"
+                          color={Theme.palette.primary}
+                          size={25}
+                        />
+                      )}
+                  </View>
+                </TouchableRipple>
+              ))}
+            </ScrollView>
 
-        <Button
-          style={{ margin: 20, padding: 5 }}
-          mode="contained"
-          onPress={() => this.moveScreen('ImportAccount')}
-        >
-          Import account
-        </Button>
+            <Button
+              style={{ margin: 20, padding: 5 }}
+              mode="contained"
+              onPress={() => this.moveScreen('ImportAccount')}
+            >
+              Import account
+            </Button>
+          </React.Fragment>
+        )}
       </BackgroundView>
     );
   }
