@@ -108,43 +108,44 @@ export class StakeResource extends Component {
           title="Preparing to stake resource..."
         />
 
-        <KeyboardAvoidingView>
-          <ScrollView style={{ margin: Theme.innerSpacing }}>
-            <ResourceTextField
-              label="Stakable Amount"
-              info={`${values.stakableAmount.toFixed(4)} EOS available`}
-              value={values.amount}
-              error={touched.amount && errors.amount}
-              onChangeText={_ => {
-                setFieldTouched('amount', true);
-                setFieldValue('amount', _);
-              }}
-              onChangePercent={percent =>
-                setFieldValue(
-                  'amount',
-                  (values.stakableAmount * percent).toFixed(4)
-                )
-              }
-            />
-
-            <Paragraph style={{ color: Theme.palette.primary }}>
-              You can unstake the resources at any time, but there will be a
-              three-day waiting period
-            </Paragraph>
-          </ScrollView>
-
-          <Button
-            mode="contained"
-            style={{
-              padding: 5,
-              borderRadius: 0
+        <ScrollView
+          keyboardShouldPersistTaps="never"
+          style={{ margin: Theme.innerSpacing }}
+        >
+          <ResourceTextField
+            label="Stakable Amount"
+            info={`${values.stakableAmount.toFixed(4)} EOS available`}
+            value={values.amount}
+            error={touched.amount && errors.amount}
+            onChangeText={_ => {
+              setFieldTouched('amount', true);
+              setFieldValue('amount', _);
             }}
-            disabled={!isValid}
-            onPress={handleSubmit}
-          >
-            Continue
-          </Button>
-        </KeyboardAvoidingView>
+            onChangePercent={percent =>
+              setFieldValue(
+                'amount',
+                (values.stakableAmount * percent).toFixed(4)
+              )
+            }
+          />
+
+          <Paragraph style={{ color: Theme.palette.primary }}>
+            You can unstake the resources at any time, but there will be a
+            three-day waiting period
+          </Paragraph>
+        </ScrollView>
+
+        <Button
+          mode="contained"
+          style={{
+            padding: 5,
+            borderRadius: 0
+          }}
+          disabled={!isValid}
+          onPress={handleSubmit}
+        >
+          Continue
+        </Button>
       </BackgroundView>
     );
   }
