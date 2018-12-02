@@ -5,6 +5,7 @@ import { StyleSheet, View } from 'react-native';
 import { AppLoading, Font, Icon } from 'expo';
 
 import AppNavigator from './navigation/AppNavigator';
+import { MainStackNavigator } from './navigation/navigators';
 
 import { initializeDB } from './db';
 
@@ -13,6 +14,9 @@ import { initializeDB } from './db';
 export default class RenderApp extends Component {
   @observable
   isLoadingComplete = false;
+
+  @observable
+  initialized = false;
 
   async startAsyncLoading() {
     return Promise.all([
@@ -47,6 +51,11 @@ export default class RenderApp extends Component {
 
     networkStore.setCurrentNetwork(accountStore.currentAccount);
 
+    // already initialized
+    if (settingsStore.initialized) {
+      this.initialized = true;
+    }
+
     this.isLoadingComplete = true;
   }
 
@@ -63,7 +72,7 @@ export default class RenderApp extends Component {
 
     return (
       <View style={styles.container}>
-        <AppNavigator />
+        {this.initialized ? <MainStackNavigator /> : <AppNavigator />}
       </View>
     );
   }

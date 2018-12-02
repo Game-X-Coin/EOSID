@@ -1,8 +1,14 @@
-import { createSwitchNavigator } from 'react-navigation';
+import { createStackNavigator } from 'react-navigation';
 
 import { AuthSwitchNavigator, MainStackNavigator } from './navigators';
 
-export default createSwitchNavigator({
-  Auth: AuthSwitchNavigator,
-  Main: MainStackNavigator
-});
+export default createStackNavigator(
+  {
+    Auth: AuthSwitchNavigator,
+    Main: MainStackNavigator
+  },
+  {
+    headerMode: 'none',
+    cardStyle: { backgroundColor: '#fff' }
+  }
+);
