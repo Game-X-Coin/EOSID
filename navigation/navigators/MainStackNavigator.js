@@ -3,6 +3,7 @@ import { observer, inject } from 'mobx-react';
 import { Linking } from 'react-native';
 import { createStackNavigator } from 'react-navigation';
 import { createMaterialBottomTabNavigator } from 'react-navigation-material-bottom-tabs';
+import StackViewStyleInterpolator from 'react-navigation-stack/dist/views/StackView/StackViewStyleInterpolator';
 import { Linking as ExpoLinking } from 'expo';
 
 import {
@@ -72,12 +73,14 @@ const DetailScreens = {
 
 const iconMap = {
   Account: WalletIcon,
+  Resources: WalletIcon,
   Activity: ActivityIcon,
   Settings: SettingsIcon
 };
 
 const labelMap = {
   Account: 'Wallet',
+  Resources: 'Resources',
   Activity: 'Activities',
   Settings: 'Settings'
 };
@@ -86,6 +89,7 @@ const labelMap = {
 const MainTabNavigator = createMaterialBottomTabNavigator(
   {
     Account: AccountScreen,
+    Resources: ResourceScreen,
     Activity: ActivityScreen,
     Settings: SettingsScreen
   },
@@ -174,30 +178,11 @@ export const MainStackNavigator = createStackNavigator(
   },
   {
     headerMode: 'none',
-    cardStyle: { backgroundColor: '#fff' }
-    /* transitionConfig: () => ({
-      transitionSpec: {
-        duration: 300,
-        easing: Easing.out(Easing.bezier(0.42, 0, 1, 1)),
-        timing: Animated.timing,
-        useNativeDriver: true
-      },
-      screenInterpolator: ({ layout, position, scene }) => {
-        const { index } = scene;
-        const { initWidth } = layout;
-
-        const translateX = position.interpolate({
-          inputRange: [index - 1, index, index + 1],
-          outputRange: [initWidth, 0, -30]
-        });
-
-        const opacity = position.interpolate({
-          inputRange: [index - 1, index - 0.99, index],
-          outputRange: [0, 1, 1]
-        });
-
-        return { opacity, transform: [{ translateX }] };
+    cardStyle: { backgroundColor: '#fff' },
+    transitionConfig: () => ({
+      screenInterpolator: sceneProps => {
+        return StackViewStyleInterpolator.forHorizontal(sceneProps);
       }
-    }) */
+    })
   }
 );
