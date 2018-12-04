@@ -9,6 +9,7 @@ import { BackgroundView } from '../../../components/View';
 import { Theme } from '../../../constants';
 import { ResourceView } from '../ManageResourceScreen/ResourceView';
 import { PageIndicator } from '../../../components/Indicator';
+import { AccountEmptyState } from '../AccountScreen';
 
 @inject('accountStore')
 @observer
@@ -17,8 +18,7 @@ export class ResourceScreen extends Component {
 
   render() {
     const {
-      navigation,
-      accountStore: { info, fetched }
+      accountStore: { info, fetched, currentAccount }
     } = this.props;
 
     const { refund_request } = info;
@@ -35,11 +35,12 @@ export class ResourceScreen extends Component {
         <Appbar.Header
           style={{ backgroundColor: Theme.header.backgroundColor }}
         >
-          <Appbar.BackAction onPress={() => navigation.goBack(null)} />
           <Appbar.Content title="Resources" />
         </Appbar.Header>
 
-        {!fetched ? (
+        {!currentAccount ? (
+          <AccountEmptyState />
+        ) : !fetched ? (
           <PageIndicator />
         ) : (
           <View>
