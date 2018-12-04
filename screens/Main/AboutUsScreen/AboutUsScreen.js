@@ -76,6 +76,12 @@ export class AboutUsScreen extends Component {
               title="Github"
               onPress={() => this.openBrowser('https://github.com/game-x-coin')}
             />
+            <Item
+              title="Privacy Policy"
+              onPress={() =>
+                this.openBrowser('https://gamexcoin.io/policy/eosid.html')
+              }
+            />
           </View>
         </ScrollView>
       </BackgroundView>
