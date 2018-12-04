@@ -283,13 +283,6 @@ export class AccountInfo extends Component {
                     icon={require('../../../assets/icons/transfer.png')}
                     onPress={() => this.moveScreen('Transfer')}
                   />
-
-                  <ActionItem
-                    name="Resources"
-                    description={fetched && `${stakedBalance} EOS`}
-                    icon={require('../../../assets/icons/resource.png')}
-                    onPress={() => this.moveScreen('Resource')}
-                  />
                 </View>
               </Animated.View>
 

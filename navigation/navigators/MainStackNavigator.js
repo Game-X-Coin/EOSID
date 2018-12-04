@@ -3,8 +3,9 @@ import { observer, inject } from 'mobx-react';
 import { Linking } from 'react-native';
 import { createStackNavigator } from 'react-navigation';
 import { createMaterialBottomTabNavigator } from 'react-navigation-material-bottom-tabs';
-import StackViewStyleInterpolator from 'react-navigation-stack/dist/views/StackView/StackViewStyleInterpolator';
 import { Linking as ExpoLinking } from 'expo';
+
+import StackViewStyleInterpolator from 'react-navigation-stack/dist/views/StackView/StackViewStyleInterpolator';
 
 import {
   AccountScreen,
@@ -37,7 +38,12 @@ import {
 } from '../../screens/Shared';
 
 import { Theme } from '../../constants';
-import { WalletIcon, ActivityIcon, SettingsIcon } from '../../components/SVG';
+import {
+  BalanceIcon,
+  ResourceIcon,
+  ActivityIcon,
+  SettingsIcon
+} from '../../components/SVG';
 
 // detail screens
 const DetailScreens = {
@@ -72,16 +78,16 @@ const DetailScreens = {
 };
 
 const iconMap = {
-  Account: WalletIcon,
-  Resources: WalletIcon,
+  Account: BalanceIcon,
   Activity: ActivityIcon,
+  Resources: ResourceIcon,
   Settings: SettingsIcon
 };
 
 const labelMap = {
-  Account: 'Wallet',
-  Resources: 'Resources',
+  Account: 'Balance',
   Activity: 'Activities',
+  Resources: 'Resources',
   Settings: 'Settings'
 };
 
