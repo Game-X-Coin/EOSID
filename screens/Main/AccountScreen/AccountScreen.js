@@ -22,7 +22,7 @@ export class AccountScreen extends Component {
           <Appbar.Header
             style={{ backgroundColor: Theme.header.backgroundColor }}
           >
-            <Appbar.Content title="Wallet" />
+            <Appbar.Content title="Balance" />
           </Appbar.Header>
         )}
 

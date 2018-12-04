@@ -1,80 +1,114 @@
 import React, { Component } from 'react';
+import { Animated } from 'react-native';
 import { observer, inject } from 'mobx-react';
-import { View, Image, Dimensions } from 'react-native';
+import { View, Image, Dimensions, Platform, StatusBar } from 'react-native';
 import { Button, Text } from 'react-native-paper';
 import Swiper from 'react-native-swiper';
 
 import { BackgroundView } from '../../../components/View';
-import { DarkTheme } from '../../../constants';
+import { DarkTheme, Theme } from '../../../constants';
 
-const { height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
+
+const STATUS_BAR_HEIGHT = Platform.OS === 'ios' ? 0 : StatusBar.currentHeight;
+const IMAGE_WIDTH = width - 80;
+const IMAGE_HEIGHT = IMAGE_WIDTH * 1.88;
 
 const contentStyle = {
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center'
+    marginTop: STATUS_BAR_HEIGHT,
+    alignItems: 'center'
   },
 
   image: {
-    height: height - 250,
-    borderRadius: 10
+    width: IMAGE_WIDTH,
+    height: IMAGE_HEIGHT,
+    borderRadius: 5
   },
 
   textArea: {
     alignItems: 'center',
-    marginTop: 25,
-    marginBottom: 15
+    marginTop: 70,
+    marginBottom: 40
+  },
+
+  title: {
+    ...DarkTheme.h1,
+    marginBottom: 20
+  },
+
+  description: {
+    ...DarkTheme.h5,
+    width: 250,
+    textAlign: 'center',
+    fontWeight: '300'
   }
 };
 
-const Wallet = () => (
+const Balance = () => (
   <View style={contentStyle.container}>
-    <Image
-      style={contentStyle.image}
-      source={require('../../../assets/images/started_wallet.png')}
-      resizeMode="contain"
-    />
-
     <View style={contentStyle.textArea}>
-      <Text style={DarkTheme.h4}>View and manage</Text>
-      <Text style={DarkTheme.h4}>all your tokens at once.</Text>
+      <Text style={contentStyle.title}>Balance</Text>
+      <Text style={contentStyle.description}>
+        Check your balance and manage your assets easily
+      </Text>
     </View>
+
+    <Image
+      resizeMode="contain"
+      style={contentStyle.image}
+      source={require('../../../assets/images/started_balance.png')}
+    />
   </View>
 );
 
 const Resources = () => (
   <View style={contentStyle.container}>
+    <View style={contentStyle.textArea}>
+      <Text style={contentStyle.title}>Resources</Text>
+      <Text style={contentStyle.description}>
+        Check status for resources and refunding progress
+      </Text>
+    </View>
+
     <Image
+      resizeMode="contain"
       style={contentStyle.image}
       source={require('../../../assets/images/started_resources.png')}
-      resizeMode="contain"
     />
-
-    <View style={contentStyle.textArea}>
-      <Text style={DarkTheme.h4}>View and manage</Text>
-      <Text style={DarkTheme.h4}>all your resources at once.</Text>
-    </View>
   </View>
 );
 
 const Activities = () => (
   <View style={contentStyle.container}>
+    <View style={contentStyle.textArea}>
+      <Text style={contentStyle.title}>Activities</Text>
+      <Text style={contentStyle.description}>
+        View historic actions including transfer and receive
+      </Text>
+    </View>
+
     <Image
       style={contentStyle.image}
       source={require('../../../assets/images/started_activities.png')}
       resizeMode="contain"
     />
-
-    <View style={contentStyle.textArea}>
-      <Text style={DarkTheme.h4}>Check out all your activities.</Text>
-    </View>
   </View>
 );
 
 @inject('settingsStore')
 @observer
 export class WelcomeScreen extends Component {
+  visible = new Animated.Value(0);
+
+  onIndexChanged(i) {
+    Animated.timing(this.visible, {
+      toValue: i === 2 ? 1 : 0,
+      duration: 200
+    }).start();
+  }
+
   async start() {
     const { navigation, settingsStore } = this.props;
 
@@ -86,49 +120,77 @@ export class WelcomeScreen extends Component {
     return (
       <BackgroundView style={{ backgroundColor: '#242424' }}>
         <Swiper
+          renderPagination={(pageIndex, total) => (
           containerStyle={{ flex: 1 }}
-          dot={
             <View
               style={{
-                backgroundColor: 'rgba(255,255,255,.3)',
-                width: 10,
-                height: 10,
-                borderRadius: 10,
-                marginLeft: 7,
-                marginRight: 7
+                flexDirection: 'row',
+                position: 'absolute',
+                top: STATUS_BAR_HEIGHT + 30,
+                left: 0,
+                right: 0,
+                justifyContent: 'center',
+                alignItems: 'center'
               }}
-            />
-          }
-          activeDot={
-            <View
-              style={{
-                backgroundColor: '#fff',
-                width: 12,
-                height: 12,
-                borderRadius: 7,
-                marginLeft: 7,
-                marginRight: 7
-              }}
-            />
-          }
-          paginationStyle={{
-            bottom: 30
-          }}
-          loop={false}
+            >
+              {Array.from({ length: total }, (v, i) => {
+                const active = i === pageIndex;
+
+                return (
+                  <View
+                    key={i}
+                    style={{
+                      borderRadius: 10,
+                      marginLeft: 7,
+                      marginRight: 7,
+
+                      ...(active
+                        ? {
+                            backgroundColor: '#fff',
+                            width: 8,
+                            height: 8
+                          }
+                        : {
+                            backgroundColor: 'rgba(255,255,255,.3)',
+                            width: 7,
+                            height: 7
+                          })
+                    }}
+                  />
+                );
+              })}
+            </View>
+          )}
+          onIndexChanged={i => this.onIndexChanged(i)}
         >
-          <Wallet />
+          <Balance />
           <Resources />
           <Activities />
         </Swiper>
 
-        <Button
-          mode="contained"
-          color="#fff"
-          onPress={() => this.start()}
-          style={{ padding: 5, borderRadius: 0 }}
+        <Animated.View
+          style={{
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            bottom: this.visible.interpolate({
+              inputRange: [0, 1],
+              outputRange: [-100, 0]
+            }),
+            borderTopColor: Theme.palette.gray,
+            borderTopWidth: 1,
+            opacity: this.visible
+          }}
         >
-          Get Started
-        </Button>
+          <Button
+            mode="contained"
+            color="#fff"
+            onPress={() => this.start()}
+            style={{ padding: 10, borderRadius: 0 }}
+          >
+            Get Started
+          </Button>
+        </Animated.View>
       </BackgroundView>
     );
   }

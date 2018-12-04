@@ -6,7 +6,7 @@ import { AndroidBackHandler } from 'react-navigation-backhandler';
 
 import { Theme, DarkTheme } from '../../../constants';
 import { BackgroundView } from '../../../components/View';
-import { MemoIcon, AccountIcon, WalletIcon } from '../../../components/SVG';
+import { MemoIcon, AccountIcon, BalanceIcon } from '../../../components/SVG';
 
 @inject('accountStore')
 @observer
@@ -126,7 +126,7 @@ export class TransferResultScreen extends Component {
               title="Remaining Amount"
               description={`${balance} ${symbol}`}
               icon={
-                <WalletIcon
+                <BalanceIcon
                   scale={1.5}
                   color={Theme.palette.inActive}
                   style={{ marginRight: 15 }}
