@@ -19,7 +19,8 @@ import { ResourceTextField } from './ResourceTextField';
   enableReinitialize: true,
   mapPropsToValues: ({ navigation, accountStore: { info } }) => {
     const { resourceName } = navigation.state.params || {};
-    const { total_resources: { cpu_weight = 0, net_weight = 0 } = {} } = info;
+    const { total_resources = {} } = info;
+    const { cpu_weight = 0, net_weight = 0 } = total_resources || {};
 
     // required resource amount for account
     const MIN_RESOURCE_AMOUNT = 0.1;
