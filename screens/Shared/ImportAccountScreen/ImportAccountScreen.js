@@ -224,6 +224,7 @@ export class ImportAccountScreen extends Component {
       <BackgroundView>
         <Appbar.Header
           style={{ backgroundColor: Theme.header.backgroundColor }}
+          dark
         >
           {!isSignUp && (
             <Appbar.BackAction onPress={() => navigation.goBack(null)} />
