@@ -120,8 +120,8 @@ export class WelcomeScreen extends Component {
     return (
       <BackgroundView style={{ backgroundColor: '#242424' }}>
         <Swiper
-          renderPagination={(pageIndex, total) => (
           containerStyle={{ flex: 1 }}
+          renderPagination={(pageIndex, total) => (
             <View
               style={{
                 flexDirection: 'row',
