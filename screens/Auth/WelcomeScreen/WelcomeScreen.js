@@ -86,7 +86,7 @@ export class WelcomeScreen extends Component {
     return (
       <BackgroundView style={{ backgroundColor: '#242424' }}>
         <Swiper
-          style={{ flex: 1 }}
+          containerStyle={{ flex: 1 }}
           dot={
             <View
               style={{
