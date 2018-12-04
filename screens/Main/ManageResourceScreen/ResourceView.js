@@ -66,7 +66,7 @@ class Resource extends PureComponent {
             </View>
 
             <Text style={{ marginBottom: 5, ...Theme.h4 }}>{value}</Text>
-            {weight && (
+            {!!weight && (
               <Text style={{ ...Theme.p, color: Theme.palette.darkGray }}>
                 {weight.toFixed(4)} EOS
               </Text>
@@ -137,8 +137,10 @@ export class ResourceView extends Component {
       net_limit: { max: maxNet = 0, used: usedNet = 0 } = {},
       ram_quota: maxRam = 0,
       ram_usage: usedRam = 0,
-      total_resources: { cpu_weight = 0, net_weight = 0 } = {}
+      total_resources = {}
     } = info;
+
+    const { cpu_weight = 0, net_weight = 0 } = total_resources || {};
 
     const percentCpu = ((maxCpu - usedCpu) / maxCpu) * 100;
     const percentNet = ((maxNet - usedNet) / maxNet) * 100;

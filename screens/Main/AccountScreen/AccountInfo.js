@@ -122,11 +122,13 @@ export class AccountInfo extends Component {
 
   render() {
     const {
-      info: { total_resources: { cpu_weight = 0, net_weight = 0 } = {} },
+      info: { total_resources = {} },
       tokens,
       fetched,
       currentAccount
     } = this.props.accountStore;
+
+    const { cpu_weight = 0, net_weight = 0 } = total_resources || {};
 
     const stakedBalance = parseFloat(cpu_weight) + parseFloat(net_weight);
     const unstakedBalance = tokens.EOS
