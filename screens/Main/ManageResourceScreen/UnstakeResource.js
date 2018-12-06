@@ -5,11 +5,7 @@ import { withFormik } from 'formik';
 import * as Yup from 'yup';
 
 import { DialogIndicator } from '../../../components/Indicator';
-import {
-  KeyboardAvoidingView,
-  ScrollView,
-  BackgroundView
-} from '../../../components/View';
+import { ScrollView, BackgroundView } from '../../../components/View';
 import { Theme } from '../../../constants';
 import { ResourceTextField } from './ResourceTextField';
 
