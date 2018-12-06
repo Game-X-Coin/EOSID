@@ -75,7 +75,7 @@ import { Theme } from '../../../constants';
         try {
           const result = await accountStore.transfer({
             ...values,
-            code: token.code,
+            account: token.code,
             pincode
           });
 
