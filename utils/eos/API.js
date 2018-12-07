@@ -387,9 +387,14 @@ class EosApi {
         EosApi.actions.gets({ pos: -1, offset: -1, account_name }),
       gets: ({ lastestSeq, pos, page = 1, offset = 10, account_name }) => {
         if (!pos) {
-          pos = lastestSeq - page * offset;
+          pos = lastestSeq - page * offset + 1;
           offset = offset - 1;
+          if (pos < 0) {
+            offset = pos + offset;
+            pos = 0;
+          }
         }
+        console.log(pos, offset);
 
         return EosApi.HistoryAPI().post('/v1/history/get_actions', {
           pos,

@@ -212,7 +212,8 @@ class Store {
     });
 
     actions = actions.filter(
-      action => action.action_trace.receipt.receiver === account.name
+      action =>
+        action.action_trace.receipt.receiver === action.action_trace.act.account
     );
 
     // when refresh actions
