@@ -6,12 +6,13 @@
 
 # Features
 
-- Show EOS balance & support tokens
-- Show resources (cpu, net, ram, refund)
-- Show history of actions
-- Support Mainnet & Jungle Testnet
+- View account balance, tokens
+- View historic actions
+- View account resources (cpu, net, ram)
 - Transfer tokens
-- Stake / Unstake resource
+- Stake / Unstake resources
+- Check refund status
+- Support Mainnet & Jungle Testnet
 
 # Download
 
