@@ -1,0 +1,15 @@
+language: node_js
+node_js:
+  - 7
+  - 6
+cache:
+  yarn: true
+  directories:
+    - node_modules
+before_install:
+  - sudo apt-get -qq update
+install:
+  - yarn
+script:
+  - cp .env.example .env
+  - yarn test
