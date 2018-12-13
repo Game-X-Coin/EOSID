@@ -1,5 +1,7 @@
 # EOSID
 
+[![Build Status](https://travis-ci.com/Game-X-Coin/EOSID.svg?branch=develop)](https://travis-ci.com/Game-X-Coin/EOSID)
+
 > Open Source EOS Wallet
 
 ![EOSID](./assets/images/eosid.png)
