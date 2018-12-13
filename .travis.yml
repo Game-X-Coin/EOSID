@@ -1,13 +1,10 @@
 language: node_js
 node_js:
-  - 7
-  - 6
+  - "node"
 cache:
   yarn: true
   directories:
     - node_modules
-before_install:
-  - sudo apt-get -qq update
 install:
   - yarn
 script:
