@@ -1,53 +1,89 @@
 import { observable, action, computed } from 'mobx';
 
-import { NetworkService } from '../services';
+import NetworkService from '../services/NetworkService';
 
-import { AccountStore } from './AccountStore';
-
-import { DEFAULT_NETWORKS } from '../constants';
+import { DEFAULT_CHAIN } from '../constants';
+import Chains from '../constants/Chains';
 
 import api from '../utils/eos/API';
+import SettingsStore from './SettingsStore';
 
 class Store {
   @observable
-  defaultNetworks = DEFAULT_NETWORKS;
+  chains = Chains.reduce((ac, chain) => {
+    ac[chain.id] = chain;
+    return ac;
+  }, {});
 
   @observable
   customNetworks = [];
 
-  @computed
-  get eos() {
-    return api;
-  }
+  @observable
+  currentNetwork = null;
 
   @computed
   get allNetworks() {
-    return [...this.defaultNetworks, ...this.customNetworks];
+    const keys = Object.keys(this.chains);
+    return keys.reduce((ac, key) => [...ac, this.chains[key].nodes || []], []);
   }
 
-  @computed
-  get currentNetwork() {
-    const { currentAccount } = AccountStore;
-
-    if (currentAccount) {
-      return this.allNetworks.find(
-        network => network.id === currentAccount.networkId
-      );
+  @action
+  getNetwork(chainId) {
+    const { currentChainId } = SettingsStore.settings;
+    if (chainId && currentChainId && currentChainId !== chainId) {
+      const chain = this.chains[chainId];
+      this.currentNetwork = chain.nodes ? chain.nodes[0] : null;
+    } else {
+      this.currentNetwork =
+        (this.chains[chainId || currentChainId || DEFAULT_CHAIN].nodes ||
+          [])[0] || null;
     }
-    // return default network
-    return this.defaultNetworks[0];
+
+    return this.currentNetwork;
+  }
+
+  @action
+  setCurrentNetwork(account, chainId, networkId) {
+    let network = null;
+    if (chainId && typeof networkId !== 'undefined') {
+      network = (this.chains[chainId].nodes || []).find(
+        node => node.id === networkId
+      );
+    } else {
+      network = this.getNetwork(account && account.chainId);
+    }
+    api.currentNetwork = network;
+    this.currentNetwork = network;
+  }
+
+  @action
+  changeNetwork(chainId, networkId) {
+    const network = this.chains[chainId].nodes.find(
+      node => node.id === networkId
+    );
+    this.currentNetwork = network;
+    api.currentNetwork = network;
+  }
+
+  @action
+  setChains(chains) {
+    this.chains = chains;
+  }
+
+  @action
+  setDefaultNetworks(networks) {
+    this.defaultNetworks = networks;
   }
 
   @action
   setCustomNetworks(networks) {
-    console.log('networks', networks);
     this.customNetworks = networks;
   }
 
   @action
   async getNetworks() {
-    return NetworkService.getNetworks().then(networks => {
-      this.setCustomNetworks(networks);
+    return await NetworkService.getNetworks(this.chains).then(chains => {
+      this.setChains(chains);
     });
   }
 
@@ -71,4 +107,4 @@ class Store {
   }
 }
 
-export const NetworkStore = new Store();
+export default new Store();

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observable } from 'mobx';
 import { observer, inject } from 'mobx-react';
-import { SafeAreaView, View } from 'react-native';
+import { View } from 'react-native';
 import {
   Appbar,
   Button,
@@ -10,15 +10,18 @@ import {
   Caption,
   TouchableRipple
 } from 'react-native-paper';
-import { TextField } from 'react-native-material-textfield';
+import moment from '../../../utils/moment';
 
 import api from '../../../utils/eos/API';
 import { TransferLogService } from '../../../services';
+import { Theme } from '../../../constants';
 
-import { KeyboardAvoidingView, ScrollView } from '../../../components/View';
-
-import HomeStyle from '../../../styles/HomeStyle';
-import { Indicator } from '../../../components/Indicator';
+import {
+  KeyboardAvoidingView,
+  ScrollView,
+  BackgroundView
+} from '../../../components/View';
+import { TextField } from '../../../components/TextField';
 
 const debounce = (func, wait) => {
   let timeout;
@@ -50,19 +53,20 @@ export class TransferLogs extends Component {
 
   render() {
     return (
-      <View>
-        <View style={{ paddingHorizontal: 20 }}>
+      <View style={{ paddingBottom: Theme.innerPadding }}>
+        <View style={{ paddingHorizontal: Theme.innerSpacing }}>
           <Text>Recent History</Text>
-          <Divider style={{ marginVertical: 10 }} />
+          <Divider
+            style={{ marginTop: 10, backgroundColor: Theme.palette.darkGray }}
+          />
         </View>
 
         {this.transferLogs.map(log => (
           <TouchableRipple
             key={log.id}
             style={{
-              paddingHorizontal: 20,
-              paddingVertical: 5,
-              marginBottom: 5
+              paddingHorizontal: Theme.innerSpacing,
+              paddingVertical: 10
             }}
             onPress={() => this.props.onLogPress(log)}
           >
@@ -74,7 +78,9 @@ export class TransferLogs extends Component {
             >
               <View style={{ flex: 1 }}>
                 <Text>{log.receiver}</Text>
-                <Caption>{log.createdAt}</Caption>
+                <Caption>
+                  {moment(new Date(log.createdAt)).format('YYYY/MM/DD')}
+                </Caption>
               </View>
               <Text style={{ fontSize: 15 }}>
                 {log.amount} {log.symbol}
@@ -87,6 +93,7 @@ export class TransferLogs extends Component {
   }
 }
 
+@inject('accountStore')
 @observer
 export class TransferScreen extends Component {
   @observable
@@ -104,17 +111,25 @@ export class TransferScreen extends Component {
 
   onChangeReceiver(v) {
     this.receiver = v;
-    this.error = '';
     this.checkReceiver(v);
   }
 
   async checkReceiver(v) {
+    const { currentAccount } = this.props.accountStore;
     this.loading = true;
+
+    if (currentAccount.name === v) {
+      this.error = 'The receiver and sender can not be the same.';
+      this.loading = false;
+      return;
+    }
 
     const result = await api.accounts.get({ account_name: v });
 
     if (result.error) {
       this.error = 'The account you entered does not exist.';
+    } else {
+      this.error = '';
     }
 
     this.loading = false;
@@ -135,39 +150,43 @@ export class TransferScreen extends Component {
     const { receiver, loading, error } = this;
 
     return (
-      <SafeAreaView style={HomeStyle.container}>
-        <Appbar.Header>
+      <BackgroundView>
+        <Appbar.Header
+          style={{ backgroundColor: Theme.header.backgroundColor }}
+        >
           <Appbar.BackAction onPress={() => navigation.goBack(null)} />
-          <Appbar.Content title="Receiver" />
+          <Appbar.Content title="Transfer" />
         </Appbar.Header>
 
         <KeyboardAvoidingView>
           <ScrollView>
-            <View style={{ padding: 20 }}>
+            <View
+              style={{
+                margin: Theme.innerSpacing
+              }}
+            >
               <TextField
                 autoFocus
-                label="Enter receiver's account"
-                title="example: eosauthority"
+                label="Receiver's account"
+                info={loading ? 'Searching account...' : ''}
+                placeholder="iameosiduser"
                 value={receiver}
                 error={error}
-                renderAccessory={() =>
-                  loading && (
-                    <View style={{ paddingHorizontal: 5 }}>
-                      <Indicator size="small" />
-                    </View>
-                  )
-                }
-                onChangeText={v => this.onChangeReceiver(v)}
+                loading={loading}
+                onChangeText={v => {
+                  this.loading = true;
+                  this.onChangeReceiver(v);
+                }}
               />
 
               <Button
                 mode="contained"
                 style={{
-                  marginVertical: 20,
+                  marginBottom: 20,
                   padding: 5
                 }}
-                disabled={!receiver.length}
-                onPress={() => !loading && !error && this.handleSubmit()}
+                disabled={!receiver.length || loading || Boolean(error)}
+                onPress={() => this.handleSubmit()}
               >
                 Next
               </Button>
@@ -181,7 +200,7 @@ export class TransferScreen extends Component {
             />
           </ScrollView>
         </KeyboardAvoidingView>
-      </SafeAreaView>
+      </BackgroundView>
     );
   }
 }

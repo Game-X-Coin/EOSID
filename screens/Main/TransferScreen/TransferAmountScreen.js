@@ -1,16 +1,19 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { SafeAreaView, View } from 'react-native';
 import { Appbar, Button } from 'react-native-paper';
-import { TextField } from 'react-native-material-textfield';
-import { Dropdown } from 'react-native-material-dropdown';
 import { withFormik } from 'formik';
 import * as Yup from 'yup';
 
 import { DialogIndicator } from '../../../components/Indicator';
-import { KeyboardAvoidingView, ScrollView } from '../../../components/View';
+import {
+  KeyboardAvoidingView,
+  ScrollView,
+  BackgroundView
+} from '../../../components/View';
+import { TextField } from '../../../components/TextField';
+import { SelectField } from '../../../components/SelectField';
 
-import HomeStyle from '../../../styles/HomeStyle';
+import { Theme } from '../../../constants';
 
 @inject('accountStore')
 @observer
@@ -43,7 +46,7 @@ import HomeStyle from '../../../styles/HomeStyle';
             'larger-than-available',
             'You have entered more than you have',
             value => {
-              const availableAmount = tokens[values.symbol];
+              const availableAmount = tokens[values.symbol].amount;
 
               return value && parseFloat(value) <= parseFloat(availableAmount);
             }
@@ -56,34 +59,40 @@ import HomeStyle from '../../../styles/HomeStyle';
     values,
     { props: { navigation, accountStore }, setSubmitting, setFieldValue }
   ) => {
-    const fixedAmount = parseFloat(values.amount).toFixed(4);
+    const { tokens } = accountStore;
+    const token = tokens[values.symbol];
+    const fixedAmount = parseFloat(values.amount).toFixed(token.precision);
 
     navigation.navigate('ConfirmPin', {
       pinProps: {
         title: 'Confirm Transfer',
         description: `Transfer ${fixedAmount} ${values.symbol}`
       },
-      async cb() {
+      async cb(pincode) {
         // show transfer loading dialog
         setFieldValue('showDialog', true);
 
-        const result = await accountStore.transfer(values);
-
-        // hide dialog
-        setFieldValue('showDialog', false);
-
-        if (result.code === 500) {
-          navigation.navigate('ShowError', {
-            title: 'Transfer Failed',
-            description: 'Please check the error, it may be a network error.',
-            error: result
+        try {
+          const result = await accountStore.transfer({
+            ...values,
+            account: token.code,
+            pincode
           });
-        } else {
+
           navigation.navigate('TransferResult', {
             ...values,
             amount: fixedAmount,
             result
           });
+        } catch ({ message }) {
+          navigation.navigate('ShowError', {
+            title: 'Transfer Failed',
+            description: 'Please check the error, it may be a network error.',
+            error: message
+          });
+        } finally {
+          // hide dialog
+          setFieldValue('showDialog', false);
         }
       }
     });
@@ -94,7 +103,6 @@ export class TransferAmountScreen extends Component {
     const {
       navigation,
       accountStore,
-
       values,
       errors,
       touched,
@@ -106,15 +114,17 @@ export class TransferAmountScreen extends Component {
 
     const { tokens } = accountStore;
 
-    const availableAmount = tokens[values.symbol];
+    const availableAmount = tokens[values.symbol].amount;
 
     const tokenData = Object.keys(tokens).map(symbol => ({
       value: symbol
     }));
 
     return (
-      <SafeAreaView style={HomeStyle.container}>
-        <Appbar.Header>
+      <BackgroundView>
+        <Appbar.Header
+          style={{ backgroundColor: Theme.header.backgroundColor }}
+        >
           <Appbar.BackAction onPress={() => navigation.goBack(null)} />
           <Appbar.Content title="Transfer" />
         </Appbar.Header>
@@ -125,44 +135,48 @@ export class TransferAmountScreen extends Component {
         />
 
         <KeyboardAvoidingView>
-          <ScrollView style={{ padding: 20 }}>
+          <ScrollView
+            style={{
+              margin: Theme.innerSpacing
+            }}
+          >
             <TextField
               label="Receiver"
               value={values.receiver}
               editable={false}
+              onPress={() => navigation.goBack(null)}
             />
 
-            <View style={{ flexDirection: 'row' }}>
-              <View style={{ flex: 1 }}>
-                <TextField
-                  autoFocus
-                  label="Enter transfer amount"
-                  keyboardType="numeric"
-                  value={values.amount}
-                  title={`${availableAmount} ${values.symbol} available`}
-                  error={touched.amount && errors.amount}
-                  onChangeText={_ => {
-                    setFieldTouched('amount', true);
-                    setFieldValue('amount', _);
-                  }}
-                />
-              </View>
-
-              <View style={{ width: 90, marginLeft: 8 }}>
-                <Dropdown
-                  value={values.symbol}
+            <TextField
+              autoFocus
+              label="Transfer Amount"
+              textAlign="right"
+              keyboardType="numeric"
+              value={values.amount}
+              info={`${availableAmount} ${values.symbol} available`}
+              error={touched.amount && errors.amount}
+              onChangeText={_ => {
+                setFieldTouched('amount', true);
+                setFieldValue('amount', _);
+              }}
+              prefixComp={
+                <SelectField
                   data={tokenData}
-                  onChangeText={_ => {
-                    setFieldValue('symbol', _);
+                  value={values.symbol}
+                  error={touched.amount && errors.amount}
+                  onChange={_ => setFieldValue('symbol', _)}
+                  containerStyle={{
+                    marginVertical: 0,
+                    width: values.symbol.length * 10 + 60
                   }}
                 />
-              </View>
-            </View>
+              }
+            />
 
             <TextField
               multiline
-              label="Enter memo (optional)"
-              suffix={`${values.memo.length} / 256`}
+              label="Memo (optional)"
+              info={`${values.memo.length} / 256`}
               value={values.memo}
               error={touched.memo && errors.memo}
               onChangeText={_ => {
@@ -181,10 +195,10 @@ export class TransferAmountScreen extends Component {
             disabled={!isValid}
             onPress={handleSubmit}
           >
-            Transfer
+            Next
           </Button>
         </KeyboardAvoidingView>
-      </SafeAreaView>
+      </BackgroundView>
     );
   }
 }

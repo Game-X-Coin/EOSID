@@ -1,118 +1,150 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { SafeAreaView, View } from 'react-native';
-import { Colors, Button, Text, Appbar } from 'react-native-paper';
-import { TextField } from 'react-native-material-textfield';
+import { View } from 'react-native';
+import { Button, Text, Appbar } from 'react-native-paper';
+import { AndroidBackHandler } from 'react-navigation-backhandler';
 
-import { Theme } from '../../../constants';
-
-import { EmptyState } from '../../../components/EmptyState';
-import { ScrollView } from '../../../components/View';
+import { Theme, DarkTheme } from '../../../constants';
+import { BackgroundView } from '../../../components/View';
+import { MemoIcon, AccountIcon, BalanceIcon } from '../../../components/SVG';
 
 @inject('accountStore')
 @observer
 export class TransferResultScreen extends Component {
-  confirm() {
-    this.props.navigation.navigate('Account');
-  }
+  moveToActivity = () => {
+    this.props.navigation.navigate('Activity');
+  };
+
+  onBackPress = () => {
+    this.moveToActivity();
+    return true;
+  };
 
   render() {
     const { navigation, accountStore } = this.props;
-    const { error, amount, symbol, receiver, memo } =
-      navigation.state.params || {};
+    const { amount, symbol, receiver, memo } = navigation.state.params || {};
 
-    const balance = symbol && accountStore.tokens[symbol];
+    const balance = symbol && accountStore.tokens[symbol].amount;
 
-    if (error) {
-      return (
-        <EmptyState
-          image={require('../../../assets/example.png')}
-          title="Transfer Failed"
-          description="Please check the error, it may be a network error."
-          descriptionStyle={{ marginBottom: 20 }}
-        >
-          <View
+    const Item = ({ title, description, icon }) => (
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          marginBottom: 10,
+          padding: 20,
+          ...DarkTheme.surface
+        }}
+      >
+        {icon}
+
+        <View style={{ flex: 1 }}>
+          <Text
             style={{
-              marginBottom: 25,
-              marginHorizontal: 30,
-              height: 150,
-              backgroundColor: Colors.grey300,
-              borderRadius: 5
+              marginBottom: 2,
+              ...DarkTheme.p,
+              color: Theme.palette.info
             }}
           >
-            <ScrollView style={{ padding: 10 }}>
-              <Text style={{ color: Colors.grey700 }}>
-                {JSON.stringify(this.error)}
-              </Text>
-            </ScrollView>
-          </View>
-
-          <Button mode="outlined" onPress={() => this.confirm()}>
-            Close
-          </Button>
-        </EmptyState>
-      );
-    }
+            {title}
+          </Text>
+          <Text style={DarkTheme.p}>{description}</Text>
+        </View>
+      </View>
+    );
 
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: Theme.primary }}>
-        <Appbar.Header dark style={{ backgroundColor: 'transparent' }}>
-          <Appbar.Action icon="close" onPress={() => this.confirm()} />
-          <Appbar.Content title="Transfer Result" />
-        </Appbar.Header>
+      <AndroidBackHandler onBackPress={this.onBackPress}>
+        <BackgroundView dark>
+          <Appbar.Header
+            dark
+            style={{ backgroundColor: DarkTheme.header.backgroundColor }}
+          >
+            <Appbar.Content title="Transfer Result" />
+          </Appbar.Header>
 
-        <View style={{ flex: 1, padding: 20, paddingTop: 30 }}>
-          <View style={{ flex: 1 }}>
-            <Text style={{ paddingBottom: 10, fontSize: 20, color: '#fff' }}>
-              {receiver}
-            </Text>
-            <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
-              <Text style={{ fontSize: 30, marginRight: 5, color: '#fff' }}>
-                {amount}
-              </Text>
+          <View
+            style={{
+              flex: 1,
+              margin: Theme.innerSpacing,
+              paddingTop: 50
+            }}
+          >
+            <View style={{ flex: 1 }}>
               <Text
                 style={{
-                  fontSize: 15,
-                  marginRight: 5,
-                  lineHeight: 30,
-                  color: '#fff'
+                  marginBottom: 7,
+                  ...Theme.h5,
+                  color: Theme.palette.info
                 }}
               >
-                {symbol}
+                Transferred amount
               </Text>
+
+              <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
+                <Text style={{ marginRight: 7, ...DarkTheme.h1 }}>
+                  {amount}
+                </Text>
+                <Text
+                  style={{
+                    lineHeight: DarkTheme.h1.fontSize,
+                    ...DarkTheme.h4
+                  }}
+                >
+                  {symbol}
+                </Text>
+              </View>
             </View>
-          </View>
 
-          {(memo || '') !== '' && (
-            <TextField
-              multiline
-              label="Memo"
-              baseColor="#fff"
-              textColor="#fff"
-              value={memo || ''}
-              editable={false}
+            <Item
+              title="Receiver"
+              description={receiver}
+              icon={
+                <AccountIcon
+                  scale={1.5}
+                  color={Theme.palette.inActive}
+                  style={{ marginRight: 15 }}
+                />
+              }
             />
-          )}
 
-          <TextField
-            multiline
-            label="Remaining amount"
-            baseColor="#fff"
-            textColor="#fff"
-            value={`${balance} ${symbol}`}
-            editable={false}
-          />
-        </View>
+            {(memo || '') !== '' && (
+              <Item
+                title="Memo"
+                description={memo || ''}
+                icon={
+                  <MemoIcon
+                    scale={1.5}
+                    color={Theme.palette.inActive}
+                    style={{ marginRight: 15 }}
+                  />
+                }
+              />
+            )}
 
-        <Button
-          style={{ padding: 5, margin: 20 }}
-          mode="contained"
-          color="#fff"
-          onPress={() => this.confirm()}
-        >
-          Close
-        </Button>
-      </SafeAreaView>
+            <Item
+              title="Remaining Amount"
+              description={`${balance} ${symbol}`}
+              icon={
+                <BalanceIcon
+                  scale={1.5}
+                  color={Theme.palette.inActive}
+                  style={{ marginRight: 15 }}
+                />
+              }
+            />
+
+            <Button
+              mode="contained"
+              color="#fff"
+              onPress={this.moveToActivity}
+              style={{ padding: 5, marginTop: 15 }}
+            >
+              Close
+            </Button>
+          </View>
+        </BackgroundView>
+      </AndroidBackHandler>
     );
   }
 }

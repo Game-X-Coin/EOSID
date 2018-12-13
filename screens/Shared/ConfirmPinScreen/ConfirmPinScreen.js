@@ -8,16 +8,13 @@ import { ConfirmPincode } from '../../../components/Pincode';
 export class ConfirmPinScreen extends Component {
   confirmPin = async (pincode, { setFailure }) => {
     const { pincodeStore, navigation } = this.props;
+    const { params } = navigation.state || {};
 
     try {
       await pincodeStore.validateAccountPincode(pincode);
       navigation.goBack(null);
 
-      try {
-        navigation.state.params && navigation.state.params.cb();
-      } catch (error) {
-        console.log(error);
-      }
+      params.cb && params.cb(pincode);
     } catch (error) {
       setFailure();
     }
@@ -32,7 +29,7 @@ export class ConfirmPinScreen extends Component {
     return (
       <ConfirmPincode
         onEnter={this.confirmPin}
-        backAction={() => this.props.navigation.goBack(null)}
+        backAction={() => navigation.goBack(null)}
         {...pinProps}
       />
     );

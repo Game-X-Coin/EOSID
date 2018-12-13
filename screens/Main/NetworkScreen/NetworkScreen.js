@@ -1,59 +1,89 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { SafeAreaView, View } from 'react-native';
-import { Appbar, List, Button } from 'react-native-paper';
+import { SafeAreaView } from 'react-native';
+import { Appbar, List, Text } from 'react-native-paper';
 
-import { ScrollView } from '../../../components/View';
+import { ScrollView, BackgroundView } from '../../../components/View';
+import { Theme } from '../../../constants';
 
-import HomeStyle from '../../../styles/HomeStyle';
-
-@inject('networkStore')
+@inject('accountStore', 'networkStore')
 @observer
 export class NetworkScreen extends Component {
   moveScreen = routeName => this.props.navigation.navigate(routeName);
 
+  changeNetwork = async (chainId, networkId) => {
+    const { accountStore } = this.props;
+    const accounts = await accountStore.getAccounts(chainId);
+    await accountStore.changeCurrentAccount(
+      accounts && accounts.length ? accounts[0] : null,
+      chainId,
+      networkId
+    );
+  };
+
   render() {
     const { networkStore, navigation } = this.props;
-    const { defaultNetworks, customNetworks } = networkStore;
+    const { chains } = networkStore;
 
     return (
-      <View style={HomeStyle.container}>
-        <SafeAreaView style={HomeStyle.container}>
-          <Appbar.Header>
-            <Appbar.BackAction onPress={() => navigation.goBack(null)} />
-            <Appbar.Content title="Networks" />
-            <Appbar.Action
-              icon="add"
-              onPress={() => this.moveScreen('AddNetwork')}
-            />
-          </Appbar.Header>
+      <BackgroundView>
+        <Appbar.Header
+          style={{ backgroundColor: Theme.header.backgroundColor }}
+        >
+          <Appbar.BackAction onPress={() => navigation.goBack(null)} />
+          <Appbar.Content title="Networks" />
+        </Appbar.Header>
 
-          <ScrollView>
-            <List.Section title="Mainnet">
-              {defaultNetworks.map(({ id, name, url }) => (
-                <List.Item key={id} title={name} description={url} />
-              ))}
-            </List.Section>
+        <ScrollView>
+          <SafeAreaView>
+            {Object.keys(chains).map(key => (
+              <List.Section title={chains[key].name} key={key}>
+                {chains[key].nodes &&
+                  chains[key].nodes.length &&
+                  chains[key].nodes.map(
+                    ({ id, name, chainURL, responseTime, success }) => (
+                      <List.Item
+                        key={id}
+                        title={name}
+                        description={`${chainURL}`}
+                        right={() => (
+                          <Text
+                            style={{
+                              alignSelf: 'center',
+                              paddingRight: 5,
+                              color: Theme.palette.primary
+                            }}
+                          >
+                            {responseTime ? `${responseTime} ms` : ''}
+                            {success ? '' : 'no response'}
+                          </Text>
+                        )}
+                        style={
+                          networkStore.currentNetwork.id === id
+                            ? { backgroundColor: Theme.palette.inActive }
+                            : {}
+                        }
+                        disabled={networkStore.currentNetwork.id === id}
+                        onPress={() => this.changeNetwork(key, id)}
+                      />
+                    )
+                  )}
+                {(!chains[key].nodes || !chains[key].nodes.length) && (
+                  <List.Item title="No networks" />
+                )}
+              </List.Section>
+            ))}
+          </SafeAreaView>
+        </ScrollView>
 
-            <List.Section title="Custom">
-              {customNetworks.map(({ id, name, url }) => (
-                <List.Item key={id} title={name} description={url} />
-              ))}
-              {!customNetworks.length && (
-                <List.Item title="No custom networks" />
-              )}
-            </List.Section>
-          </ScrollView>
-
-          <Button
-            style={{ padding: 5, margin: 20 }}
-            mode="contained"
-            onPress={() => this.moveScreen('AddNetwork')}
-          >
-            Add custom network
-          </Button>
-        </SafeAreaView>
-      </View>
+        {/* <Button
+          style={{ padding: 5, margin: 20 }}
+          mode="contained"
+          onPress={() => this.moveScreen('AddNetwork')}
+        >
+          Add network
+        </Button> */}
+      </BackgroundView>
     );
   }
 }

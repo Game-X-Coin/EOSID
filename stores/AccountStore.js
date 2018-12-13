@@ -1,10 +1,13 @@
 import { observable, action, computed } from 'mobx';
 
-import { AccountService, TransferLogService } from '../services';
+import AccountService from '../services/AccountService';
+import TransferLogService from '../services/TransferLogService';
 
-import { SettingsStore, PincodeStore } from './';
+import NetworkStore from './NetworkStore';
+import SettingsStore from './SettingsStore';
 
 import api from '../utils/eos/API';
+import TokenContracts from '../constants/TokenContracts';
 
 class Store {
   @observable
@@ -45,16 +48,35 @@ class Store {
 
   @computed
   get currentAccount() {
-    const { accountId } = SettingsStore.settings;
-
-    return this.accounts.find(account => account.id === accountId);
+    const { accountId, chainId } = SettingsStore.settings;
+    let accounts = this.accounts.filter(account => account.chainId === chainId);
+    let account = accounts.find(account => account.id === accountId);
+    if (!account && accounts.length) {
+      account = accounts[0];
+    }
+    return account;
   }
 
   @action
-  async changeCurrentAccount(accountId) {
-    if (accountId !== (this.currentAccount && this.currentAccount.accountId)) {
+  async changeCurrentAccount(accountId, chainId, networkId) {
+    if (!chainId) {
+      chainId = SettingsStore.settings.chainId;
+    }
+    if (!accountId && this.accounts) {
+      accountId = (
+        this.accounts.find(account => account.chainId === chainId) || {}
+      ).id;
+    }
+
+    if (
+      !accountId ||
+      accountId !== (this.currentAccount && this.currentAccount.accountId)
+    ) {
       // update settings
-      await SettingsStore.updateSettings({ accountId });
+      await SettingsStore.updateSettings({ accountId, chainId });
+
+      // set current network
+      NetworkStore.setCurrentNetwork(this.currentAccount, chainId, networkId);
       // fetch account info
       await this.getAccountInfo();
     }
@@ -66,28 +88,41 @@ class Store {
   }
 
   @action
-  async getAccounts() {
+  async getAccounts(chainId) {
     return AccountService.getAccounts().then(accounts => {
       this.setAccounts(accounts);
+      if (chainId) {
+        return this.accounts.filter(account => account.chainId === chainId);
+      }
+      return accounts;
     });
   }
 
   @action
   async addAccount(accountInfo) {
     return AccountService.addAccount({
-      ...accountInfo,
-      pincode: PincodeStore.accountPincode
+      ...accountInfo
     }).then(async account => {
       // remove duplicate entity
       const accounts = this.accounts.filter(
-        entity => entity.name !== account.name
+        entity =>
+          entity.name !== account.name || entity.chainId !== account.chainId
       );
       accounts.push(account);
 
       this.setAccounts(accounts);
-      await this.changeCurrentAccount(account.id);
+      await this.changeCurrentAccount(account.id, account.chainId);
       await this.getAccountInfo();
     });
+  }
+
+  @action
+  async updateEncryptedKeys(prevPincode, newPincode) {
+    return AccountService.updateEncryptedKeys(prevPincode, newPincode).then(
+      accounts => {
+        this.setAccounts(accounts);
+      }
+    );
   }
 
   @action
@@ -99,7 +134,8 @@ class Store {
 
       this.setAccounts(filterDeletedAccount);
       this.changeCurrentAccount(
-        this.accounts.length ? this.accounts[0].id : ''
+        this.accounts.length ? this.accounts[0].id : '',
+        this.accounts.length ? this.accounts[0].chainId : ''
       );
     });
   }
@@ -130,16 +166,31 @@ class Store {
 
   async getTokens() {
     const account = this.currentAccount;
+    const { chainId } = SettingsStore.settings;
 
-    const tokens = await api.currency.balance({ account: account.name });
+    if (!Object.keys(this.tokens).length) {
+      this.tokens = {
+        EOS: { amount: '0.0000', code: 'eosio.token' }
+      };
+    }
 
-    this.tokens = {
-      EOS: '0.0000',
-      ...tokens.reduce((ac, v) => {
-        const [amount, symbol] = v.split(' ');
-        return { ...ac, [symbol]: amount };
-      }, {})
-    };
+    TokenContracts[chainId].forEach(async contract => {
+      const balances = await api.currency.balance({
+        code: contract,
+        account: account.name
+      });
+      if (balances && balances.length) {
+        const tokens = balances.reduce((ac, v) => {
+          const [amount, symbol] = v.split(' ');
+          const precision = amount.split('.')[1].length;
+          return { ...ac, [symbol]: { amount, code: contract, precision } };
+        }, {});
+        this.tokens = {
+          ...this.tokens,
+          ...tokens
+        };
+      }
+    });
   }
 
   async getActions(page = 1) {
@@ -154,11 +205,16 @@ class Store {
       ? lastestActions[0].account_action_seq
       : 0;
 
-    const { actions = [] } = await api.actions.gets({
+    let { actions = [] } = await api.actions.gets({
       account_name: account.name,
       lastestSeq,
       page
     });
+
+    actions = actions.filter(
+      action =>
+        action.action_trace.receipt.receiver === action.action_trace.act.account
+    );
 
     // when refresh actions
     if (page === 1) {
@@ -173,17 +229,17 @@ class Store {
   @action
   async transfer(params) {
     const { id, name } = this.currentAccount;
-    const { permission = 'active' } = params;
-    const key = AccountService.getKey(this.currentAccount, permission);
+    // const { permission = 'active' } = params;
+    const key = AccountService.getKey(this.currentAccount);
 
     return AccountService.transfer({
       ...params,
-      sender: name,
+      from: name,
       encryptedPrivateKey: key.encryptedPrivateKey,
-      pincode: PincodeStore.accountPincode
+      permission: key.permission
     }).then(async tx => {
-      // fetch lastets tokens
       await this.getTokens();
+      this.getActions();
       // log transfer
       TransferLogService.addTransferLog({ ...params, accountId: id });
 
@@ -194,21 +250,22 @@ class Store {
   @action
   async manageResource(params) {
     const { name } = this.currentAccount;
-    const { permission = 'active' } = params;
-    const key = AccountService.getKey(this.currentAccount, permission);
+    // const { permission = 'active' } = params;
+    const key = AccountService.getKey(this.currentAccount);
 
     return AccountService.manageResource({
       ...params,
-      sender: name,
+      from: name,
       encryptedPrivateKey: key.encryptedPrivateKey,
-      pincode: PincodeStore.accountPincode
+      permission: key.permission
     }).then(async tx => {
       await this.getInfo();
       await this.getTokens();
+      this.getActions();
 
       return tx;
     });
   }
 }
 
-export const AccountStore = new Store();
+export default new Store();

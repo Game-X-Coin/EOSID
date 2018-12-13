@@ -2,269 +2,528 @@ import React, { Component } from 'react';
 import { observable } from 'mobx';
 import { observer, inject } from 'mobx-react';
 import { withNavigation } from 'react-navigation';
-import { View } from 'react-native';
 import {
-  Colors,
-  ProgressBar,
-  Title,
-  Text,
-  Divider,
-  TouchableRipple,
-  Caption,
-  Button,
-  Appbar
-} from 'react-native-paper';
-import { Icon, LinearGradient } from 'expo';
-import bytes from 'bytes';
-import prettyMs from 'pretty-ms';
+  View,
+  Image,
+  TouchableWithoutFeedback,
+  Animated,
+  Platform,
+  PanResponder,
+  StatusBar,
+  SafeAreaView,
+  Dimensions
+} from 'react-native';
+import { Title, Text, TouchableRipple } from 'react-native-paper';
+import { AndroidBackHandler } from 'react-navigation-backhandler';
 
+import { Theme, DarkTheme } from '../../../constants';
 import { PageIndicator } from '../../../components/Indicator';
-import { ScrollView } from '../../../components/View';
+import { BackgroundView, ScrollView } from '../../../components/View';
+import { ArrowIcon } from '../../../components/SVG';
+import TokenLogo from '../../../constants/TokenLogo';
 
-import { AccountSelectDrawer } from './AccountSelectDrawer';
-
-const ItemTitle = ({ title, style }) => (
-  <View
-    style={{
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginBottom: 10,
-      ...style
-    }}
-  >
-    <Caption>{title}</Caption>
-
-    <Divider style={{ flex: 1, marginLeft: 10 }} />
-  </View>
-);
-
-const DelegatedItem = ({ title, subTitle, amount, percentage, color }) => (
-  <View>
-    <View style={{ flexDirection: 'row' }}>
-      <View
-        style={{
-          flex: 1,
-          flexDirection: 'row',
-          alignItems: 'flex-start'
-        }}
-      >
-        <Text style={{ marginRight: 5, fontSize: 15 }}>{title}</Text>
-        <Caption>{subTitle}</Caption>
-      </View>
-
-      <Text>{amount && `${amount.toFixed(4)} EOS`}</Text>
-    </View>
-    <ProgressBar
-      progress={percentage}
-      color={color}
-      style={{ paddingVertical: 8 }}
-    />
-  </View>
-);
+const WINDOW_HEIGHT = Dimensions.get('window').height;
+const STATUS_BAR_HEIGHT = Platform.OS === 'ios' ? 0 : StatusBar.currentHeight;
+const SWIPABLE_HEIGHT = 60;
 
 @withNavigation
 @inject('accountStore')
 @observer
 export class AccountInfo extends Component {
   @observable
+  refreshing = false;
+
+  @observable
   drawerVisible = false;
 
   @observable
-  refreshing = false;
+  innerHeight = WINDOW_HEIGHT;
+
+  // animate drawer
+  drawerFrame = new Animated.Value(0);
 
   onRefresh = async () => {
     this.refreshing = true;
 
-    await Promise.all([
-      this.props.accountStore.getInfo(),
-      this.props.accountStore.getTokens()
-    ]);
+    await this.props.accountStore.getTokens();
 
     this.refreshing = false;
   };
 
-  prettyBytes(value) {
-    return bytes(value, { thousandsSeparator: ',' });
+  panResponder = PanResponder.create({
+    onMoveShouldSetPanResponder: () => true,
+    onMoveShouldSetPanResponderCapture: () => true,
+    onPanResponderMove: (...args) => this.panResponderMove(...args),
+    onPanResponderRelease: (...args) => this.panResponderRelease(...args)
+  });
+
+  panResponderMove(evt, getsture) {
+    const { moveY, y0 } = getsture;
+
+    if (this.drawerVisible) {
+      const pos = moveY - y0;
+
+      if (pos > 0) {
+        this.drawerFrame.setValue(1 - pos / this.innerHeight);
+      }
+    } else {
+      const pos = y0 - moveY;
+
+      if (pos > 0) {
+        this.drawerFrame.setValue(pos / this.innerHeight);
+      }
+    }
   }
 
-  prettyTime(value) {
-    return prettyMs(value * 0.001);
+  panResponderRelease(evt, { moveY, vy }) {
+    if (this.drawerVisible) {
+      if (moveY > this.innerHeight / 2 || vy > 0.5) {
+        this.hideDrawer();
+      } else {
+        this.showDrawer();
+      }
+    } else {
+      if (moveY < this.innerHeight / 2 || vy < -0.5) {
+        this.showDrawer();
+      } else {
+        this.hideDrawer();
+      }
+    }
   }
 
   showDrawer() {
     this.drawerVisible = true;
+
+    Animated.timing(this.drawerFrame, {
+      toValue: 1,
+      duration: 200
+    }).start();
   }
 
   hideDrawer() {
     this.drawerVisible = false;
+
+    Animated.timing(this.drawerFrame, {
+      toValue: 0,
+      duration: 200
+    }).start();
+  }
+
+  onBackPress() {
+    if (this.drawerVisible) {
+      this.hideDrawer();
+      return true;
+    }
+
+    return false;
   }
 
   moveScreen = (...args) => this.props.navigation.navigate(...args);
 
   render() {
-    const { info, tokens, fetched, currentAccount } = this.props.accountStore;
-
     const {
-      cpu_limit = { max: 0, used: 0 },
-      cpu_weight = 0,
-      net_limit = { max: 0, used: 0 },
-      net_weight = 0,
-      ram_usage = 0,
-      ram_quota = 0,
-      refund_request
-    } = info;
+      info: { total_resources = {} },
+      tokens,
+      fetched,
+      currentAccount
+    } = this.props.accountStore;
 
-    const delegatedCPU = cpu_weight * 0.0001;
-    const delegatedNET = net_weight * 0.0001;
-    const undelegatedAmount =
-      Object.keys(tokens).length && parseFloat(tokens.EOS);
-    const totalAsset = delegatedCPU + delegatedNET + undelegatedAmount;
-    const refundAmount =
-      refund_request &&
-      Number(refund_request.cpu_amount.split(' ')[0]) +
-        Number(refund_request.net_amount.split(' ')[0]);
+    const { cpu_weight = 0, net_weight = 0 } = total_resources || {};
 
-    const CustomAppbar = () => (
-      <Appbar.Header dark style={{ backgroundColor: 'transparent' }}>
-        <View style={{ flex: 1, flexDirection: 'row', paddingHorizontal: 15 }}>
-          <TouchableRipple borderless onPress={() => this.showDrawer()}>
-            <Title
+    const stakedBalance = parseFloat(cpu_weight) + parseFloat(net_weight);
+    const unstakedBalance = tokens.EOS
+      ? parseFloat(tokens.EOS.amount).toFixed(4)
+      : 0;
+
+    const ActionItem = ({ icon, name, description, onPress }) => (
+      <View
+        style={{
+          marginBottom: 15,
+          ...Theme.surface,
+          ...Theme.shadow
+        }}
+      >
+        <TouchableRipple onPress={onPress}>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              paddingHorizontal: 20
+            }}
+          >
+            <Image
               style={{
-                color: '#fff',
-                fontSize: 18
+                padding: 5,
+                width: 17,
+                height: 17
+              }}
+              source={icon}
+            />
+            <Text
+              style={{
+                flex: 1,
+                marginLeft: 20,
+                paddingVertical: 14,
+                ...Theme.h5
               }}
             >
-              {currentAccount.name}{' '}
-              <Icon.Ionicons name="md-arrow-dropdown" size={18} />
-            </Title>
-          </TouchableRipple>
-          <View style={{ flex: 1 }} />
-        </View>
-        <Appbar.Action
-          icon="add"
-          onPress={() => this.moveScreen('ImportAccount')}
-        />
-      </Appbar.Header>
+              {name}
+            </Text>
+
+            {description && (
+              <Text style={{ ...Theme.p, color: Theme.palette.darkGray }}>
+                {description}
+              </Text>
+            )}
+          </View>
+        </TouchableRipple>
+      </View>
     );
 
     return (
-      <React.Fragment>
-        {/* Drawer */}
-        <AccountSelectDrawer
-          visible={this.drawerVisible}
-          onHide={() => this.hideDrawer()}
-        />
-
-        <ScrollView refreshing={this.refreshing} onRefresh={this.onRefresh}>
-          <LinearGradient
-            colors={['#3023ae', '#c86dd7']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-          >
-            <CustomAppbar />
-
+      <AndroidBackHandler onBackPress={() => this.onBackPress()}>
+        <BackgroundView dark>
+          <SafeAreaView style={{ flex: 1 }}>
             <View
-              style={{
-                paddingTop: 15,
-                paddingBottom: 35,
-                alignItems: 'center'
+              style={{ flex: 1 }}
+              onLayout={event => {
+                this.innerHeight = event.nativeEvent.layout.height;
               }}
             >
-              <Title style={{ marginBottom: 5, color: '#fff', fontSize: 25 }}>
-                {fetched ? `${totalAsset.toFixed(4)} EOS` : 'fetch assets...'}
-              </Title>
-
-              <Text style={{ color: '#fff' }}>TOTAL BALANCE</Text>
-            </View>
-          </LinearGradient>
-
-          {!fetched ? (
-            <PageIndicator style={{ height: 300 }} />
-          ) : (
-            <React.Fragment>
-              {/* Resources */}
-              <View style={{ padding: 20 }}>
-                <ItemTitle title="Resources" />
-
-                <DelegatedItem
-                  title="CPU"
-                  subTitle={`(${this.prettyTime(
-                    cpu_limit.used
-                  )} / ${this.prettyTime(cpu_limit.max)})`}
-                  amount={delegatedCPU}
-                  percentage={cpu_limit.used / cpu_limit.max}
-                  color={Colors.blue700}
-                />
-
-                <DelegatedItem
-                  title="Network"
-                  subTitle={`(${this.prettyBytes(
-                    net_limit.used
-                  )} / ${this.prettyBytes(net_limit.max)})`}
-                  amount={delegatedNET}
-                  percentage={cpu_limit.used / cpu_limit.max}
-                  color={Colors.green700}
-                />
-
-                {refund_request && (
-                  <DelegatedItem
-                    title="Refunding"
-                    subTitle={refund_request.request_time}
-                    amount={refundAmount}
-                    percentage={refundAmount / (delegatedCPU + delegatedNET)}
-                    color={Colors.orange700}
-                  />
-                )}
-
-                <DelegatedItem
-                  title="RAM"
-                  subTitle={`(${this.prettyBytes(
-                    ram_usage
-                  )} / ${this.prettyBytes(ram_quota)})`}
-                  percentage={ram_usage / ram_quota}
-                  color={Colors.grey900}
-                />
-
-                <Button
-                  style={{ marginTop: 5 }}
-                  onPress={() => this.moveScreen('ManageResource')}
+              <Animated.View
+                style={{
+                  opacity: this.drawerFrame.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [1, 0]
+                  })
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    marginHorizontal: Theme.innerSpacing - 5,
+                    paddingTop: 15 + STATUS_BAR_HEIGHT
+                  }}
                 >
-                  Manage Resource
-                </Button>
-              </View>
-
-              {/* Tokens */}
-              <View style={{ paddingBottom: 20 }}>
-                <ItemTitle title="Tokens" style={{ paddingHorizontal: 20 }} />
-                {Object.keys(tokens).map(symbol => (
+                  <View style={{ flex: 1 }} />
                   <TouchableRipple
-                    key={symbol}
-                    onPress={() => this.moveScreen('Transfer', { symbol })}
+                    borderless
+                    style={{ padding: 5 }}
+                    onPress={() => this.moveScreen('Permission')}
                   >
+                    <Image
+                      style={{
+                        width: 30,
+                        height: 30
+                      }}
+                      source={require('../../../assets/icons/account.png')}
+                    />
+                  </TouchableRipple>
+                </View>
+
+                <View
+                  style={{
+                    marginVertical: 50
+                  }}
+                >
+                  <Text
+                    style={{
+                      marginBottom: 5,
+                      textAlign: 'center',
+                      ...DarkTheme.h5
+                    }}
+                  >
+                    Total Balance
+                  </Text>
+                  {fetched ? (
                     <View
                       style={{
                         flexDirection: 'row',
-                        paddingHorizontal: 20,
-                        paddingVertical: 10
+                        alignItems: 'flex-end',
+                        justifyContent: 'center'
                       }}
                     >
-                      <Text style={{ flex: 1, fontSize: 17 }}>{symbol}</Text>
-                      <Text style={{ fontSize: 17 }}>{tokens[symbol]}</Text>
+                      <Text
+                        style={{
+                          marginRight: 7,
+                          fontSize: 37,
+                          color: DarkTheme.text.color
+                        }}
+                      >
+                        {unstakedBalance}
+                      </Text>
+                      <Text
+                        style={{
+                          lineHeight: 37,
+                          ...DarkTheme.h4
+                        }}
+                      >
+                        EOS
+                      </Text>
                     </View>
-                  </TouchableRipple>
-                ))}
+                  ) : (
+                    <Text
+                      style={{
+                        textAlign: 'center',
+                        lineHeight: 50,
+                        ...DarkTheme.h3
+                      }}
+                    >
+                      Fetching balance...
+                    </Text>
+                  )}
+                </View>
 
-                <Button
-                  style={{ marginTop: 5, marginHorizontal: 20 }}
-                  onPress={() => this.moveScreen('Transfer')}
+                <View
+                  style={{
+                    marginHorizontal: Theme.innerSpacing
+                  }}
                 >
-                  Transfer Token
-                </Button>
+                  <ActionItem
+                    name="Transfer"
+                    icon={require('../../../assets/icons/transfer.png')}
+                    onPress={() => this.moveScreen('Transfer')}
+                  />
+                </View>
+              </Animated.View>
+
+              <View
+                style={{ flex: 1, backgroundColor: 'transparent' }}
+                {...this.panResponder.panHandlers}
+              >
+                <View
+                  style={{
+                    position: 'absolute',
+                    left: 0,
+                    right: 0,
+                    bottom: SWIPABLE_HEIGHT + 10,
+                    alignItems: 'center',
+                    opacity: 0.5
+                  }}
+                >
+                  <ArrowIcon scale="1.5" />
+                </View>
               </View>
-            </React.Fragment>
-          )}
-        </ScrollView>
-      </React.Fragment>
+
+              <Animated.View
+                style={{
+                  position: 'absolute',
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  top: 0,
+                  zIndex: 9999,
+                  marginHorizontal: this.drawerFrame.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [Theme.innerSpacing, 0]
+                  }),
+                  borderRadius: this.drawerFrame.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [10, 0]
+                  }),
+                  transform: [
+                    {
+                      translateY: this.drawerFrame.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [
+                          this.innerHeight - SWIPABLE_HEIGHT,
+                          STATUS_BAR_HEIGHT
+                        ]
+                      })
+                    }
+                  ],
+                  overflow: 'hidden'
+                }}
+              >
+                <View {...this.panResponder.panHandlers}>
+                  <TouchableWithoutFeedback
+                    onPress={() => !this.drawerVisible && this.showDrawer()}
+                  >
+                    <Animated.View
+                      style={{
+                        backgroundColor: this.drawerFrame.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [
+                            DarkTheme.surface.backgroundColor,
+                            DarkTheme.app.backgroundColor
+                          ]
+                        })
+                      }}
+                    >
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          paddingHorizontal: Theme.innerPadding,
+                          height: SWIPABLE_HEIGHT
+                        }}
+                      >
+                        <View
+                          style={{
+                            flex: 1,
+                            flexDirection: 'row',
+                            alignItems: 'center'
+                          }}
+                        >
+                          <Text style={{ fontWeight: '500', ...DarkTheme.h4 }}>
+                            {currentAccount.name}
+                          </Text>
+                          <Text style={DarkTheme.h4}>'s tokens</Text>
+                        </View>
+                      </View>
+
+                      <Image
+                        resizeMode="contain"
+                        source={require('../../../assets/logos/eos_large.png')}
+                        style={{
+                          position: 'absolute',
+                          right: 10,
+                          top: 70,
+                          opacity: 0.5,
+                          height: 180
+                        }}
+                      />
+
+                      <View
+                        style={{
+                          paddingHorizontal: 30,
+                          marginTop: 80,
+                          marginBottom: 30
+                        }}
+                      >
+                        <Text
+                          style={{
+                            marginBottom: 5,
+                            ...DarkTheme.h5
+                          }}
+                        >
+                          Total Balance
+                        </Text>
+                        {fetched ? (
+                          <View
+                            style={{
+                              flexDirection: 'row',
+                              alignItems: 'flex-end'
+                            }}
+                          >
+                            <Text
+                              style={{
+                                marginRight: 7,
+                                fontSize: 37,
+                                color: DarkTheme.text.color
+                              }}
+                            >
+                              {unstakedBalance}
+                            </Text>
+                            <Text
+                              style={{
+                                lineHeight: 37,
+                                ...DarkTheme.h4
+                              }}
+                            >
+                              EOS
+                            </Text>
+                          </View>
+                        ) : (
+                          <Text
+                            style={{
+                              lineHeight: 50,
+                              ...DarkTheme.h3
+                            }}
+                          >
+                            Fetching balance...
+                          </Text>
+                        )}
+                      </View>
+
+                      <View
+                        style={{
+                          marginBottom: 10,
+                          alignItems: 'center',
+                          opacity: 0.5
+                        }}
+                      >
+                        <ArrowIcon down scale="1.5" />
+                      </View>
+                    </Animated.View>
+                  </TouchableWithoutFeedback>
+                </View>
+
+                <View
+                  style={{
+                    flex: 1,
+                    backgroundColor: Theme.surface.backgroundColor
+                  }}
+                >
+                  {!fetched ? (
+                    <PageIndicator />
+                  ) : (
+                    <ScrollView
+                      refreshing={this.refreshing}
+                      onRefresh={this.onRefresh}
+                    >
+                      {Object.keys(tokens).map(symbol => (
+                        <TouchableRipple
+                          key={symbol}
+                          style={{
+                            paddingHorizontal: Theme.innerPadding
+                          }}
+                          onPress={() =>
+                            this.moveScreen('Transfer', { symbol })
+                          }
+                        >
+                          <View
+                            style={{
+                              flexDirection: 'row',
+                              alignItems: 'center'
+                            }}
+                          >
+                            {TokenLogo[tokens[symbol].code] &&
+                            TokenLogo[tokens[symbol].code][symbol] ? (
+                              <Image
+                                style={{
+                                  marginRight: 15,
+                                  width: 40,
+                                  height: 40,
+                                  borderRadius: 20
+                                }}
+                                resizeMode="contain"
+                                source={TokenLogo[tokens[symbol].code][symbol]}
+                              />
+                            ) : (
+                              <Image
+                                style={{
+                                  marginRight: 15,
+                                  width: 40,
+                                  height: 40
+                                }}
+                                source={require('../../../assets/images/token_logo/eos.png')}
+                              />
+                            )}
+                            <Title
+                              style={{
+                                flex: 1,
+                                paddingVertical: 25,
+                                ...Theme.h5
+                              }}
+                            >
+                              {symbol}
+                            </Title>
+                            <Title style={Theme.h5}>
+                              {tokens[symbol].amount}
+                            </Title>
+                          </View>
+                        </TouchableRipple>
+                      ))}
+                    </ScrollView>
+                  )}
+                </View>
+              </Animated.View>
+            </View>
+          </SafeAreaView>
+        </BackgroundView>
+      </AndroidBackHandler>
     );
   }
 }

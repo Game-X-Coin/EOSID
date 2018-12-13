@@ -4,10 +4,14 @@ import { AES, enc } from 'crypto-js';
 import { AccountModel, AccountError } from '../db';
 import api from '../utils/eos/API';
 
-export class AccountService {
-  static async getAccounts() {
+export default class AccountService {
+  static async getAccounts(chainId) {
     const AccountRepo = getRepository(AccountModel);
-    const accounts = await AccountRepo.find();
+    const where = {};
+    if (chainId) {
+      where.chainId = chainId;
+    }
+    const accounts = await AccountRepo.find(where);
 
     return accounts;
   }
@@ -20,7 +24,7 @@ export class AccountService {
     );
 
     // invalid account
-    if (!account_names.length) {
+    if (!account_names || !account_names.length) {
       return Promise.reject(AccountError.AccountNotAvailable);
     }
 
@@ -33,6 +37,7 @@ export class AccountService {
     permissions,
     publicKey,
     name,
+    chainId,
     ...accountInfo
   }) {
     const AccountRepo = getRepository(AccountModel);
@@ -40,18 +45,17 @@ export class AccountService {
     // encrypt private key
     const encryptedPrivateKey = AccountService.encryptKey(privateKey, pincode);
 
-    let account = await AccountRepo.findOne({ name });
+    let account = await AccountRepo.findOne({ name, chainId });
 
     if (!account) {
       // create new account instance
-      account = new AccountModel({
-        ...accountInfo,
-        name,
+      const keys = AccountService.setKey({
         publicKey,
         encryptedPrivateKey,
         permission: permissions[0]
       });
-
+      account = new AccountModel({ ...accountInfo, name, keys, chainId });
+      permissions = permissions.slice(1);
       // check duplicated permission in account
     } else if (
       permissions.find(permission => AccountService.getKey(account, permission))
@@ -60,15 +64,19 @@ export class AccountService {
     }
 
     // update account permissions
-    account.keys = permissions.reduce((pv, permission) => {
+    const keys = permissions.reduce((pv, permission) => {
       const key = {
         publicKey,
         encryptedPrivateKey,
         permission
       };
 
-      return AccountService.setKey(pv, key);
+      return AccountService.setKey(key, pv);
     }, []);
+
+    if (keys.length) {
+      account.keys = [...(account.keys ? account.keys : []), ...keys];
+    }
 
     // save
     return await AccountRepo.save(account);
@@ -84,8 +92,54 @@ export class AccountService {
     await AccountRepo.remove(findAccount);
   }
 
-  static encryptKey(encryptedPrivateKey, pinCode) {
-    return AES.encrypt(encryptedPrivateKey, pinCode).toString();
+  static async updateEncryptedKeys(prevPincode, newPincode) {
+    const AccountRepo = getRepository(AccountModel);
+    const accounts = await AccountRepo.find();
+
+    const updatedAccounts = accounts.map(account => {
+      const updatedKeys = account.keys.map(key => {
+        const {
+          encryptedPrivateKey,
+          ...parsedKeys
+        } = AccountService.getParsingKey(key);
+
+        const decryptedPrivateKey = AccountService.decryptKey(
+          encryptedPrivateKey,
+          prevPincode
+        );
+
+        // update private key
+        const updatedEncryptedPrivateKey = AccountService.encryptKey(
+          decryptedPrivateKey,
+          newPincode
+        );
+
+        const stringifiedKey = AccountService.stringifyKey({
+          ...parsedKeys,
+          encryptedPrivateKey: updatedEncryptedPrivateKey
+        });
+
+        return stringifiedKey;
+      });
+
+      return {
+        ...account,
+        keys: updatedKeys
+      };
+    });
+
+    // update keys in account repo
+    await Promise.all(
+      updatedAccounts.map(account =>
+        AccountRepo.update(account.id, { keys: account.keys })
+      )
+    );
+
+    return updatedAccounts;
+  }
+
+  static encryptKey(privateKey, pinCode) {
+    return AES.encrypt(privateKey, pinCode).toString();
   }
 
   static decryptKey(encryptedPrivateKey, pinCode) {
@@ -93,30 +147,38 @@ export class AccountService {
   }
 
   static getParsingKey(key) {
-    key = key.replace(/\|/g, ',');
+    key = key.replace(/[|]/g, ',');
     return JSON.parse(key);
   }
-  static getKey(account, permission = 'active') {
-    const foundKey = account.keys.find(
-      key => AccountService.getParsingKey(key).permission === permission
-    );
+
+  static getKey(account, permission) {
+    let foundKey = false;
+
+    account.keys.some(key => {
+      const parsedKey = AccountService.getParsingKey(key);
+      return (foundKey =
+        !permission || parsedKey.permission === permission ? parsedKey : false);
+    });
 
     return foundKey;
   }
 
-  static setKey(keys, key) {
-    if (!keys) {
-      keys = [];
-    }
-    key = JSON.stringify(key);
-    key = key.replace(/,/g, '|');
-    keys.push(key);
+  static stringifyKey(key) {
+    const stringified = JSON.stringify(key);
+    const replaced = stringified.replace(/,/g, '|');
+
+    return replaced;
+  }
+
+  static setKey(key, keys = []) {
+    const stringifiedKey = AccountService.stringifyKey(key);
+    keys.push(stringifiedKey);
     return keys;
   }
 
   static async transfer({
     pincode,
-    sender,
+    from,
     receiver,
     encryptedPrivateKey,
     ...transferInfo
@@ -129,7 +191,7 @@ export class AccountService {
       privateKey,
       pincode,
       to: receiver,
-      from: sender
+      from
     });
   }
 

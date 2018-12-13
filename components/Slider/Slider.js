@@ -1,9 +1,10 @@
 import React from 'react';
 import { View, PanResponder } from 'react-native';
+import { Theme } from '../../constants';
 
 const min = 0;
 const max = 1;
-const CIRCLE_DIAMETER = 30;
+const CIRCLE_DIAMETER = 25;
 
 export class Slider extends React.Component {
   state = {
@@ -87,8 +88,8 @@ export class Slider extends React.Component {
   render() {
     const { value, deltaValue, barWidth } = this.state;
     const {
-      trackColor = '#b7b7b7',
-      slidedTrackColor = '#1073ff',
+      trackColor = '#ebebeb',
+      slidedTrackColor = Theme.palette.primary,
       thumbColor = '#fff'
     } = this.props;
 
@@ -108,16 +109,17 @@ export class Slider extends React.Component {
       <View
         style={{
           justifyContent: 'center',
-          padding: CIRCLE_DIAMETER / 2
+          paddingHorizontal: CIRCLE_DIAMETER / 2
         }}
       >
         <View
           style={{
             flex: 1,
             flexDirection: 'row',
-            height: 4,
+            height: CIRCLE_DIAMETER,
             backgroundColor: trackColor,
-            borderRadius: 3
+            borderRadius: Theme.innerBorderRadius,
+            overflow: 'hidden'
           }}
           onLayout={this.onBarLayout}
         >
@@ -136,13 +138,7 @@ export class Slider extends React.Component {
             borderRadius: CIRCLE_DIAMETER / 2,
             width: CIRCLE_DIAMETER,
             height: CIRCLE_DIAMETER,
-            // shadows in Android
-            elevation: 4,
-            // shadows in IOS
-            shadowColor: 'black',
-            shadowOffset: { width: 0, height: 2 },
-            shadowRadius: 2,
-            shadowOpacity: 0.5
+            ...Theme.shadow
           }}
           {...this.panResponder.panHandlers}
         />

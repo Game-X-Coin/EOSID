@@ -3,46 +3,67 @@ import { observer, inject } from 'mobx-react';
 import { Linking } from 'react-native';
 import { createStackNavigator } from 'react-navigation';
 import { createMaterialBottomTabNavigator } from 'react-navigation-material-bottom-tabs';
-import { Icon, Linking as ExpoLinking } from 'expo';
+import { Linking as ExpoLinking } from 'expo';
+
+import StackViewStyleInterpolator from 'react-navigation-stack/dist/views/StackView/StackViewStyleInterpolator';
 
 import {
   AccountScreen,
   SettingsScreen,
   AddNetworkScreen,
   NetworkScreen as SettingsNetworkScreen,
-  TransactionScreen,
-  TransactionDetailScreen,
   AccountsScreen,
   TransferScreen,
   TransferAmountScreen,
   TransferResultScreen,
   PermissionRequestScreen,
-  ManageResourceScreen
+  ManageResourceScreen,
+  PermissionScreen,
+  ActivityScreen,
+  ActivityDetailScreen,
+  ResourceScreen,
+  SettingsAppPinScreen,
+  SettingsAccountPinScreen,
+  AboutUsScreen
 } from '../../screens/Main';
 
 import {
   ImportAccountScreen,
   ShowErrorScreen,
+  ShowSuccessScreen,
   ConfirmPinScreen,
   ConfirmAppPinScreen,
   NewPinScreen,
   NewAppPinScreen
 } from '../../screens/Shared';
 
+import { Theme } from '../../constants';
+import {
+  BalanceIcon,
+  ResourceIcon,
+  ActivityIcon,
+  SettingsIcon
+} from '../../components/SVG';
+
 // detail screens
 const DetailScreens = {
   // accounts
   ImportAccount: ImportAccountScreen,
+  Resource: ResourceScreen,
   ManageResource: ManageResourceScreen,
   Transfer: TransferScreen,
   TransferAmount: TransferAmountScreen,
   TransferResult: TransferResultScreen,
+  Permission: PermissionScreen,
   // settings
   SettingsNetwork: SettingsNetworkScreen,
+  SettingsAppPin: SettingsAppPinScreen,
+  SettingsAccountPin: SettingsAccountPinScreen,
+  SettingsAboutUs: AboutUsScreen,
   AddNetwork: AddNetworkScreen,
   Accounts: AccountsScreen,
-  // tx
-  TransactionDetail: TransactionDetailScreen,
+  // activity
+  ActivityDetail: ActivityDetailScreen,
   // confirm pincode
   ConfirmPin: ConfirmPinScreen,
   ConfirmAppPin: ConfirmAppPinScreen,
@@ -51,50 +72,59 @@ const DetailScreens = {
   NewAppPin: NewAppPinScreen,
   // confirm dapp sign
   PermissionRequest: PermissionRequestScreen,
-  // show error
-  ShowError: ShowErrorScreen
+  // show result status
+  ShowError: ShowErrorScreen,
+  ShowSuccess: ShowSuccessScreen
 };
 
-// for tab icons
 const iconMap = {
-  Account: 'md-contact',
-  Transaction: 'md-filing',
-  Settings: 'md-settings'
+  Account: BalanceIcon,
+  Activity: ActivityIcon,
+  Resources: ResourceIcon,
+  Settings: SettingsIcon
+};
+
+const labelMap = {
+  Account: 'Balance',
+  Activity: 'Activities',
+  Resources: 'Resources',
+  Settings: 'Settings'
 };
 
 // tab navigator
 const MainTabNavigator = createMaterialBottomTabNavigator(
   {
     Account: AccountScreen,
-    Transaction: TransactionScreen,
+    Resources: ResourceScreen,
+    Activity: ActivityScreen,
     Settings: SettingsScreen
   },
   {
-    shifting: true,
-    navigationOptions: ({ navigation }) => ({
-      tabBarIcon: ({ tintColor }) => {
-        const { routeName } = navigation.state;
-
-        return (
-          <Icon.Ionicons
-            size={26}
-            name={iconMap[routeName]}
-            color={tintColor}
-          />
-        );
+    navigationOptions: ({
+      navigation: {
+        state: { routeName }
       }
-    })
+    }) => ({
+      title: labelMap[routeName],
+      tabBarIcon: ({ tintColor }) => {
+        return iconMap[routeName]({ color: tintColor });
+      }
+    }),
+    activeColor: Theme.palette.active,
+    inactiveColor: Theme.palette.inActive,
+    barStyle: {
+      backgroundColor: Theme.tab.backgroundColor
+    }
   }
 );
 
-@inject('accountStore')
+@inject('accountStore', 'settingsStore')
 @observer
 class MainTabNavigatorWrapper extends React.Component {
   constructor(params) {
     super(params);
 
     this.addLinkingListener();
-    this.state = { redirectData: null, initialLinkingUri: '' };
   }
 
   handleLinkingHandler = event => {
@@ -102,7 +132,6 @@ class MainTabNavigatorWrapper extends React.Component {
     if (data.path && data.path !== '') {
       this.props.navigation.navigate(data.path, data.queryParams);
     }
-    this.setState({ redirectData: data });
   };
 
   addLinkingListener = () => {
@@ -110,12 +139,27 @@ class MainTabNavigatorWrapper extends React.Component {
   };
 
   async componentWillMount() {
-    const initialLinkingUri = await Linking.getInitialURL();
-    const data = ExpoLinking.parse(initialLinkingUri);
-    if (data.path && data.path !== '') {
-      this.props.navigation.navigate(data.path, data.queryParams);
+    const { navigation, settingsStore } = this.props;
+
+    const findLinking = async () => {
+      const initialLinkingUri = await Linking.getInitialURL();
+      const data = ExpoLinking.parse(initialLinkingUri);
+
+      if (data.path && data.path !== '') {
+        navigation.navigate(data.path, data.queryParams);
+      }
+    };
+
+    if (settingsStore.settings.appPincodeEnabled) {
+      navigation.navigate('ConfirmAppPin', {
+        cantBack: true,
+        cb: async () => {
+          findLinking();
+        }
+      });
+    } else {
+      findLinking();
     }
-    this.setState({ initialLinkingUri });
   }
 
   componentWillUnmount() {
@@ -140,6 +184,11 @@ export const MainStackNavigator = createStackNavigator(
   },
   {
     headerMode: 'none',
-    cardStyle: { backgroundColor: '#fff' }
+    cardStyle: { backgroundColor: '#fff' },
+    transitionConfig: () => ({
+      screenInterpolator: sceneProps => {
+        return StackViewStyleInterpolator.forHorizontal(sceneProps);
+      }
+    })
   }
 );

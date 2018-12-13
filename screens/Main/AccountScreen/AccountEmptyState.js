@@ -9,13 +9,13 @@ export class AccountEmptyState extends Component {
   render() {
     return (
       <EmptyState
-        image={require('../../../assets/example.png')}
+        image={require('../../../assets/images/no_account.png')}
         title="No account imported yet"
-        description="When you import account, you can transfer tokens, stake/unstake and sign transaction."
+        description="When you import account, you can use features such as token transfer."
       >
         <Button
           icon="add"
-          mode="outlined"
+          mode="contained"
           onPress={() => this.props.navigation.navigate('ImportAccount')}
         >
           Import Account

@@ -8,16 +8,13 @@ import { ConfirmPincode } from '../../../components/Pincode';
 export class ConfirmAppPinScreen extends Component {
   confirmPin = async (pincode, { setFailure }) => {
     const { pincodeStore, navigation } = this.props;
+    const { params } = navigation.state || {};
 
     try {
       await pincodeStore.validateAppPincode(pincode);
       navigation.goBack(null);
 
-      try {
-        navigation.state.params && navigation.state.params.cb();
-      } catch (error) {
-        console.log(error);
-      }
+      params.cb && params.cb(pincode);
     } catch (error) {
       setFailure();
     }

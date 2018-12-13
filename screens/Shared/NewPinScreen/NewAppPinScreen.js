@@ -8,22 +8,21 @@ import { NewPincode } from '../../../components/Pincode';
 export class NewAppPinScreen extends Component {
   newPin = async pincode => {
     const { pincodeStore, navigation } = this.props;
+    const { params } = navigation.state || {};
 
-    try {
-      await pincodeStore.saveAppPincode(pincode);
-      navigation.state.params && navigation.state.params.cb();
-      navigation.goBack(null);
-    } catch (error) {
-      console.log(error);
-    }
+    await pincodeStore.saveAppPincode(pincode);
+    params.cb && params.cb(pincode);
+    navigation.goBack(null);
   };
 
   render() {
+    const { navigation } = this.props;
+
     return (
       <NewPincode
         description="Set password to secure your app."
         onEnter={this.newPin}
-        backAction={() => this.props.navigation.goBack(null)}
+        backAction={() => navigation.goBack(null)}
       />
     );
   }

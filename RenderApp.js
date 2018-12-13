@@ -1,18 +1,22 @@
 import React, { Component } from 'react';
 import { observable } from 'mobx';
 import { observer, inject } from 'mobx-react/native';
-import { Platform, StatusBar, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { AppLoading, Font, Icon } from 'expo';
 
 import AppNavigator from './navigation/AppNavigator';
+import { MainStackNavigator } from './navigation/navigators';
 
 import { initializeDB } from './db';
 
-@inject('settingsStore', 'networkStore', 'accountStore')
+@inject('pincodeStore', 'settingsStore', 'networkStore', 'accountStore')
 @observer
 export default class RenderApp extends Component {
   @observable
   isLoadingComplete = false;
+
+  @observable
+  initialized = false;
 
   async startAsyncLoading() {
     return Promise.all([
@@ -31,13 +35,26 @@ export default class RenderApp extends Component {
   }
 
   async onFinishLoading() {
-    const { settingsStore, networkStore, accountStore } = this.props;
+    const {
+      pincodeStore,
+      settingsStore,
+      networkStore,
+      accountStore
+    } = this.props;
 
     await Promise.all([
+      pincodeStore.getPincodes(),
       settingsStore.getSettings(),
       networkStore.getNetworks(),
       accountStore.getAccounts()
     ]);
+
+    networkStore.setCurrentNetwork(accountStore.currentAccount);
+
+    // already initialized
+    if (settingsStore.initialized) {
+      this.initialized = true;
+    }
 
     this.isLoadingComplete = true;
   }
@@ -55,8 +72,7 @@ export default class RenderApp extends Component {
 
     return (
       <View style={styles.container}>
-        {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
-        <AppNavigator />
+        {this.initialized ? <MainStackNavigator /> : <AppNavigator />}
       </View>
     );
   }

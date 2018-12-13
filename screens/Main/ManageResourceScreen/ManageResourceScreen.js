@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { SafeAreaView, View } from 'react-native';
 import { createMaterialTopTabNavigator } from 'react-navigation';
 import { Appbar } from 'react-native-paper';
 
@@ -7,7 +6,8 @@ import { StakeResource } from './StakeResource';
 import { UnstakeResource } from './UnstakeResource';
 
 import { Theme } from '../../../constants';
-import HomeStyle from '../../../styles/HomeStyle';
+import { ResourceView } from './ResourceView';
+import { BackgroundView, KeyboardAvoidingView } from '../../../components/View';
 
 const TopTabNavigator = createMaterialTopTabNavigator(
   {
@@ -16,24 +16,43 @@ const TopTabNavigator = createMaterialTopTabNavigator(
   },
   {
     swipeEnabled: false,
-    tabBarOptions: { style: { backgroundColor: Theme.primary } }
+    backBehavior: null,
+    tabBarOptions: {
+      activeTintColor: 'black',
+      inactiveTintColor: 'black',
+      style: {
+        backgroundColor: Theme.app.backgroundColor
+      },
+      indicatorStyle: {
+        backgroundColor: Theme.palette.primary,
+        height: 3
+      }
+    }
   }
 );
 
 class ManageResourceScreen extends Component {
   render() {
     const { navigation } = this.props;
+    const { resourceName } = navigation.state.params;
 
     return (
-      <View style={HomeStyle.container}>
-        <SafeAreaView style={HomeStyle.container}>
-          <Appbar.Header style={{ elevation: 0 }}>
-            <Appbar.BackAction onPress={() => navigation.goBack(null)} />
-            <Appbar.Content title="Manage Resource" />
-          </Appbar.Header>
+      <BackgroundView>
+        <Appbar.Header
+          style={{
+            elevation: 0,
+            backgroundColor: Theme.header.backgroundColor
+          }}
+        >
+          <Appbar.BackAction onPress={() => navigation.goBack(null)} />
+          <Appbar.Content title={`Manage ${resourceName}`} />
+        </Appbar.Header>
+
+        <KeyboardAvoidingView>
+          <ResourceView type={resourceName} />
           <TopTabNavigator navigation={navigation} />
-        </SafeAreaView>
-      </View>
+        </KeyboardAvoidingView>
+      </BackgroundView>
     );
   }
 }

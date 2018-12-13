@@ -1,70 +1,114 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { SafeAreaView } from 'react-native';
-import { Appbar, List, Button, RadioButton } from 'react-native-paper';
+import { View, Alert } from 'react-native';
+import { Icon } from 'expo';
+import {
+  Appbar,
+  Text,
+  Button,
+  TouchableRipple,
+  Caption
+} from 'react-native-paper';
 
-import { ScrollView } from '../../../components/View';
+import { ScrollView, BackgroundView } from '../../../components/View';
 
-import HomeStyle from '../../../styles/HomeStyle';
+import { Theme } from '../../../constants';
+import Chains from '../../../constants/Chains';
+import { AccountEmptyState } from '../AccountScreen';
 
 @inject('accountStore', 'networkStore')
 @observer
 export class AccountsScreen extends Component {
   moveScreen = routeName => this.props.navigation.navigate(routeName);
 
-  changeAccount = accoundId => {
-    this.props.accountStore.changeCurrentAccount(accoundId);
+  changeAccount = (accoundId, chainId) => {
+    this.props.accountStore.changeCurrentAccount(accoundId, chainId);
     this.moveScreen('Account');
   };
 
+  confirmRemoveAccount = accoundId => {
+    Alert.alert(
+      'Confirm Remove Account',
+      'Are you sure you want to remove account?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Confirm', onPress: () => this.removeAccount(accoundId) }
+      ]
+    );
+  };
+
+  removeAccount = accoundId => {
+    const { navigation, accountStore } = this.props;
+
+    navigation.navigate('ConfirmPin', {
+      pinProps: {
+        description: 'Confirm password to remove account.'
+      },
+      cb: async () => {
+        accountStore.removeAccount(accoundId);
+      }
+    });
+  };
+
   render() {
-    const { accountStore, networkStore, navigation } = this.props;
+    const { accountStore, navigation } = this.props;
     const { accounts, currentAccount } = accountStore;
-    const { allNetworks } = networkStore;
 
     return (
-      <SafeAreaView style={HomeStyle.container}>
-        <Appbar.Header>
+      <BackgroundView>
+        <Appbar.Header
+          style={{ backgroundColor: Theme.header.backgroundColor }}
+        >
           <Appbar.BackAction onPress={() => navigation.goBack(null)} />
           <Appbar.Content title="Accounts" />
-          <Appbar.Action
-            icon="add"
-            onPress={() => this.moveScreen('ImportAccount')}
-          />
         </Appbar.Header>
 
-        <ScrollView>
-          <List.Section title="Select to change account">
-            {accounts.map(({ id, name, networkId }) => (
-              <List.Item
-                key={id}
-                title={name}
-                description={
-                  allNetworks.find(({ id }) => id === networkId).name
-                }
-                right={() => (
-                  <RadioButton
-                    status={
-                      name === (currentAccount && currentAccount.name)
-                        ? 'checked'
-                        : 'unchecked'
-                    }
-                  />
-                )}
-                onPress={() => this.changeAccount(id)}
-              />
-            ))}
-          </List.Section>
-        </ScrollView>
+        {!accounts.length ? (
+          <AccountEmptyState />
+        ) : (
+          <React.Fragment>
+            <ScrollView>
+              {accounts.map(({ id, name, chainId }) => (
+                <TouchableRipple
+                  key={id}
+                  style={{
+                    paddingHorizontal: Theme.innerPadding,
+                    paddingVertical: 15
+                  }}
+                  onPress={() => this.changeAccount(id, chainId)}
+                  onLongPress={() => this.confirmRemoveAccount(id)}
+                >
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <View style={{ flex: 1 }}>
+                      <Text>{name}</Text>
+                      <Caption>
+                        {Chains.find(({ id }) => id === chainId).name}
+                      </Caption>
+                    </View>
+                    {currentAccount &&
+                      name === currentAccount.name &&
+                      chainId === currentAccount.chainId && (
+                        <Icon.Ionicons
+                          name="md-checkmark"
+                          color={Theme.palette.primary}
+                          size={25}
+                        />
+                      )}
+                  </View>
+                </TouchableRipple>
+              ))}
+            </ScrollView>
 
-        <Button
-          style={{ margin: 20, padding: 5 }}
-          mode="contained"
-          onPress={() => this.moveScreen('ImportAccount')}
-        >
-          Import account
-        </Button>
-      </SafeAreaView>
+            <Button
+              style={{ margin: 20, padding: 5 }}
+              mode="contained"
+              onPress={() => this.moveScreen('ImportAccount')}
+            >
+              Import account
+            </Button>
+          </React.Fragment>
+        )}
+      </BackgroundView>
     );
   }
 }

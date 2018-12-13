@@ -1,60 +1,56 @@
 import React, { Component } from 'react';
-import { observable } from 'mobx';
 import { observer, inject } from 'mobx-react';
-import { SafeAreaView, ScrollView, View } from 'react-native';
-import {
-  Appbar,
-  Caption,
-  Text,
-  TouchableRipple,
-  Colors,
-  Button,
-  Switch
-} from 'react-native-paper';
-import { Icon } from 'expo';
+import { View, Image } from 'react-native';
+import { Appbar, Text, TouchableRipple, Colors } from 'react-native-paper';
 
-import HomeStyle from '../../../styles/HomeStyle';
+import { Theme } from '../../../constants';
+import { ScrollView, BackgroundView } from '../../../components/View';
 
 const Section = ({ title, children }) => (
   <View>
-    <Caption
+    <View
       style={{
-        marginVertical: 0,
-        paddingHorizontal: 15,
-        paddingVertical: 5,
-        backgroundColor: Colors.grey200
+        backgroundColor: Theme.palette.gray,
+        height: 20
       }}
-    >
-      {title}
-    </Caption>
-    {children}
+    />
+    <View style={{ backgroundColor: Theme.surface.backgroundColor }}>
+      <Text
+        style={{
+          marginTop: 15,
+          marginHorizontal: 20,
+          paddingVertical: 10,
+          fontSize: 13,
+          borderBottomWidth: 1,
+          borderColor: Colors.grey200,
+          color: Colors.grey700
+        }}
+      >
+        {title}
+      </Text>
+      {children}
+    </View>
   </View>
 );
 
-const Item = ({ title, description, onPress, children }) => (
+const Item = ({ title, description, onPress, icon }) => (
   <TouchableRipple
-    style={{ padding: 15, borderBottomWidth: 1, borderColor: Colors.grey200 }}
+    style={{
+      padding: 20,
+      backgroundColor: Theme.surface.backgroundColor
+    }}
     onPress={onPress}
   >
     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-      <Text style={{ flex: 1 }}>{title}</Text>
-      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-        {description && (
-          <Text style={{ marginRight: 15, color: Colors.grey700 }}>
-            {description}
-          </Text>
-        )}
-
-        {children ? (
-          children
-        ) : (
-          <Icon.Ionicons
-            size={18}
-            color={Colors.grey700}
-            name="ios-arrow-forward"
-          />
-        )}
-      </View>
+      <Image
+        resizeMode="contain"
+        source={icon}
+        style={{ width: 20, height: 20, marginRight: 5 }}
+      />
+      <Text style={{ flex: 1, marginLeft: 10, fontSize: 15 }}>{title}</Text>
+      {description && (
+        <Text style={{ color: Theme.palette.darkGray }}>{description}</Text>
+      )}
     </View>
   </TouchableRipple>
 );
@@ -62,40 +58,6 @@ const Item = ({ title, description, onPress, children }) => (
 @inject('accountStore', 'settingsStore')
 @observer
 export class SettingsScreen extends Component {
-  @observable
-  appPincodeEnabled = this.props.settingsStore.settings.appPincodeEnabled;
-
-  toggleAppPincode = () => {
-    const { settingsStore, navigation } = this.props;
-
-    this.appPincodeEnabled = !this.appPincodeEnabled;
-
-    // tricky - when navigate back to settings
-    setTimeout(() => {
-      this.appPincodeEnabled = !this.appPincodeEnabled;
-    }, 1000);
-
-    // check app pincode is enabled
-    if (settingsStore.settings.appPincodeEnabled) {
-      navigation.navigate('ConfirmAppPin', {
-        cb: async () => {
-          await settingsStore.updateSettings({ appPincodeEnabled: false });
-          this.appPincodeEnabled = false;
-        }
-      });
-    } else {
-      navigation.navigate('NewAppPin', {
-        cb: () => {
-          this.appPincodeEnabled = true;
-        }
-      });
-    }
-  };
-
-  signOut = () => {
-    this.moveScreen('Auth');
-  };
-
   moveScreen = routeName => this.props.navigation.navigate(routeName);
 
   render() {
@@ -103,48 +65,50 @@ export class SettingsScreen extends Component {
     const { settings } = this.props.settingsStore;
 
     return (
-      <View style={HomeStyle.container}>
-        <SafeAreaView style={HomeStyle.container}>
-          <Appbar.Header>
-            <Appbar.Content title="Settings" />
-          </Appbar.Header>
-          <ScrollView style={HomeStyle.container}>
-            <Section title="User Settings">
+      <BackgroundView>
+        <Appbar.Header
+          style={{ backgroundColor: Theme.header.backgroundColor }}
+        >
+          <Appbar.Content title="Settings" />
+        </Appbar.Header>
+        <ScrollView style={{ paddingBottom: 50 }}>
+          <Section title="User Settings">
+            <Item
+              title="Accounts"
+              icon={require('../../../assets/icons/account_outline.png')}
+              description={currentAccount && currentAccount.name}
+              onPress={() => this.moveScreen('Accounts')}
+            />
+            {settings.accountPincodeEnabled && (
               <Item
-                title="Accounts"
-                description={currentAccount && currentAccount.name}
-                onPress={() => this.moveScreen('Accounts')}
+                title="Account Pincode"
+                icon={require('../../../assets/icons/pincode_outline.png')}
+                onPress={() => this.moveScreen('SettingsAccountPin')}
               />
-            </Section>
-            <Section title="App Settings">
-              <Item
-                title="Networks"
-                onPress={() => this.moveScreen('SettingsNetwork')}
-              />
-              <Item title="Language" />
-              <Item title="App Pincode" onPress={this.toggleAppPincode}>
-                <Switch
-                  value={this.appPincodeEnabled}
-                  onValueChange={this.toggleAppPincode}
-                />
-              </Item>
-            </Section>
-            <Section title="App Info">
-              <Item title="Support" />
-            </Section>
-
-            {settings.appPincodeEnabled && (
-              <Button
-                style={{ padding: 5, marginTop: 15 }}
-                color={Colors.red500}
-                onPress={this.signOut}
-              >
-                Sign out
-              </Button>
             )}
-          </ScrollView>
-        </SafeAreaView>
-      </View>
+          </Section>
+          <Section title="App Settings">
+            <Item
+              title="Networks"
+              icon={require('../../../assets/icons/networks_outline.png')}
+              onPress={() => this.moveScreen('SettingsNetwork')}
+            />
+            {/* <Item title="Language" /> */}
+            <Item
+              title="App Pincode"
+              icon={require('../../../assets/icons/pincode_outline.png')}
+              onPress={() => this.moveScreen('SettingsAppPin')}
+            />
+          </Section>
+          <Section title="App Info">
+            <Item
+              title="About Us"
+              icon={require('../../../assets/icons/aboutus_outline.png')}
+              onPress={() => this.moveScreen('SettingsAboutUs')}
+            />
+          </Section>
+        </ScrollView>
+      </BackgroundView>
     );
   }
 }
