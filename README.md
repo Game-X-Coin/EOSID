@@ -40,6 +40,12 @@ $ yarn global add expo-cli
 
 ## Getting Started
 
+Set env
+
+```
+$ cp .env.example .env
+```
+
 Install dependencies
 
 ```
