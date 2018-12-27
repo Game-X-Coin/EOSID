@@ -23,7 +23,7 @@
       "icon": "./assets/images/icon_ios.png"
     },
     "android": {
-      "versionCode": 7,
+      "versionCode": 8,
       "package": "io.gamexcoin.eosid",
       "icon": "./assets/images/icon_android.png",
       "intentFilters": [{
