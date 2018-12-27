@@ -75,8 +75,11 @@ export class ImportAccountScreen extends Component {
     this.toggleLoadingDialog();
 
     try {
-      const chain = Chains.find(({ id }) => id === values.chainId);
-      const network = networkStore.getNetwork(chain.id);
+      let network = networkStore.currentNetwork;
+      if (!network && network.chainId !== values.chainId) {
+        const chain = Chains.find(({ id }) => id === values.chainId);
+        network = networkStore.getNetwork(chain.id);
+      }
 
       const accounts = await AccountService.findKeyAccount(
         publicKey,

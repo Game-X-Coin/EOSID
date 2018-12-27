@@ -20,15 +20,16 @@ export default [
     url: 'https://www.zbeos.com',
     logo: 'https://www.zbeos.com/img/zbeoslogo.svg',
     nodes: [
-      {
-        url: 'https://node1.zbeos.com',
-        location: {
-          name: 'ZBnode1',
-          country: 'Singapore',
-          latitude: 1.53,
-          longitude: 103.74
-        }
-      }
+      // not provide history plugin
+      // {
+      //   url: 'https://node1.zbeos.com',
+      //   location: {
+      //     name: 'ZBnode1',
+      //     country: 'Singapore',
+      //     latitude: 1.53,
+      //     longitude: 103.74
+      //   }
+      // }
     ]
   },
   {
@@ -36,15 +37,16 @@ export default [
     url: 'https://www.starteos.io',
     logo: 'https://www.starteos.io/logo/starteos-logo.svg',
     nodes: [
-      {
-        url: 'http://api-mainnet.starteos.io',
-        location: {
-          name: 'Ohio',
-          country: 'US',
-          latitude: 82.9072,
-          longitude: 40.4273
-        }
-      }
+      // not provide history plugin
+      // {
+      //   url: 'http://api-mainnet.starteos.io',
+      //   location: {
+      //     name: 'Ohio',
+      //     country: 'US',
+      //     latitude: 82.9072,
+      //     longitude: 40.4273
+      //   }
+      // }
       // {
       //   url: 'http://api-mainnet1.starteos.io',
       //   location: {
@@ -77,15 +79,16 @@ export default [
     url: 'https://www.bitfinex.com',
     logo: 'https://www.bitfinex.com/assets/bp_symbol.svg',
     nodes: [
-      {
-        url: 'http://eos-bp.bitfinex.com:8888',
-        location: {
-          name: 'London',
-          country: 'GB',
-          latitude: 51.509865,
-          longitude: -0.118092
-        }
-      }
+      // not provide history plugin
+      // {
+      //   url: 'http://eos-bp.bitfinex.com:8888',
+      //   location: {
+      //     name: 'London',
+      //     country: 'GB',
+      //     latitude: 51.509865,
+      //     longitude: -0.118092
+      //   }
+      // }
     ]
   },
   {
@@ -110,7 +113,7 @@ export default [
     logo: 'https://luckybean.keybase.pub/eos_cannon_logo.svg',
     nodes: [
       {
-        url: 'https://mainnet.eoscannon.io',
+        url: 'https://api.jeda.one',
         location: {
           name: 'Hong Kong',
           country: 'HK',
@@ -125,15 +128,16 @@ export default [
     url: 'https://bp.eosnewyork.io',
     logo: 'https://bp.eosnewyork.io/eosnewyorkio.svg',
     nodes: [
-      {
-        url: 'http://api.eosnewyork.io',
-        location: {
-          name: 'primary',
-          country: 'BR',
-          latitude: -23.5505,
-          longitude: -46.6333
-        }
-      }
+      // not product history plugin
+      // {
+      //   url: 'http://api.eosnewyork.io',
+      //   location: {
+      //     name: 'primary',
+      //     country: 'BR',
+      //     latitude: -23.5505,
+      //     longitude: -46.6333
+      //   }
+      // }
     ]
   },
   {
@@ -157,15 +161,16 @@ export default [
     url: 'https://www.bitmars.one',
     logo: 'https://api.bitmars.one:8000/logo.svg',
     nodes: [
-      {
-        url: 'https://api.bitmars.one',
-        location: {
-          name: 'Tokyo',
-          country: 'JP',
-          latitude: 35.7090259,
-          longitude: 139.7319925
-        }
-      }
+      // not provide history plugin
+      // {
+      //   url: 'https://api.bitmars.one',
+      //   location: {
+      //     name: 'Tokyo',
+      //     country: 'JP',
+      //     latitude: 35.7090259,
+      //     longitude: 139.7319925
+      //   }
+      // }
     ]
   },
   {
@@ -173,15 +178,16 @@ export default [
     url: 'https://eosio.sg',
     logo: 'https://image.eosio.sg/EOSIOSG.svg',
     nodes: [
-      {
-        url: 'https://mainnet.eosio.sg',
-        location: {
-          name: 'Taiwan',
-          country: 'TW',
-          latitude: 25.105497,
-          longitude: 121.597366
-        }
-      }
+      // not provide history plugin
+      // {
+      //   url: 'https://mainnet.eosio.sg',
+      //   location: {
+      //     name: 'Taiwan',
+      //     country: 'TW',
+      //     latitude: 25.105497,
+      //     longitude: 121.597366
+      //   }
+      // }
     ]
   },
   {
@@ -254,15 +260,16 @@ export default [
     url: 'https://eoscanada.com',
     logo: 'https://www.eoscanada.com/hubfs/eos-canada-logo-square-01.svg',
     nodes: [
-      {
-        url: 'https://mainnet.eoscanada.com',
-        location: {
-          name: 'Montreal, Canada',
-          country: 'CA',
-          latitude: '45.50884',
-          longitude: -73.58781
-        }
-      }
+      // not provide history plugin
+      // {
+      //   url: 'https://mainnet.eoscanada.com',
+      //   location: {
+      //     name: 'Montreal, Canada',
+      //     country: 'CA',
+      //     latitude: '45.50884',
+      //     longitude: -73.58781
+      //   }
+      // }
     ]
   },
   {
@@ -312,15 +319,16 @@ export default [
     url: 'https://www.eos42.io',
     logo: 'https://www.eos42.io/static/img/eos42_logo_bp.svg',
     nodes: [
-      {
-        url: 'https://nodes.eos42.io',
-        location: {
-          name: 'London',
-          country: 'GB',
-          latitude: 51.51118829,
-          longitude: -0.09617353
-        }
-      }
+      // not provide history plugin
+      // {
+      //   url: 'https://nodes.eos42.io',
+      //   location: {
+      //     name: 'London',
+      //     country: 'GB',
+      //     latitude: 51.51118829,
+      //     longitude: -0.09617353
+      //   }
+      // }
     ]
   },
   {
@@ -344,15 +352,16 @@ export default [
     url: 'https://libertyblock.io',
     logo: 'https://www.libertyblock.io/svg-logo-1.svg',
     nodes: [
-      {
-        url: 'https://mainnet.libertyblock.io:7777',
-        location: {
-          name: 'Toronto, Canada',
-          country: 'CA',
-          latitude: 43.70011,
-          longitude: -79.411079
-        }
-      }
+      // not provide history plugin
+      // {
+      //   url: 'https://mainnet.libertyblock.io:7777',
+      //   location: {
+      //     name: 'Toronto, Canada',
+      //     country: 'CA',
+      //     latitude: 43.70011,
+      //     longitude: -79.411079
+      //   }
+      // }
     ]
   },
   {
@@ -360,15 +369,16 @@ export default [
     url: 'https://eosys.io',
     logo: 'https://eosys.io/logo_eosys.svg',
     nodes: [
-      {
-        url: 'https://rpc.eosys.io',
-        location: {
-          name: 'Seoul',
-          country: 'KR',
-          latitude: 37.5665,
-          longitude: 126.978
-        }
-      }
+      // not provide history plugin
+      // {
+      //   url: 'https://rpc.eosys.io',
+      //   location: {
+      //     name: 'Seoul',
+      //     country: 'KR',
+      //     latitude: 37.5665,
+      //     longitude: 126.978
+      //   }
+      // }
     ]
   },
   {
@@ -377,15 +387,16 @@ export default [
     logo:
       'https://cdn.steemitimages.com/DQmakY4p7oxQPxpPz5VSMdMnwp4SbSUiDjXYuDpDNPpfhcU/EOSeoul_logo.svg',
     nodes: [
-      {
-        url: 'https://api.eoseoul.io',
-        location: {
-          name: 'EOSSeoul-API',
-          country: 'KR',
-          latitude: 37.400226,
-          longitude: 127.104194
-        }
-      }
+      // not provide history plugin
+      // {
+      //   url: 'https://api.eoseoul.io',
+      //   location: {
+      //     name: 'EOSSeoul-API',
+      //     country: 'KR',
+      //     latitude: 37.400226,
+      //     longitude: 127.104194
+      //   }
+      // }
     ]
   },
   {

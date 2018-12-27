@@ -1,4 +1,5 @@
-import { Api, JsSignatureProvider, JsonRpc, Serialize } from 'eosjs-rn';
+import { Api, JsonRpc, Serialize } from 'eosjs-rn';
+import JsSignatureProvider from 'eosjs-rn/dist/eosjs-jssig';
 import ecc from 'eosjs-ecc-rn';
 import { TextDecoder, TextEncoder } from 'text-encoding';
 import Fetch from '../Fetch';
@@ -394,7 +395,6 @@ class EosApi {
             pos = 0;
           }
         }
-        console.log(pos, offset);
 
         return EosApi.HistoryAPI().post('/v1/history/get_actions', {
           pos,
