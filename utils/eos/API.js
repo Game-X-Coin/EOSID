@@ -394,7 +394,6 @@ class EosApi {
             pos = 0;
           }
         }
-        console.log(pos, offset);
 
         return EosApi.HistoryAPI().post('/v1/history/get_actions', {
           pos,
