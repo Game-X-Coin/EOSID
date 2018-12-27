@@ -7,31 +7,48 @@ import {
   Image,
   TouchableWithoutFeedback,
   Animated,
-  Dimensions,
   Platform,
   PanResponder,
-  StatusBar
+  StatusBar,
+  SafeAreaView,
+  Dimensions
 } from 'react-native';
 import { Title, Text, TouchableRipple } from 'react-native-paper';
-import { Icon } from 'expo';
 import { AndroidBackHandler } from 'react-navigation-backhandler';
 
 import { Theme, DarkTheme } from '../../../constants';
 import { PageIndicator } from '../../../components/Indicator';
 import { BackgroundView, ScrollView } from '../../../components/View';
-import Chains from '../../../constants/Chains';
+import { ArrowIcon } from '../../../components/SVG';
+import TokenLogo from '../../../constants/TokenLogo';
 
+const WINDOW_HEIGHT = Dimensions.get('window').height;
 const STATUS_BAR_HEIGHT = Platform.OS === 'ios' ? 0 : StatusBar.currentHeight;
+const SWIPABLE_HEIGHT = 60;
 
 @withNavigation
 @inject('accountStore')
 @observer
 export class AccountInfo extends Component {
   @observable
+  refreshing = false;
+
+  @observable
   drawerVisible = false;
+
+  @observable
+  innerHeight = WINDOW_HEIGHT;
 
   // animate drawer
   drawerFrame = new Animated.Value(0);
+
+  onRefresh = async () => {
+    this.refreshing = true;
+
+    await this.props.accountStore.getTokens();
+
+    this.refreshing = false;
+  };
 
   panResponder = PanResponder.create({
     onMoveShouldSetPanResponder: () => true,
@@ -40,25 +57,33 @@ export class AccountInfo extends Component {
     onPanResponderRelease: (...args) => this.panResponderRelease(...args)
   });
 
-  panResponderMove(evt, { moveY, y0, ...g }) {
+  panResponderMove(evt, getsture) {
+    const { moveY, y0 } = getsture;
+
     if (this.drawerVisible) {
-      this.drawerFrame.setValue(y0 / moveY);
+      const pos = moveY - y0;
+
+      if (pos > 0) {
+        this.drawerFrame.setValue(1 - pos / this.innerHeight);
+      }
     } else {
-      this.drawerFrame.setValue(1 - moveY / y0);
+      const pos = y0 - moveY;
+
+      if (pos > 0) {
+        this.drawerFrame.setValue(pos / this.innerHeight);
+      }
     }
   }
 
   panResponderRelease(evt, { moveY, vy }) {
-    const { height } = Dimensions.get('window');
-
     if (this.drawerVisible) {
-      if (moveY > height / 2 || vy > 0.5) {
+      if (moveY > this.innerHeight / 2 || vy > 0.5) {
         this.hideDrawer();
       } else {
         this.showDrawer();
       }
     } else {
-      if (moveY < height / 2 || vy < -0.5) {
+      if (moveY < this.innerHeight / 2 || vy < -0.5) {
         this.showDrawer();
       } else {
         this.hideDrawer();
@@ -71,7 +96,7 @@ export class AccountInfo extends Component {
 
     Animated.timing(this.drawerFrame, {
       toValue: 1,
-      duration: 150
+      duration: 200
     }).start();
   }
 
@@ -80,26 +105,37 @@ export class AccountInfo extends Component {
 
     Animated.timing(this.drawerFrame, {
       toValue: 0,
-      duration: 150
+      duration: 200
     }).start();
   }
 
-  onBackPress = () => {
+  onBackPress() {
     if (this.drawerVisible) {
       this.hideDrawer();
       return true;
     }
 
     return false;
-  };
+  }
 
   moveScreen = (...args) => this.props.navigation.navigate(...args);
 
   render() {
-    const { tokens, fetched, currentAccount } = this.props.accountStore;
-    const chain = Chains.find(chain => chain.id === currentAccount.chainId);
+    const {
+      info: { total_resources = {} },
+      tokens,
+      fetched,
+      currentAccount
+    } = this.props.accountStore;
 
-    const ActionItem = ({ icon, name, onPress }) => (
+    const { cpu_weight = 0, net_weight = 0 } = total_resources || {};
+
+    const stakedBalance = parseFloat(cpu_weight) + parseFloat(net_weight);
+    const unstakedBalance = tokens.EOS
+      ? parseFloat(tokens.EOS.amount).toFixed(4)
+      : 0;
+
+    const ActionItem = ({ icon, name, description, onPress }) => (
       <View
         style={{
           marginBottom: 15,
@@ -117,262 +153,375 @@ export class AccountInfo extends Component {
           >
             <Image
               style={{
-                paddingHorizontal: 10,
-                width: 20,
-                height: 20
+                padding: 5,
+                width: 17,
+                height: 17
               }}
               source={icon}
             />
-            <Title
-              style={{ marginLeft: 25, paddingVertical: 14, fontSize: 18 }}
+            <Text
+              style={{
+                flex: 1,
+                marginLeft: 20,
+                paddingVertical: 14,
+                ...Theme.h5
+              }}
             >
               {name}
-            </Title>
+            </Text>
+
+            {description && (
+              <Text style={{ ...Theme.p, color: Theme.palette.darkGray }}>
+                {description}
+              </Text>
+            )}
           </View>
         </TouchableRipple>
       </View>
     );
 
     return (
-      <AndroidBackHandler onBackPress={this.onBackPress}>
+      <AndroidBackHandler onBackPress={() => this.onBackPress()}>
         <BackgroundView dark>
-          <Animated.View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              paddingHorizontal: 20,
-              paddingTop: 15 + STATUS_BAR_HEIGHT,
-              opacity: this.drawerFrame.interpolate({
-                inputRange: [0, 1],
-                outputRange: [1, 0]
-              })
-            }}
-          >
-            <View style={{ flex: 1 }} />
-            <TouchableRipple
-              borderless
-              onPress={() => this.moveScreen('Permission')}
+          <SafeAreaView style={{ flex: 1 }}>
+            <View
+              style={{ flex: 1 }}
+              onLayout={event => {
+                this.innerHeight = event.nativeEvent.layout.height;
+              }}
             >
-              <Image
+              <Animated.View
                 style={{
-                  width: 30,
-                  height: 30
+                  opacity: this.drawerFrame.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [1, 0]
+                  })
                 }}
-                source={require('../../../assets/icons/permission.png')}
-              />
-            </TouchableRipple>
-          </Animated.View>
-
-          <Animated.View
-            style={{
-              marginTop: 60,
-              marginHorizontal: 25,
-              opacity: this.drawerFrame.interpolate({
-                inputRange: [0, 1],
-                outputRange: [1, 0]
-              })
-            }}
-          >
-            <ActionItem
-              name="Transfer"
-              icon={require('../../../assets/icons/transfer.png')}
-              onPress={() => this.moveScreen('Transfer')}
-            />
-
-            <ActionItem
-              name="Resource"
-              icon={require('../../../assets/icons/resource.png')}
-              onPress={() => this.moveScreen('Resource')}
-            />
-          </Animated.View>
-
-          <View
-            style={{ flex: 1, backgroundColor: 'transparent' }}
-            {...this.panResponder.panHandlers}
-          />
-
-          <Animated.View
-            style={{
-              position: 'absolute',
-              bottom: 0,
-              left: 0,
-              right: 0,
-              top: this.drawerFrame.interpolate({
-                inputRange: [0, 1],
-                outputRange: [
-                  Dimensions.get('window').height - 120,
-                  STATUS_BAR_HEIGHT
-                ]
-              }),
-              zIndex: 9999,
-              marginHorizontal: this.drawerFrame.interpolate({
-                inputRange: [0, 1],
-                outputRange: [15, 0]
-              }),
-              borderTopLeftRadius: this.drawerFrame.interpolate({
-                inputRange: [0, 1],
-                outputRange: [10, 0]
-              }),
-              borderTopRightRadius: this.drawerFrame.interpolate({
-                inputRange: [0, 1],
-                outputRange: [10, 0]
-              }),
-              overflow: 'hidden'
-            }}
-          >
-            <View {...this.panResponder.panHandlers}>
-              <TouchableWithoutFeedback
-                onPress={() => !this.drawerVisible && this.showDrawer()}
               >
-                <Animated.View
+                <View
                   style={{
-                    backgroundColor: this.drawerFrame.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: ['#343a40', DarkTheme.app.backgroundColor]
-                    })
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    marginHorizontal: Theme.innerSpacing - 5,
+                    paddingTop: 15 + STATUS_BAR_HEIGHT
                   }}
                 >
-                  <View
+                  <View style={{ flex: 1 }} />
+                  <TouchableRipple
+                    borderless
+                    style={{ padding: 5 }}
+                    onPress={() => this.moveScreen('Permission')}
+                  >
+                    <Image
+                      style={{
+                        width: 30,
+                        height: 30
+                      }}
+                      source={require('../../../assets/icons/account.png')}
+                    />
+                  </TouchableRipple>
+                </View>
+
+                <View
+                  style={{
+                    marginVertical: 50
+                  }}
+                >
+                  <Text
                     style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      paddingHorizontal: 20,
-                      height: 60
+                      marginBottom: 5,
+                      textAlign: 'center',
+                      ...DarkTheme.h5
                     }}
+                  >
+                    Total Balance
+                  </Text>
+                  {fetched ? (
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'flex-end',
+                        justifyContent: 'center'
+                      }}
+                    >
+                      <Text
+                        style={{
+                          marginRight: 7,
+                          fontSize: 37,
+                          color: DarkTheme.text.color
+                        }}
+                      >
+                        {unstakedBalance}
+                      </Text>
+                      <Text
+                        style={{
+                          lineHeight: 37,
+                          ...DarkTheme.h4
+                        }}
+                      >
+                        EOS
+                      </Text>
+                    </View>
+                  ) : (
+                    <Text
+                      style={{
+                        textAlign: 'center',
+                        lineHeight: 50,
+                        ...DarkTheme.h3
+                      }}
+                    >
+                      Fetching balance...
+                    </Text>
+                  )}
+                </View>
+
+                <View
+                  style={{
+                    marginHorizontal: Theme.innerSpacing
+                  }}
+                >
+                  <ActionItem
+                    name="Transfer"
+                    icon={require('../../../assets/icons/transfer.png')}
+                    onPress={() => this.moveScreen('Transfer')}
+                  />
+                </View>
+              </Animated.View>
+
+              <View
+                style={{ flex: 1, backgroundColor: 'transparent' }}
+                {...this.panResponder.panHandlers}
+              >
+                <View
+                  style={{
+                    position: 'absolute',
+                    left: 0,
+                    right: 0,
+                    bottom: SWIPABLE_HEIGHT + 10,
+                    alignItems: 'center',
+                    opacity: 0.5
+                  }}
+                >
+                  <ArrowIcon scale="1.5" />
+                </View>
+              </View>
+
+              <Animated.View
+                style={{
+                  position: 'absolute',
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  top: 0,
+                  zIndex: 9999,
+                  marginHorizontal: this.drawerFrame.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [Theme.innerSpacing, 0]
+                  }),
+                  borderRadius: this.drawerFrame.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [10, 0]
+                  }),
+                  transform: [
+                    {
+                      translateY: this.drawerFrame.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [
+                          this.innerHeight - SWIPABLE_HEIGHT,
+                          STATUS_BAR_HEIGHT
+                        ]
+                      })
+                    }
+                  ],
+                  overflow: 'hidden'
+                }}
+              >
+                <View {...this.panResponder.panHandlers}>
+                  <TouchableWithoutFeedback
+                    onPress={() => !this.drawerVisible && this.showDrawer()}
                   >
                     <Animated.View
                       style={{
-                        opacity: this.drawerFrame.interpolate({
+                        backgroundColor: this.drawerFrame.interpolate({
                           inputRange: [0, 1],
-                          outputRange: [0, 1]
-                        }),
-                        marginLeft: this.drawerFrame.interpolate({
-                          inputRange: [0, 1],
-                          outputRange: [-50, 0]
+                          outputRange: [
+                            DarkTheme.surface.backgroundColor,
+                            DarkTheme.app.backgroundColor
+                          ]
                         })
                       }}
-                    >
-                      <TouchableRipple
-                        borderless
-                        onPress={() => this.hideDrawer()}
-                      >
-                        <Icon.Ionicons
-                          name="md-arrow-back"
-                          size={24}
-                          color={DarkTheme.text.color}
-                          style={{ padding: 5 }}
-                        />
-                      </TouchableRipple>
-                    </Animated.View>
-
-                    <View
-                      style={{
-                        flex: 1,
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        paddingLeft: 30
-                      }}
-                    >
-                      <Text style={{ fontWeight: '500', ...DarkTheme.h4 }}>
-                        {currentAccount.name}
-                      </Text>
-                      <Text style={DarkTheme.h4}>'s assets</Text>
-                    </View>
-                  </View>
-
-                  <View
-                    style={{
-                      paddingHorizontal: 20,
-                      marginTop: 50,
-                      marginBottom: 20
-                    }}
-                  >
-                    {fetched ? (
-                      <View>
-                        <Text
-                          style={{
-                            ...DarkTheme.text,
-                            marginBottom: 5,
-                            opacity: 0.8
-                          }}
-                        >
-                          Total
-                        </Text>
-                        <View
-                          style={{
-                            flexDirection: 'row',
-                            alignItems: 'flex-end'
-                          }}
-                        >
-                          <Text style={{ marginRight: 7, ...DarkTheme.h1 }}>
-                            {tokens.EOS}
-                          </Text>
-                          <Text
-                            style={{
-                              lineHeight: DarkTheme.h1.fontSize,
-                              ...DarkTheme.h5
-                            }}
-                          >
-                            EOS
-                          </Text>
-                        </View>
-                      </View>
-                    ) : (
-                      <Text style={DarkTheme.h3}>Fetching assets...</Text>
-                    )}
-                  </View>
-                </Animated.View>
-              </TouchableWithoutFeedback>
-            </View>
-
-            <View
-              style={{
-                flex: 1,
-                backgroundColor: Theme.surface.backgroundColor
-              }}
-            >
-              {!fetched ? (
-                <PageIndicator />
-              ) : (
-                <ScrollView>
-                  {Object.keys(tokens).map(symbol => (
-                    <TouchableRipple
-                      key={symbol}
-                      style={{
-                        paddingHorizontal: Theme.innerPadding
-                      }}
-                      onPress={() => this.moveScreen('Transfer', { symbol })}
                     >
                       <View
                         style={{
                           flexDirection: 'row',
-                          alignItems: 'center'
+                          alignItems: 'center',
+                          paddingHorizontal: Theme.innerPadding,
+                          height: SWIPABLE_HEIGHT
                         }}
                       >
-                        <Image
-                          style={{ marginRight: 15, width: 40, height: 40 }}
-                          source={{
-                            uri:
-                              'https://cdn.freebiesupply.com/logos/large/2x/eos-3-logo-png-transparent.png'
-                          }}
-                        />
-                        <Title
+                        <View
                           style={{
                             flex: 1,
-                            paddingVertical: 25,
-                            ...Theme.h5
+                            flexDirection: 'row',
+                            alignItems: 'center'
                           }}
                         >
-                          {symbol}
-                        </Title>
-                        <Title style={Theme.h5}>{tokens[symbol]}</Title>
+                          <Text style={{ fontWeight: '500', ...DarkTheme.h4 }}>
+                            {currentAccount.name}
+                          </Text>
+                          <Text style={DarkTheme.h4}>'s tokens</Text>
+                        </View>
                       </View>
-                    </TouchableRipple>
-                  ))}
-                </ScrollView>
-              )}
+
+                      <Image
+                        resizeMode="contain"
+                        source={require('../../../assets/logos/eos_large.png')}
+                        style={{
+                          position: 'absolute',
+                          right: 10,
+                          top: 70,
+                          opacity: 0.5,
+                          height: 180
+                        }}
+                      />
+
+                      <View
+                        style={{
+                          paddingHorizontal: 30,
+                          marginTop: 80,
+                          marginBottom: 30
+                        }}
+                      >
+                        <Text
+                          style={{
+                            marginBottom: 5,
+                            ...DarkTheme.h5
+                          }}
+                        >
+                          Total Balance
+                        </Text>
+                        {fetched ? (
+                          <View
+                            style={{
+                              flexDirection: 'row',
+                              alignItems: 'flex-end'
+                            }}
+                          >
+                            <Text
+                              style={{
+                                marginRight: 7,
+                                fontSize: 37,
+                                color: DarkTheme.text.color
+                              }}
+                            >
+                              {unstakedBalance}
+                            </Text>
+                            <Text
+                              style={{
+                                lineHeight: 37,
+                                ...DarkTheme.h4
+                              }}
+                            >
+                              EOS
+                            </Text>
+                          </View>
+                        ) : (
+                          <Text
+                            style={{
+                              lineHeight: 50,
+                              ...DarkTheme.h3
+                            }}
+                          >
+                            Fetching balance...
+                          </Text>
+                        )}
+                      </View>
+
+                      <View
+                        style={{
+                          marginBottom: 10,
+                          alignItems: 'center',
+                          opacity: 0.5
+                        }}
+                      >
+                        <ArrowIcon down scale="1.5" />
+                      </View>
+                    </Animated.View>
+                  </TouchableWithoutFeedback>
+                </View>
+
+                <View
+                  style={{
+                    flex: 1,
+                    backgroundColor: Theme.surface.backgroundColor
+                  }}
+                >
+                  {!fetched ? (
+                    <PageIndicator />
+                  ) : (
+                    <ScrollView
+                      refreshing={this.refreshing}
+                      onRefresh={this.onRefresh}
+                    >
+                      {Object.keys(tokens).map(symbol => (
+                        <TouchableRipple
+                          key={symbol}
+                          style={{
+                            paddingHorizontal: Theme.innerPadding
+                          }}
+                          onPress={() =>
+                            this.moveScreen('Transfer', { symbol })
+                          }
+                        >
+                          <View
+                            style={{
+                              flexDirection: 'row',
+                              alignItems: 'center'
+                            }}
+                          >
+                            {TokenLogo[tokens[symbol].code] &&
+                            TokenLogo[tokens[symbol].code][symbol] ? (
+                              <Image
+                                style={{
+                                  marginRight: 15,
+                                  width: 40,
+                                  height: 40,
+                                  borderRadius: 20
+                                }}
+                                resizeMode="contain"
+                                source={TokenLogo[tokens[symbol].code][symbol]}
+                              />
+                            ) : (
+                              <Image
+                                style={{
+                                  marginRight: 15,
+                                  width: 40,
+                                  height: 40
+                                }}
+                                source={require('../../../assets/images/token_logo/eos.png')}
+                              />
+                            )}
+                            <Title
+                              style={{
+                                flex: 1,
+                                paddingVertical: 25,
+                                ...Theme.h5
+                              }}
+                            >
+                              {symbol}
+                            </Title>
+                            <Title style={Theme.h5}>
+                              {tokens[symbol].amount}
+                            </Title>
+                          </View>
+                        </TouchableRipple>
+                      ))}
+                    </ScrollView>
+                  )}
+                </View>
+              </Animated.View>
             </View>
-          </Animated.View>
+          </SafeAreaView>
         </BackgroundView>
       </AndroidBackHandler>
     );

@@ -46,7 +46,7 @@ import { Theme } from '../../../constants';
             'larger-than-available',
             'You have entered more than you have',
             value => {
-              const availableAmount = tokens[values.symbol];
+              const availableAmount = tokens[values.symbol].amount;
 
               return value && parseFloat(value) <= parseFloat(availableAmount);
             }
@@ -59,7 +59,9 @@ import { Theme } from '../../../constants';
     values,
     { props: { navigation, accountStore }, setSubmitting, setFieldValue }
   ) => {
-    const fixedAmount = parseFloat(values.amount).toFixed(4);
+    const { tokens } = accountStore;
+    const token = tokens[values.symbol];
+    const fixedAmount = parseFloat(values.amount).toFixed(token.precision);
 
     navigation.navigate('ConfirmPin', {
       pinProps: {
@@ -71,7 +73,11 @@ import { Theme } from '../../../constants';
         setFieldValue('showDialog', true);
 
         try {
-          const result = await accountStore.transfer({ ...values, pincode });
+          const result = await accountStore.transfer({
+            ...values,
+            account: token.code,
+            pincode
+          });
 
           navigation.navigate('TransferResult', {
             ...values,
@@ -97,7 +103,6 @@ export class TransferAmountScreen extends Component {
     const {
       navigation,
       accountStore,
-
       values,
       errors,
       touched,
@@ -109,7 +114,7 @@ export class TransferAmountScreen extends Component {
 
     const { tokens } = accountStore;
 
-    const availableAmount = tokens[values.symbol];
+    const availableAmount = tokens[values.symbol].amount;
 
     const tokenData = Object.keys(tokens).map(symbol => ({
       value: symbol
@@ -132,7 +137,7 @@ export class TransferAmountScreen extends Component {
         <KeyboardAvoidingView>
           <ScrollView
             style={{
-              marginHorizontal: Theme.innerSpacing
+              margin: Theme.innerSpacing
             }}
           >
             <TextField

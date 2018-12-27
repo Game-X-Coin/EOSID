@@ -10,7 +10,7 @@ import {
   Caption,
   TouchableRipple
 } from 'react-native-paper';
-import moment from 'moment';
+import moment from '../../../utils/moment';
 
 import api from '../../../utils/eos/API';
 import { TransferLogService } from '../../../services';
@@ -57,7 +57,7 @@ export class TransferLogs extends Component {
         <View style={{ paddingHorizontal: Theme.innerSpacing }}>
           <Text>Recent History</Text>
           <Divider
-            style={{ marginTop: 10, backgroundColor: Theme.pallete.darkGray }}
+            style={{ marginTop: 10, backgroundColor: Theme.palette.darkGray }}
           />
         </View>
 
@@ -78,7 +78,9 @@ export class TransferLogs extends Component {
             >
               <View style={{ flex: 1 }}>
                 <Text>{log.receiver}</Text>
-                <Caption>{moment(log.createdAt).format('YYYY/MM/DD')}</Caption>
+                <Caption>
+                  {moment(new Date(log.createdAt)).format('YYYY/MM/DD')}
+                </Caption>
               </View>
               <Text style={{ fontSize: 15 }}>
                 {log.amount} {log.symbol}
@@ -91,6 +93,7 @@ export class TransferLogs extends Component {
   }
 }
 
+@inject('accountStore')
 @observer
 export class TransferScreen extends Component {
   @observable
@@ -108,17 +111,25 @@ export class TransferScreen extends Component {
 
   onChangeReceiver(v) {
     this.receiver = v;
-    this.error = '';
     this.checkReceiver(v);
   }
 
   async checkReceiver(v) {
+    const { currentAccount } = this.props.accountStore;
     this.loading = true;
+
+    if (currentAccount.name === v) {
+      this.error = 'The receiver and sender can not be the same.';
+      this.loading = false;
+      return;
+    }
 
     const result = await api.accounts.get({ account_name: v });
 
     if (result.error) {
       this.error = 'The account you entered does not exist.';
+    } else {
+      this.error = '';
     }
 
     this.loading = false;
@@ -151,8 +162,7 @@ export class TransferScreen extends Component {
           <ScrollView>
             <View
               style={{
-                marginHorizontal: Theme.innerSpacing,
-                marginBottom: Theme.innerSpacing
+                margin: Theme.innerSpacing
               }}
             >
               <TextField
@@ -175,7 +185,7 @@ export class TransferScreen extends Component {
                   marginBottom: 20,
                   padding: 5
                 }}
-                disabled={!receiver.length || loading || error}
+                disabled={!receiver.length || loading || Boolean(error)}
                 onPress={() => this.handleSubmit()}
               >
                 Next

@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import { View, Image } from 'react-native';
+import { Image } from 'react-native';
 import { Title, Paragraph } from 'react-native-paper';
 
-import { Theme } from '../../constants';
+import { Theme, DarkTheme } from '../../constants';
+import { BackgroundView } from '../View';
 
 export class EmptyState extends Component {
   render() {
@@ -14,16 +15,16 @@ export class EmptyState extends Component {
       imageSize = 250,
       imageStyle,
       titleStyle,
-      descriptionStyle
+      descriptionStyle,
+      dark
     } = this.props;
 
     return (
-      <View
+      <BackgroundView
+        dark={dark}
         style={{
-          flex: 1,
           justifyContent: 'center',
-          alignItems: 'center',
-          backgroundColor: Theme.app.backgroundColor
+          alignItems: 'center'
         }}
       >
         <Image
@@ -31,7 +32,13 @@ export class EmptyState extends Component {
           source={image}
         />
 
-        <Title style={{ marginBottom: 7, fontSize: 22, ...titleStyle }}>
+        <Title
+          style={{
+            marginBottom: 7,
+            ...(dark ? DarkTheme.h4 : Theme.h4),
+            ...titleStyle
+          }}
+        >
           {title}
         </Title>
 
@@ -40,7 +47,8 @@ export class EmptyState extends Component {
             marginBottom: 35,
             paddingHorizontal: 30,
             textAlign: 'center',
-            color: Theme.pallete.darkGray,
+            fontSize: Theme.text.fontSize,
+            color: dark ? Theme.palette.gray : Theme.palette.darkGray,
             ...descriptionStyle
           }}
         >
@@ -48,7 +56,7 @@ export class EmptyState extends Component {
         </Paragraph>
 
         {children}
-      </View>
+      </BackgroundView>
     );
   }
 }

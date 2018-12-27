@@ -2,10 +2,11 @@ import { observable, action, computed } from 'mobx';
 
 import NetworkService from '../services/NetworkService';
 
-import { DEFAULT_NETWORKS, DEFAULT_CHAIN } from '../constants';
+import { DEFAULT_CHAIN } from '../constants';
 import Chains from '../constants/Chains';
 
 import api from '../utils/eos/API';
+import SettingsStore from './SettingsStore';
 
 class Store {
   @observable
@@ -15,44 +16,44 @@ class Store {
   }, {});
 
   @observable
-  defaultNetworks = DEFAULT_NETWORKS;
-
-  @observable
   customNetworks = [];
 
   @observable
-  currentNetwork = this.defaultNetworks[0];
-
-  @observable
-  currentChain = DEFAULT_CHAIN;
+  currentNetwork = null;
 
   @computed
   get allNetworks() {
-    return [...this.defaultNetworks, ...this.customNetworks];
+    const keys = Object.keys(this.chains);
+    return keys.reduce((ac, key) => [...ac, this.chains[key].nodes || []], []);
   }
 
   @action
   getNetwork(chainId) {
-    if (
-      chainId &&
-      (!this.currentNetwork.nodes || this.currentNetwork.chainId !== chainId)
-    ) {
+    const { currentChainId } = SettingsStore.settings;
+    if (chainId && currentChainId && currentChainId !== chainId) {
       const chain = this.chains[chainId];
-      this.currentNetwork = chain.nodes
-        ? chain.nodes[0]
-        : this.defaultNetworks[0];
+      this.currentNetwork = chain.nodes ? chain.nodes[0] : null;
     } else {
       this.currentNetwork =
-        (this.chains[chainId || this.currentChain || 0].nodes || [])[0] ||
-        this.defaultNetworks[0];
+        (this.chains[chainId || currentChainId || DEFAULT_CHAIN].nodes ||
+          [])[0] || null;
     }
 
     return this.currentNetwork;
   }
 
   @action
-  setCurrentNetwork(account) {
-    api.currentNetwork = this.getNetwork(account && account.chainId);
+  setCurrentNetwork(account, chainId, networkId) {
+    let network = null;
+    if (chainId && typeof networkId !== 'undefined') {
+      network = (this.chains[chainId].nodes || []).find(
+        node => node.id === networkId
+      );
+    } else {
+      network = this.getNetwork(account && account.chainId);
+    }
+    api.currentNetwork = network;
+    this.currentNetwork = network;
   }
 
   @action

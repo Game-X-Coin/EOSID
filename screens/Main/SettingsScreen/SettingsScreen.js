@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
-import { View } from 'react-native';
+import { View, Image } from 'react-native';
 import { Appbar, Text, TouchableRipple, Colors } from 'react-native-paper';
-import { Icon } from 'expo';
 
 import { Theme } from '../../../constants';
 import { ScrollView, BackgroundView } from '../../../components/View';
@@ -11,7 +10,7 @@ const Section = ({ title, children }) => (
   <View>
     <View
       style={{
-        backgroundColor: Theme.pallete.gray,
+        backgroundColor: Theme.palette.gray,
         height: 20
       }}
     />
@@ -34,32 +33,24 @@ const Section = ({ title, children }) => (
   </View>
 );
 
-const Item = ({ title, description, onPress, children }) => (
+const Item = ({ title, description, onPress, icon }) => (
   <TouchableRipple
     style={{
-      padding: 20
+      padding: 20,
+      backgroundColor: Theme.surface.backgroundColor
     }}
     onPress={onPress}
   >
     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+      <Image
+        resizeMode="contain"
+        source={icon}
+        style={{ width: 20, height: 20, marginRight: 5 }}
+      />
       <Text style={{ flex: 1, marginLeft: 10, fontSize: 15 }}>{title}</Text>
-      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-        {description && (
-          <Text style={{ marginRight: 15, color: Colors.grey600 }}>
-            {description}
-          </Text>
-        )}
-
-        {children ? (
-          children
-        ) : (
-          <Icon.Ionicons
-            size={18}
-            color={Colors.grey600}
-            name="ios-arrow-forward"
-          />
-        )}
-      </View>
+      {description && (
+        <Text style={{ color: Theme.palette.darkGray }}>{description}</Text>
+      )}
     </View>
   </TouchableRipple>
 );
@@ -84,12 +75,14 @@ export class SettingsScreen extends Component {
           <Section title="User Settings">
             <Item
               title="Accounts"
+              icon={require('../../../assets/icons/account_outline.png')}
               description={currentAccount && currentAccount.name}
               onPress={() => this.moveScreen('Accounts')}
             />
             {settings.accountPincodeEnabled && (
               <Item
                 title="Account Pincode"
+                icon={require('../../../assets/icons/pincode_outline.png')}
                 onPress={() => this.moveScreen('SettingsAccountPin')}
               />
             )}
@@ -97,16 +90,22 @@ export class SettingsScreen extends Component {
           <Section title="App Settings">
             <Item
               title="Networks"
+              icon={require('../../../assets/icons/networks_outline.png')}
               onPress={() => this.moveScreen('SettingsNetwork')}
             />
             {/* <Item title="Language" /> */}
             <Item
               title="App Pincode"
+              icon={require('../../../assets/icons/pincode_outline.png')}
               onPress={() => this.moveScreen('SettingsAppPin')}
             />
           </Section>
           <Section title="App Info">
-            <Item title="Support" />
+            <Item
+              title="About Us"
+              icon={require('../../../assets/icons/aboutus_outline.png')}
+              onPress={() => this.moveScreen('SettingsAboutUs')}
+            />
           </Section>
         </ScrollView>
       </BackgroundView>

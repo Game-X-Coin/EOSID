@@ -7,6 +7,7 @@ import NetworkStore from './NetworkStore';
 import SettingsStore from './SettingsStore';
 
 import api from '../utils/eos/API';
+import TokenContracts from '../constants/TokenContracts';
 
 class Store {
   @observable
@@ -47,22 +48,35 @@ class Store {
 
   @computed
   get currentAccount() {
-    const { accountId } = SettingsStore.settings;
-
-    let account = this.accounts.find(account => account.id === accountId);
-    if (!account && this.accounts.length) {
-      account = this.accounts[0];
+    const { accountId, chainId } = SettingsStore.settings;
+    let accounts = this.accounts.filter(account => account.chainId === chainId);
+    let account = accounts.find(account => account.id === accountId);
+    if (!account && accounts.length) {
+      account = accounts[0];
     }
     return account;
   }
 
   @action
-  async changeCurrentAccount(accountId, chainId) {
-    if (accountId !== (this.currentAccount && this.currentAccount.accountId)) {
+  async changeCurrentAccount(accountId, chainId, networkId) {
+    if (!chainId) {
+      chainId = SettingsStore.settings.chainId;
+    }
+    if (!accountId && this.accounts) {
+      accountId = (
+        this.accounts.find(account => account.chainId === chainId) || {}
+      ).id;
+    }
+
+    if (
+      !accountId ||
+      accountId !== (this.currentAccount && this.currentAccount.accountId)
+    ) {
       // update settings
       await SettingsStore.updateSettings({ accountId, chainId });
+
       // set current network
-      NetworkStore.setCurrentNetwork(this.currentAccount);
+      NetworkStore.setCurrentNetwork(this.currentAccount, chainId, networkId);
       // fetch account info
       await this.getAccountInfo();
     }
@@ -74,10 +88,13 @@ class Store {
   }
 
   @action
-  async getAccounts() {
-    const currentNetwork = NetworkStore.currentNetwork;
-    return AccountService.getAccounts(currentNetwork.chainId).then(accounts => {
+  async getAccounts(chainId) {
+    return AccountService.getAccounts().then(accounts => {
       this.setAccounts(accounts);
+      if (chainId) {
+        return this.accounts.filter(account => account.chainId === chainId);
+      }
+      return accounts;
     });
   }
 
@@ -89,7 +106,7 @@ class Store {
       // remove duplicate entity
       const accounts = this.accounts.filter(
         entity =>
-          entity.name !== account.name && entity.chainId !== account.chainId
+          entity.name !== account.name || entity.chainId !== account.chainId
       );
       accounts.push(account);
 
@@ -149,16 +166,31 @@ class Store {
 
   async getTokens() {
     const account = this.currentAccount;
+    const { chainId } = SettingsStore.settings;
 
-    const tokens = await api.currency.balance({ account: account.name });
+    if (!Object.keys(this.tokens).length) {
+      this.tokens = {
+        EOS: { amount: '0.0000', code: 'eosio.token' }
+      };
+    }
 
-    this.tokens = {
-      EOS: '0.0000',
-      ...tokens.reduce((ac, v) => {
-        const [amount, symbol] = v.split(' ');
-        return { ...ac, [symbol]: amount };
-      }, {})
-    };
+    TokenContracts[chainId].forEach(async contract => {
+      const balances = await api.currency.balance({
+        code: contract,
+        account: account.name
+      });
+      if (balances && balances.length) {
+        const tokens = balances.reduce((ac, v) => {
+          const [amount, symbol] = v.split(' ');
+          const precision = amount.split('.')[1].length;
+          return { ...ac, [symbol]: { amount, code: contract, precision } };
+        }, {});
+        this.tokens = {
+          ...this.tokens,
+          ...tokens
+        };
+      }
+    });
   }
 
   async getActions(page = 1) {
@@ -173,11 +205,16 @@ class Store {
       ? lastestActions[0].account_action_seq
       : 0;
 
-    const { actions = [] } = await api.actions.gets({
+    let { actions = [] } = await api.actions.gets({
       account_name: account.name,
       lastestSeq,
       page
     });
+
+    actions = actions.filter(
+      action =>
+        action.action_trace.receipt.receiver === action.action_trace.act.account
+    );
 
     // when refresh actions
     if (page === 1) {
@@ -223,7 +260,7 @@ class Store {
       permission: key.permission
     }).then(async tx => {
       await this.getInfo();
-      this.getTokens();
+      await this.getTokens();
       this.getActions();
 
       return tx;

@@ -1,33 +1,36 @@
 const tintColor = '#0d0d0d';
 
-const pallete = {
+const palette = {
   primary: tintColor,
   secondary: '#ff4b34',
   tertiary: '#33ba20',
   quaternary: '#ffd111',
+
   active: tintColor,
   inActive: '#bababa',
+  info: '#539cf8',
+  error: '#d32f2f',
+
   gray: '#f5f5f5',
   darkGray: '#838283',
   white: '#fff',
-  transparent: 'transparent',
-  error: '#d32f2f'
+  transparent: 'transparent'
 };
 
 const app = {
-  backgroundColor: pallete.white
+  backgroundColor: palette.white
 };
 
 const header = {
-  backgroundColor: pallete.transparent
+  backgroundColor: palette.primary
 };
 
 const tab = {
-  backgroundColor: pallete.white
+  backgroundColor: palette.white
 };
 
 const surface = {
-  backgroundColor: pallete.white,
+  backgroundColor: palette.white,
   borderRadius: 5,
   overflow: 'hidden'
 };
@@ -42,7 +45,7 @@ const p = {
 };
 
 const generateHeadings = color =>
-  [30, 27, 24, 20, 17].reduce((pv, cv, i) => {
+  [32, 28, 24, 20, 17].reduce((pv, cv, i) => {
     return {
       ...pv,
       [`h${i + 1}`]: {
@@ -55,10 +58,10 @@ const generateHeadings = color =>
 
 export const Theme = {
   paper: {
-    colors: pallete
+    colors: palette
   },
 
-  pallete,
+  palette,
 
   app,
   header,
@@ -85,10 +88,10 @@ export const Theme = {
 
 export const DarkTheme = {
   paper: {
-    colors: pallete
+    colors: palette
   },
 
-  pallete,
+  palette,
 
   app: {
     ...app,
@@ -102,16 +105,16 @@ export const DarkTheme = {
 
   surface: {
     ...surface,
-    backgroundColor: '#3a3a3a'
+    backgroundColor: '#2e2e2e'
   },
 
   text: {
     ...text,
-    color: pallete.white
+    color: palette.white
   },
   p: {
     ...p,
-    color: pallete.white
+    color: palette.white
   },
-  ...generateHeadings(pallete.white)
+  ...generateHeadings(palette.white)
 };

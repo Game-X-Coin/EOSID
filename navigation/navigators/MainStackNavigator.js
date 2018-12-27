@@ -3,7 +3,9 @@ import { observer, inject } from 'mobx-react';
 import { Linking } from 'react-native';
 import { createStackNavigator } from 'react-navigation';
 import { createMaterialBottomTabNavigator } from 'react-navigation-material-bottom-tabs';
-import { Icon, Linking as ExpoLinking } from 'expo';
+import { Linking as ExpoLinking } from 'expo';
+
+import StackViewStyleInterpolator from 'react-navigation-stack/dist/views/StackView/StackViewStyleInterpolator';
 
 import {
   AccountScreen,
@@ -21,7 +23,8 @@ import {
   ActivityDetailScreen,
   ResourceScreen,
   SettingsAppPinScreen,
-  SettingsAccountPinScreen
+  SettingsAccountPinScreen,
+  AboutUsScreen
 } from '../../screens/Main';
 
 import {
@@ -35,6 +38,12 @@ import {
 } from '../../screens/Shared';
 
 import { Theme } from '../../constants';
+import {
+  BalanceIcon,
+  ResourceIcon,
+  ActivityIcon,
+  SettingsIcon
+} from '../../components/SVG';
 
 // detail screens
 const DetailScreens = {
@@ -50,6 +59,7 @@ const DetailScreens = {
   SettingsNetwork: SettingsNetworkScreen,
   SettingsAppPin: SettingsAppPinScreen,
   SettingsAccountPin: SettingsAccountPinScreen,
+  SettingsAboutUs: AboutUsScreen,
   AddNetwork: AddNetworkScreen,
   Accounts: AccountsScreen,
   // activity
@@ -67,51 +77,54 @@ const DetailScreens = {
   ShowSuccess: ShowSuccessScreen
 };
 
-// for tab icons
 const iconMap = {
-  Account: 'md-contact',
-  Activity: 'md-filing',
-  Settings: 'md-settings'
+  Account: BalanceIcon,
+  Activity: ActivityIcon,
+  Resources: ResourceIcon,
+  Settings: SettingsIcon
+};
+
+const labelMap = {
+  Account: 'Balance',
+  Activity: 'Activities',
+  Resources: 'Resources',
+  Settings: 'Settings'
 };
 
 // tab navigator
 const MainTabNavigator = createMaterialBottomTabNavigator(
   {
     Account: AccountScreen,
+    Resources: ResourceScreen,
     Activity: ActivityScreen,
     Settings: SettingsScreen
   },
   {
-    navigationOptions: ({ navigation }) => ({
+    navigationOptions: ({
+      navigation: {
+        state: { routeName }
+      }
+    }) => ({
+      title: labelMap[routeName],
       tabBarIcon: ({ tintColor }) => {
-        const { routeName } = navigation.state;
-
-        return (
-          <Icon.Ionicons
-            size={26}
-            name={iconMap[routeName]}
-            color={tintColor}
-          />
-        );
+        return iconMap[routeName]({ color: tintColor });
       }
     }),
-    shifting: true,
-    activeColor: Theme.pallete.active,
-    inactiveColor: Theme.pallete.inActive,
+    activeColor: Theme.palette.active,
+    inactiveColor: Theme.palette.inActive,
     barStyle: {
       backgroundColor: Theme.tab.backgroundColor
     }
   }
 );
 
-@inject('accountStore')
+@inject('accountStore', 'settingsStore')
 @observer
 class MainTabNavigatorWrapper extends React.Component {
   constructor(params) {
     super(params);
 
     this.addLinkingListener();
-    this.state = { redirectData: null, initialLinkingUri: '' };
   }
 
   handleLinkingHandler = event => {
@@ -119,7 +132,6 @@ class MainTabNavigatorWrapper extends React.Component {
     if (data.path && data.path !== '') {
       this.props.navigation.navigate(data.path, data.queryParams);
     }
-    this.setState({ redirectData: data });
   };
 
   addLinkingListener = () => {
@@ -127,12 +139,27 @@ class MainTabNavigatorWrapper extends React.Component {
   };
 
   async componentWillMount() {
-    const initialLinkingUri = await Linking.getInitialURL();
-    const data = ExpoLinking.parse(initialLinkingUri);
-    if (data.path && data.path !== '') {
-      this.props.navigation.navigate(data.path, data.queryParams);
+    const { navigation, settingsStore } = this.props;
+
+    const findLinking = async () => {
+      const initialLinkingUri = await Linking.getInitialURL();
+      const data = ExpoLinking.parse(initialLinkingUri);
+
+      if (data.path && data.path !== '') {
+        navigation.navigate(data.path, data.queryParams);
+      }
+    };
+
+    if (settingsStore.settings.appPincodeEnabled) {
+      navigation.navigate('ConfirmAppPin', {
+        cantBack: true,
+        cb: async () => {
+          findLinking();
+        }
+      });
+    } else {
+      findLinking();
     }
-    this.setState({ initialLinkingUri });
   }
 
   componentWillUnmount() {
@@ -157,30 +184,11 @@ export const MainStackNavigator = createStackNavigator(
   },
   {
     headerMode: 'none',
-    cardStyle: { backgroundColor: '#fff' }
-    /* transitionConfig: () => ({
-      transitionSpec: {
-        duration: 300,
-        easing: Easing.out(Easing.bezier(0.42, 0, 1, 1)),
-        timing: Animated.timing,
-        useNativeDriver: true
-      },
-      screenInterpolator: ({ layout, position, scene }) => {
-        const { index } = scene;
-        const { initWidth } = layout;
-
-        const translateX = position.interpolate({
-          inputRange: [index - 1, index, index + 1],
-          outputRange: [initWidth, 0, -30]
-        });
-
-        const opacity = position.interpolate({
-          inputRange: [index - 1, index - 0.99, index],
-          outputRange: [0, 1, 1]
-        });
-
-        return { opacity, transform: [{ translateX }] };
+    cardStyle: { backgroundColor: '#fff' },
+    transitionConfig: () => ({
+      screenInterpolator: sceneProps => {
+        return StackViewStyleInterpolator.forHorizontal(sceneProps);
       }
-    }) */
+    })
   }
 );

@@ -2,10 +2,9 @@ import { Api, JsSignatureProvider, JsonRpc, Serialize } from 'eosjs-rn';
 import ecc from 'eosjs-ecc-rn';
 import { TextDecoder, TextEncoder } from 'text-encoding';
 import Fetch from '../Fetch';
-import { DEFAULT_NETWORKS } from '../../constants';
 
 class EosApi {
-  static currentNetwork = DEFAULT_NETWORKS ? DEFAULT_NETWORKS[0] : null;
+  static currentNetwork = null;
   static FetchChain = null;
   static FetchHistory = null;
   static isJungleNet = false;
@@ -133,14 +132,19 @@ class EosApi {
               `${field.name} is required, ${field.name} parameter missing`
             );
           }
-          if (field.type === 'extended_asset') {
+          if (field.type.endsWith('?') || field.type.endsWith('$')) {
+            // optional type or extension type
+            if (!params.hasOwnProperty(field.name)) {
+              return;
+            }
+          } else if (field.type === 'extended_asset') {
             data[field.name] = {
               quantity: params[field.name],
               contract: account
             };
-          } else {
-            data[field.name] = params[field.name];
+            return;
           }
+          data[field.name] = params[field.name];
         });
         return data;
       },
@@ -381,12 +385,20 @@ class EosApi {
         }),
       getsLastest: ({ account_name }) =>
         EosApi.actions.gets({ pos: -1, offset: -1, account_name }),
-      gets: ({ lastestSeq, page = 1, offset = 10, account_name }) => {
-        const pos = lastestSeq - page * offset;
+      gets: ({ lastestSeq, pos, page = 1, offset = 10, account_name }) => {
+        if (!pos) {
+          pos = lastestSeq - page * offset + 1;
+          offset = offset - 1;
+          if (pos < 0) {
+            offset = pos + offset;
+            pos = 0;
+          }
+        }
+        console.log(pos, offset);
 
         return EosApi.HistoryAPI().post('/v1/history/get_actions', {
           pos,
-          offset: offset - 1,
+          offset,
           account_name
         });
       }

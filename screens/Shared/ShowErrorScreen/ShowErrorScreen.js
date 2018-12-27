@@ -3,7 +3,8 @@ import { View } from 'react-native';
 import { Text, Appbar } from 'react-native-paper';
 
 import { EmptyState } from '../../../components/EmptyState';
-import { Theme } from '../../../constants';
+import { Theme, DarkTheme } from '../../../constants';
+import { BackgroundView } from '../../../components/View';
 
 export class ShowErrorScreen extends Component {
   render() {
@@ -14,6 +15,7 @@ export class ShowErrorScreen extends Component {
     return (
       <View style={{ flex: 1 }}>
         <Appbar.Header
+          dark
           style={{
             justifyContent: 'flex-end',
             backgroundColor: Theme.header.backgroundColor
@@ -23,6 +25,7 @@ export class ShowErrorScreen extends Component {
         </Appbar.Header>
 
         <EmptyState
+          dark
           image={require('../../../assets/images/error.png')}
           title={title}
           description={description}
@@ -33,11 +36,11 @@ export class ShowErrorScreen extends Component {
               marginBottom: 35,
               padding: 15,
               width: '80%',
-              backgroundColor: Theme.pallete.gray,
+              backgroundColor: DarkTheme.surface.backgroundColor,
               borderRadius: 5
             }}
           >
-            <Text>{error}</Text>
+            <Text style={{ color: Theme.palette.gray }}>{error}</Text>
           </View>
         </EmptyState>
       </View>

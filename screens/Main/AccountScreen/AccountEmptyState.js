@@ -11,7 +11,7 @@ export class AccountEmptyState extends Component {
       <EmptyState
         image={require('../../../assets/images/no_account.png')}
         title="No account imported yet"
-        description="When you import account, you can transfer tokens, stake/unstake and sign transaction."
+        description="When you import account, you can use features such as token transfer."
       >
         <Button
           icon="add"

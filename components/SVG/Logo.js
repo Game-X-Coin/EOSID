@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import { Svg } from 'expo';
 
-export default class Logo extends Component {
+export class Logo extends Component {
   render() {
-    const { width = 1, height = 1 } = this.props;
+    const { scale = 1 } = this.props;
+
     return (
-      <Svg height={27 * height} width={36 * width} viewBox="0 0 36 27">
+      <Svg width={36 * scale} height={27 * scale} viewBox="0 0 36 27">
         <Svg.Polygon fill="#FFD111" points="0 18 9 27 18 18" />
         <Svg.Polygon
           fill="#0070BE"

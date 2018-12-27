@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { View, Clipboard } from 'react-native';
 import { Appbar, Button, Text, Colors } from 'react-native-paper';
-import { Icon } from 'expo';
 import Toast from '@rimiti/react-native-toastify';
 
 import { Theme } from '../../../constants';
@@ -34,35 +33,30 @@ export class PermissionScreen extends Component {
           style={{ backgroundColor: Theme.header.backgroundColor }}
         >
           <Appbar.BackAction onPress={() => navigation.goBack(null)} />
-          <Appbar.Content title="Permission" />
+          <Appbar.Content title="Account" />
         </Appbar.Header>
 
         <Toast ref={c => (this.toast = c)} />
 
         <ScrollView>
-          <View style={{ height: 20, backgroundColor: Theme.pallete.gray }} />
+          <View style={{ height: 20, backgroundColor: Theme.palette.gray }} />
 
           <View
             style={{
               flexDirection: 'row',
               alignItems: 'center',
-              padding: 15,
+              padding: 20,
               ...Theme.surface
             }}
           >
-            <View
-              style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}
+            <Text
+              style={{
+                flex: 1,
+                ...Theme.h5
+              }}
             >
-              <Icon.Ionicons name="md-contact" size={30} />
-              <Text
-                style={{
-                  marginLeft: 20,
-                  ...Theme.h5
-                }}
-              >
-                Account
-              </Text>
-            </View>
+              Account
+            </Text>
 
             <Text style={Theme.h5}>{name}</Text>
           </View>
@@ -75,7 +69,7 @@ export class PermissionScreen extends Component {
             return (
               <View
                 key={permission}
-                style={{ backgroundColor: Theme.pallete.gray }}
+                style={{ backgroundColor: Theme.palette.gray }}
               >
                 <View style={{ height: 20 }} />
 

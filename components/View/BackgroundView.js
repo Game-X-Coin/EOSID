@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View } from 'react-native';
+import { View, StatusBar } from 'react-native';
 
 import { Theme, DarkTheme } from '../../constants';
 
@@ -8,18 +8,21 @@ export class BackgroundView extends Component {
     const { dark, style, children, ...props } = this.props;
 
     return (
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: dark
-            ? DarkTheme.app.backgroundColor
-            : Theme.app.backgroundColor,
-          ...style
-        }}
-        {...props}
-      >
-        {children}
-      </View>
+      <React.Fragment>
+        <StatusBar barStyle="light-content" />
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: dark
+              ? DarkTheme.app.backgroundColor
+              : Theme.app.backgroundColor,
+            ...style
+          }}
+          {...props}
+        >
+          {children}
+        </View>
+      </React.Fragment>
     );
   }
 }
