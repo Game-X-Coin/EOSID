@@ -65,16 +65,20 @@ export class AboutUsScreen extends Component {
             }}
           >
             <Item
-              title="Homepage"
-              onPress={() => this.openBrowser('https://gamexcoin.io')}
+              title="GameXCoin Homepage"
+              onPress={() =>
+                this.openBrowser('https://gamexcoin.io?from=EOSID')
+              }
             />
             <Item
-              title="Telegram"
+              title="Telegram - Marketing Channel"
               onPress={() => this.openBrowser('https://t.me/GXC_EN')}
             />
             <Item
-              title="Github"
-              onPress={() => this.openBrowser('https://github.com/game-x-coin')}
+              title="Github - Open Source"
+              onPress={() =>
+                this.openBrowser('https://github.com/game-x-coin/EOSID')
+              }
             />
             <Item
               title="Privacy Policy"
