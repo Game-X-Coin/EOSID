@@ -20,7 +20,7 @@
 
 [Android](https://play.google.com/store/apps/details?id=io.gamexcoin.eosid)
 
-iOS (comming soon)
+iOS (coming soon)
 
 # Development
 
@@ -72,6 +72,6 @@ $ yarn run build:ios
 
 # License
 
-This project is licensed under the GPLv3 License
+This project is licensed under the MIT License
 
 [more info](./LICENSE)
